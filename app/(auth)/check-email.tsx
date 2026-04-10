@@ -1,0 +1,67 @@
+import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
+import { Text, View } from 'react-native';
+import { BaseButton } from '@/components/base/display/BaseButton';
+import { HintBox } from '@/components/base/display/HintBox';
+import { ScreenContainer } from '@/components/base/layout/ScreenContainer';
+import { colors, spacing, typography } from '@/shared/theme/tokens';
+
+export default function CheckEmailScreen() {
+ const { t } = useTranslation();
+ const router = useRouter();
+
+ return (
+  <ScreenContainer
+   scrollable={false}
+   style={{ justifyContent: 'center', alignItems: 'center' }}
+   contentContainerStyle={{ paddingHorizontal: spacing.xl }}
+  >
+   <View style={{ alignItems: 'center', paddingHorizontal: spacing.xl }}>
+    <Text style={{ fontSize: 72, marginBottom: spacing.lg }}>{t('auth.checkEmail.icon')}</Text>
+
+    <Text
+     style={{
+      color: colors.text.primary,
+      fontSize: typography.size['2xl'],
+      fontWeight: typography.weight.bold as '700',
+      textAlign: 'center',
+      marginBottom: spacing.sm,
+     }}
+    >
+     {t('auth.checkEmail.title')}
+    </Text>
+
+    <Text
+     style={{
+      color: colors.text.secondary,
+      fontSize: typography.size.md,
+      textAlign: 'center',
+      marginBottom: spacing.md,
+      lineHeight: Math.ceil(typography.size.md * typography.lineHeight.normal),
+     }}
+    >
+     {t('auth.checkEmail.subtitle')}
+    </Text>
+
+    <HintBox style={{ marginBottom: spacing['2xl'] }}>
+     <Text
+      style={{
+       color: colors.text.secondary,
+       fontSize: typography.size.sm,
+       textAlign: 'center',
+       lineHeight: Math.ceil(typography.size.sm * typography.lineHeight.normal),
+      }}
+     >
+      {t('auth.checkEmail.hint')}
+     </Text>
+    </HintBox>
+
+    <BaseButton
+     label={t('auth.checkEmail.backToLogin')}
+     variant="outlined"
+     onPress={() => router.replace('/(auth)/login')}
+    />
+   </View>
+  </ScreenContainer>
+ );
+}

@@ -1,0 +1,6 @@
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind directives are processed during the build pipeline. */
+@tailwind base;
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind directives are processed during the build pipeline. */
+@tailwind components;
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind directives are processed during the build pipeline. */
+@tailwind utilities;
