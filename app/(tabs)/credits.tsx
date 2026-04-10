@@ -5,8 +5,8 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ExternalLinkCard } from '@/components/base/display/ExternalLinkCard';
 import { Card } from '@/components/base/display/Card';
+import { ExternalLinkCard } from '@/components/base/display/ExternalLinkCard';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { ScreenHeader } from '@/components/base/layout/ScreenHeader';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
@@ -132,14 +132,14 @@ export default function CreditsScreen() {
  ];
 
  const creatorLinks: CreditLink[] = [
-   {
-     key: 'github',
-     title: 'GitHub',
-     subtitle: t('credits.githubSubtitle'),
-     accentColor: '#F4F4FF',
-     mark: <BrandMark iconName="github" brand accentColor="#F4F4FF" label="GH" />,
-     url: 'https://github.com/Franiix',
-   },
+  {
+   key: 'github',
+   title: 'GitHub',
+   subtitle: t('credits.githubSubtitle'),
+   accentColor: '#F4F4FF',
+   mark: <BrandMark iconName="github" brand accentColor="#F4F4FF" label="GH" />,
+   url: 'https://github.com/Franiix',
+  },
   {
    key: 'linkedin',
    title: 'LinkedIn',
@@ -157,7 +157,7 @@ export default function CreditsScreen() {
    subtitle: t('credits.termsSubtitle'),
    accentColor: '#7B73FF',
    mark: <BrandMark iconName="file-contract" accentColor="#7B73FF" label="T" />,
-   url: 'memorycard://legal/terms',
+   url: 'questsave://legal/terms',
   },
   {
    key: 'privacy',
@@ -165,7 +165,7 @@ export default function CreditsScreen() {
    subtitle: t('credits.privacySubtitle'),
    accentColor: '#3AA7FF',
    mark: <BrandMark iconName="user-shield" accentColor="#3AA7FF" label="P" />,
-   url: 'memorycard://legal/privacy',
+   url: 'questsave://legal/privacy',
   },
   {
    key: 'policy',
@@ -173,7 +173,7 @@ export default function CreditsScreen() {
    subtitle: t('credits.policySubtitle'),
    accentColor: '#14C38E',
    mark: <BrandMark iconName="shield-alt" accentColor="#14C38E" label="S" />,
-   url: 'memorycard://legal/policy',
+   url: 'questsave://legal/policy',
   },
  ];
 
@@ -183,7 +183,7 @@ export default function CreditsScreen() {
    <ScreenHeader title={t('tabs.credits')} onBack={handleBackPress} />
    <ScrollView
     showsVerticalScrollIndicator={false}
-   contentContainerStyle={{
+    contentContainerStyle={{
      paddingHorizontal: spacing.md,
      paddingTop: 84,
      paddingBottom: 110,
@@ -197,7 +197,7 @@ export default function CreditsScreen() {
        fontSize: typography.size['2xl'],
        fontFamily: typography.font.bold,
       }}
-      >
+     >
       {t('credits.title')}
      </Text>
      <Text
@@ -212,60 +212,60 @@ export default function CreditsScreen() {
     </View>
 
     <CreditsSection
-      title={t('credits.dataSourcesTitle')}
-      subtitle={t('credits.dataSourcesSubtitle')}
-      links={dataSources}
-      openLabel={t('credits.openLink')}
+     title={t('credits.dataSourcesTitle')}
+     subtitle={t('credits.dataSourcesSubtitle')}
+     links={dataSources}
+     openLabel={t('credits.openLink')}
     />
 
     <CreditsSection
-      title={t('credits.creatorTitle')}
-      subtitle={t('credits.creatorSubtitle')}
-      links={creatorLinks}
-      openLabel={t('credits.openLink')}
+     title={t('credits.creatorTitle')}
+     subtitle={t('credits.creatorSubtitle')}
+     links={creatorLinks}
+     openLabel={t('credits.openLink')}
     />
 
     <Card
-      variant="outlined"
-      style={{
-        padding: spacing.md,
-        gap: spacing.sm,
-      }}
+     variant="outlined"
+     style={{
+      padding: spacing.md,
+      gap: spacing.sm,
+     }}
     >
-      <SectionTitle title={t('credits.legalTitle')} />
-      <Text
-        style={{
-          color: colors.text.secondary,
-          fontSize: typography.size.sm,
-          fontFamily: typography.font.regular,
-        }}
-      >
-        {t('credits.legalSubtitle')}
-      </Text>
+     <SectionTitle title={t('credits.legalTitle')} />
+     <Text
+      style={{
+       color: colors.text.secondary,
+       fontSize: typography.size.sm,
+       fontFamily: typography.font.regular,
+      }}
+     >
+      {t('credits.legalSubtitle')}
+     </Text>
 
-      <View style={{ gap: spacing.sm }}>
-        {legalLinks.map((link) => (
-          <ExternalLinkCard
-            key={link.key}
-            title={link.title}
-            subtitle={link.subtitle}
-            mark={link.mark}
-            accentColor={link.accentColor}
-            primaryAction={{
-              label: t('credits.openDocument'),
-              iconName: 'folder-open',
-              onPress: () =>
-                router.push(
-                  link.key === 'terms'
-                    ? '/legal/terms'
-                    : link.key === 'privacy'
-                      ? '/legal/privacy'
-                      : '/legal/policy',
-                ),
-            }}
-          />
-        ))}
-      </View>
+     <View style={{ gap: spacing.sm }}>
+      {legalLinks.map((link) => (
+       <ExternalLinkCard
+        key={link.key}
+        title={link.title}
+        subtitle={link.subtitle}
+        mark={link.mark}
+        accentColor={link.accentColor}
+        primaryAction={{
+         label: t('credits.openDocument'),
+         iconName: 'folder-open',
+         onPress: () =>
+          router.push(
+           link.key === 'terms'
+            ? '/legal/terms'
+            : link.key === 'privacy'
+              ? '/legal/privacy'
+              : '/legal/policy',
+          ),
+        }}
+       />
+      ))}
+     </View>
     </Card>
    </ScrollView>
   </SafeAreaView>

@@ -1,11 +1,11 @@
 ﻿{
 	"expo": {
 		"name": "QuestSave+",
-		"slug": "memorycard-plus",
-		"version": "0.0.1",
+		"slug": "questsave-plus",
+		"version": "0.0.1-alpha",
 		"orientation": "portrait",
 		"icon": "./assets/images/icon.png",
-		"scheme": "memorycard",
+		"scheme": "questsave",
 		"userInterfaceStyle": "automatic",
 		"splash": {
 			"image": "./assets/images/splash.png",
@@ -14,14 +14,16 @@
 		},
 		"ios": {
 			"supportsTablet": true,
-			"bundleIdentifier": "com.franiix.memorycardplus"
+			"bundleIdentifier": "com.franiix.questsaveplus",
+			"buildNumber": "1"
 		},
 		"android": {
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/images/adaptive-icon.png",
 				"backgroundColor": "#0F0F1A"
 			},
-			"package": "com.franiix.memorycardplus"
+			"package": "com.franiix.questsaveplus",
+			"versionCode": 1
 		},
 		"web": {
 			"bundler": "metro",
@@ -34,4 +36,3 @@
 		}
 	}
 }
-

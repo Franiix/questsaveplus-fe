@@ -124,13 +124,13 @@ shared/
 ### Installazione
 
 ```bash
-cd memorycard-app
+cd questsaveplus-fe
 npm install
 ```
 
 ### Variabili d'ambiente
 
-Crea un file `.env` in `memorycard-app/` con:
+Crea un file `.env` in `questsaveplus-fe/` con:
 
 ```bash
 EXPO_PUBLIC_SUPABASE_URL=
@@ -162,7 +162,7 @@ npm run check
 
 ## Dipendenze Da Backend
 
-L'app si aspetta che il backend Supabase in [memorycard-backend/README.md](/C:/Users/franiix/Projects/Personale/MemoryCard+/memorycard-backend/README.md) sia giÃ  allineato alla base `v1.0` IGDB-only.
+L'app si aspetta che il backend Supabase in [README.md](/C:/Users/franiix/Projects/Personale/QuestSave+/questsaveplus-be/README.md) sia gia allineato alla base `v1.0` IGDB-only.
 
 ## Qualita E Verifica Manuale
 
