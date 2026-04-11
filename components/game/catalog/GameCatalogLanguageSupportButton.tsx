@@ -1,8 +1,9 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
-import { ModalCloseButton } from '@/components/base/feedback/ModalCloseButton';
+import CountryFlag from 'react-native-country-flag';
 import { Card } from '@/components/base/display/Card';
+import { ModalCloseButton } from '@/components/base/feedback/ModalCloseButton';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
 import { getGameCatalogInfo } from '@/shared/utils/gameCatalog';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
@@ -23,21 +24,18 @@ const LANGUAGE_REGION_FALLBACK: Record<string, string> = {
  tr: 'TR',
 };
 
-function getFlagEmoji(locale?: string | null) {
+function getRegionCode(locale?: string | null) {
  if (!locale) return null;
  const [language, regionCandidate] = locale.split(/[-_]/);
  const region = (regionCandidate ?? LANGUAGE_REGION_FALLBACK[language?.toLowerCase() ?? ''])?.toUpperCase();
  if (!region || region.length !== 2) return null;
- return String.fromCodePoint(...region.split('').map((char) => 127397 + char.charCodeAt(0)));
+ return region;
 }
 
-function getLocaleBadge(locale?: string | null) {
+function getLocalePrefix(locale?: string | null) {
  if (!locale) return null;
  const normalized = locale.replace('_', '-');
- const prefix = normalized.split('-')[0]?.toUpperCase();
- if (!prefix) return null;
- const flag = getFlagEmoji(normalized);
- return flag ? flag : prefix;
+ return normalized.split('-')[0]?.toUpperCase() ?? null;
 }
 
 type GameCatalogLanguageSupportButtonProps = {
@@ -133,15 +131,28 @@ export function GameCatalogLanguageSupportButton({
        showsVerticalScrollIndicator
       >
        {rows.map((row) => {
-        const localeBadge = getLocaleBadge(row.locale);
+        const regionCode = getRegionCode(row.locale);
+        const localePrefix = getLocalePrefix(row.locale);
         return (
          <Card key={`${row.language}-${row.locale ?? 'base'}`} variant="outlined" style={{ padding: spacing.md }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
            <View style={{ flex: 2, gap: spacing.xs }}>
-            <Text style={{ color: colors.text.primary }}>
-             {localeBadge ? `${localeBadge} ` : ''}
-             {row.language}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+             {regionCode ? (
+              <CountryFlag isoCode={regionCode.toLowerCase()} size={14} />
+             ) : localePrefix ? (
+              <Text
+               style={{
+                color: colors.text.tertiary,
+                fontSize: typography.size.xs,
+                fontFamily: typography.font.semibold,
+               }}
+              >
+               {localePrefix}
+              </Text>
+             ) : null}
+             <Text style={{ color: colors.text.primary, flexShrink: 1 }}>{row.language}</Text>
+            </View>
            </View>
            <View style={{ flex: 1, alignItems: 'center' }}>
             <FontAwesome5
