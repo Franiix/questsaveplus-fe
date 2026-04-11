@@ -1,20 +1,20 @@
 import * as Linking from 'expo-linking';
 import { useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
-import { ModalCloseButton } from '@/components/base/feedback/ModalCloseButton';
 import { Card } from '@/components/base/display/Card';
+import { ModalCloseButton } from '@/components/base/feedback/ModalCloseButton';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
+import type { GameCatalogLinkItem, LinkCategory } from '@/shared/models/GameCatalogLinkItem.model';
+import type { IgdbRawExtras } from '@/shared/models/IgdbCatalogExtras.model';
+import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
 import {
  getGameCatalogExternalStoreItems,
  getGameCatalogWebsiteItems,
 } from '@/shared/utils/gameCatalog';
-import type { LinkCategory } from '@/shared/models/GameCatalogLinkItem.model';
-import type { GameCatalogLinkItem } from '@/shared/models/GameCatalogLinkItem.model';
-import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
 
 type GameCatalogLinksButtonProps = {
  providerId?: string | null;
- raw?: unknown | null;
+ raw?: IgdbRawExtras | null;
  title: string;
  openLabel: string;
  hintLabel?: string | null;
@@ -43,7 +43,10 @@ export function GameCatalogLinksButton({
 
  const grouped = useMemo(() => {
   const deduped = new Map<string, GameCatalogLinkItem>();
-  for (const item of [...getGameCatalogExternalStoreItems(raw), ...getGameCatalogWebsiteItems(raw)]) {
+  for (const item of [
+   ...getGameCatalogExternalStoreItems(raw),
+   ...getGameCatalogWebsiteItems(raw),
+  ]) {
    if (!deduped.has(item.url)) {
     deduped.set(item.url, item);
    }
@@ -118,7 +121,12 @@ export function GameCatalogLinksButton({
     </View>
    </Pressable>
 
-   <Modal visible={visible} animationType="slide" transparent onRequestClose={() => setVisible(false)}>
+   <Modal
+    visible={visible}
+    animationType="slide"
+    transparent
+    onRequestClose={() => setVisible(false)}
+   >
     <View style={{ flex: 1, backgroundColor: 'rgba(7,8,16,0.56)', justifyContent: 'flex-end' }}>
      <View
       style={{
@@ -189,7 +197,9 @@ export function GameCatalogLinksButton({
                 {item.subtitle}
                </Text>
               </View>
-              <Text style={{ color: colors.primary['200'], fontSize: typography.size.base }}>{'>'}</Text>
+              <Text style={{ color: colors.primary['200'], fontSize: typography.size.base }}>
+               {'>'}
+              </Text>
              </View>
             </Pressable>
            </Card>

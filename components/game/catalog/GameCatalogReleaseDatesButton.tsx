@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { PlatformGlyph, platformNameToKey } from '@/components/base/display/PlatformIcon';
-import { getGameCatalogReleaseDateItems } from '@/shared/utils/gameCatalog';
+import type { IgdbRawExtras } from '@/shared/models/IgdbCatalogExtras.model';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
+import { getGameCatalogReleaseDateItems } from '@/shared/utils/gameCatalog';
 
 const INITIAL_VISIBLE = 4;
 
 type GameCatalogReleaseDatesButtonProps = {
  providerId?: string | null;
- raw?: unknown | null;
+ raw?: IgdbRawExtras | null;
  title: string;
  openLabel: string;
  closeLabel: string;

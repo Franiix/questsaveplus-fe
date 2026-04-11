@@ -1,17 +1,21 @@
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons';
 import { GameCatalogModalCardList } from '@/components/game/catalog/GameCatalogModalCardList';
-import { getGameCatalogAlternativeNames } from '@/shared/utils/gameCatalog';
+import type { IgdbRawExtras } from '@/shared/models/IgdbCatalogExtras.model';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
+import { getGameCatalogAlternativeNames } from '@/shared/utils/gameCatalog';
 
 type GameCatalogAlternativeNamesButtonProps = {
  providerId?: string | null;
- raw?: unknown | null;
+ raw?: IgdbRawExtras | null;
 };
 
-export function GameCatalogAlternativeNamesButton({ providerId, raw }: GameCatalogAlternativeNamesButtonProps) {
+export function GameCatalogAlternativeNamesButton({
+ providerId,
+ raw,
+}: GameCatalogAlternativeNamesButtonProps) {
  const { t } = useTranslation();
  const [visible, setVisible] = useState(false);
  const items = useMemo(() => getGameCatalogAlternativeNames(raw), [raw]);
@@ -39,7 +43,7 @@ export function GameCatalogAlternativeNamesButton({ providerId, raw }: GameCatal
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: spacing.md,
-    }}
+     }}
     >
      <Text
       style={{

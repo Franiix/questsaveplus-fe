@@ -26,12 +26,12 @@ export function createHomeSectionViewModel(
  title: string,
  games: CatalogGame[],
  query: {
-  fetchNextPage: () => Promise<unknown>;
+  fetchNextPage: () => Promise<object>;
   hasNextPage?: boolean;
   isError: boolean;
   isFetching: boolean;
   isFetchingNextPage: boolean;
-  refetch: () => Promise<unknown>;
+  refetch: () => Promise<object>;
  },
 ): HomeSectionViewModel {
  return {

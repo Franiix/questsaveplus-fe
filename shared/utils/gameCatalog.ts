@@ -559,7 +559,7 @@ function asExternalStoreItems(value: unknown): GameCatalogLinkItem[] {
 }
 
 export function getGameCatalogInfo(
- raw?: unknown | null,
+ raw?: IgdbRawExtras | null,
  _locale: CatalogLocale = 'en',
 ): GameCatalogInfo {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
@@ -594,7 +594,7 @@ export function getGameCatalogInfo(
  };
 }
 
-export function getGameCatalogPrimaryReleaseDate(raw?: unknown | null, locale = 'en') {
+export function getGameCatalogPrimaryReleaseDate(raw?: IgdbRawExtras | null, locale = 'en') {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
  if (typeof extras.first_release_date === 'number' && Number.isFinite(extras.first_release_date)) {
   return formatCatalogDate(extras.first_release_date * 1000, locale);
@@ -603,23 +603,23 @@ export function getGameCatalogPrimaryReleaseDate(raw?: unknown | null, locale = 
  return items[0]?.dateLabel ?? null;
 }
 
-export function getGameCatalogStoryline(raw?: unknown | null) {
+export function getGameCatalogStoryline(raw?: IgdbRawExtras | null) {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
  return typeof extras.storyline === 'string' ? extras.storyline.trim() || null : null;
 }
 
-export function getGameCatalogOverviewText(summary?: string | null, raw?: unknown | null) {
+export function getGameCatalogOverviewText(summary?: string | null, raw?: IgdbRawExtras | null) {
  const normalizedSummary = typeof summary === 'string' ? summary.trim() : '';
  if (normalizedSummary.length > 0) return normalizedSummary;
  return getGameCatalogStoryline(raw);
 }
 
-export function getGameCatalogFranchiseName(raw?: unknown | null) {
+export function getGameCatalogFranchiseName(raw?: IgdbRawExtras | null) {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
  return asFirstArrayName(extras.franchises) ?? asSingleName(extras.franchise);
 }
 
-export function getGameCatalogRatings(raw?: unknown | null): GameCatalogScores {
+export function getGameCatalogRatings(raw?: IgdbRawExtras | null): GameCatalogScores {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
  const aggregated = typeof extras.aggregated_rating === 'number' ? extras.aggregated_rating : null;
  const aggregatedCount =
@@ -637,32 +637,32 @@ export function getGameCatalogRatings(raw?: unknown | null): GameCatalogScores {
  };
 }
 
-export function getGameCatalogAgeRatingItems(raw?: unknown | null): GameCatalogAgeRating[] {
+export function getGameCatalogAgeRatingItems(raw?: IgdbRawExtras | null): GameCatalogAgeRating[] {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
  return asAgeRatingItems(extras.age_ratings);
 }
 
-export function getGameCatalogReleaseDateItems(raw?: unknown | null, locale = 'en') {
+export function getGameCatalogReleaseDateItems(raw?: IgdbRawExtras | null, locale = 'en') {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
  return asReleaseDateItems(extras.release_dates, locale);
 }
 
-export function getGameCatalogWebsiteItems(raw?: unknown | null) {
+export function getGameCatalogWebsiteItems(raw?: IgdbRawExtras | null) {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
  return asWebsiteItems(extras.websites);
 }
 
-export function getGameCatalogExternalStoreItems(raw?: unknown | null) {
+export function getGameCatalogExternalStoreItems(raw?: IgdbRawExtras | null) {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
  return asExternalStoreItems(extras.external_games);
 }
 
-export function getGameCatalogAlternativeNames(raw?: unknown | null) {
+export function getGameCatalogAlternativeNames(raw?: IgdbRawExtras | null) {
  if (!raw) return [];
  return asAlternativeNames((raw as IgdbRawExtras).alternative_names);
 }
 
-export function hasGameCatalogInfoContent(raw?: unknown | null) {
+export function hasGameCatalogInfoContent(raw?: IgdbRawExtras | null) {
  const info = getGameCatalogInfo(raw);
  return (
   info.gameModes.length > 0 ||
@@ -682,7 +682,7 @@ export function hasGameCatalogInfoContent(raw?: unknown | null) {
  );
 }
 
-export function hasGameCatalogMedia(raw?: unknown | null) {
+export function hasGameCatalogMedia(raw?: IgdbRawExtras | null) {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
  return Boolean(
   (extras.screenshots && extras.screenshots.length > 0) ||
@@ -692,7 +692,7 @@ export function hasGameCatalogMedia(raw?: unknown | null) {
 }
 
 export function getIgdbNamedItemExternalId(
- raw: unknown | null,
+ raw: IgdbRawExtras | null,
  key: 'genres' | 'developers' | 'publishers',
  index = 0,
 ) {
@@ -718,7 +718,7 @@ export function getIgdbNamedItemExternalId(
  return id !== undefined && id !== null ? String(id) : null;
 }
 
-export function getIgdbCategoryTranslationKey(raw: unknown | null) {
+export function getIgdbCategoryTranslationKey(raw: IgdbRawExtras | null) {
  if (!raw) return null;
  const extras = raw as IgdbRawExtras;
  const category = extras.game_type?.id ?? extras.category;
@@ -729,7 +729,7 @@ export function getIgdbCategoryTranslationKey(raw: unknown | null) {
  return extras.relationKind ?? null;
 }
 
-export function getGameCatalogReleaseStatusKey(raw?: unknown | null) {
+export function getGameCatalogReleaseStatusKey(raw?: IgdbRawExtras | null) {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
  const status = getIgdbStatusName(extras);
  if (status) return normalizeReleaseStatusKey(status);
@@ -742,7 +742,7 @@ export function getGameCatalogReleaseStatusKey(raw?: unknown | null) {
 }
 
 export function getGameCatalogReleaseStatusLabel(
- raw: unknown | null,
+ raw: IgdbRawExtras | null,
  translate: (key: string, options?: Record<string, unknown>) => string,
 ) {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
@@ -834,7 +834,7 @@ function hasCompetitiveOnline(raw: IgdbRawExtras | null | undefined) {
 }
 
 export function getGameEditorialPlaystyle(
- raw: unknown | null,
+ raw: IgdbRawExtras | null,
  translate: TranslateFn,
  locale: CatalogLocale = 'en',
 ): GameEditorialCardContent | null {
@@ -1195,7 +1195,7 @@ export function getGameEditorialPlacement(
 
 export function getGameEditorialAudience(
  game: CatalogGameDetail,
- raw: unknown | null,
+ raw: IgdbRawExtras | null,
  translate: TranslateFn,
 ): GameEditorialCardContent | null {
  const extras = asIgdbExtras(raw ?? game.metadata?.raw ?? null);

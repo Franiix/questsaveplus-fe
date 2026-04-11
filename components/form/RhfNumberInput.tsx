@@ -9,6 +9,8 @@ type RhfNumberInputProps<
  max?: number;
 } & RhfTextInputProps<TFieldValues, TFieldName>;
 
+type NumericInputValue = string | number | null | undefined;
+
 export function RhfNumberInput<
  TFieldValues extends FieldValues,
  TFieldName extends Path<TFieldValues>,
@@ -21,10 +23,10 @@ export function RhfNumberInput<
      validate: {
       ...(typeof rules?.validate === 'function' ? { _: rules.validate } : (rules?.validate ?? {})),
       ...(min !== undefined && {
-       min: (v: unknown) => !v || Number(v as string) >= min || `Valore minimo: ${min}`,
+       min: (v: NumericInputValue) => !v || Number(v) >= min || `Valore minimo: ${min}`,
       }),
       ...(max !== undefined && {
-       max: (v: unknown) => !v || Number(v as string) <= max || `Valore massimo: ${max}`,
+       max: (v: NumericInputValue) => !v || Number(v) <= max || `Valore massimo: ${max}`,
       }),
      },
     }

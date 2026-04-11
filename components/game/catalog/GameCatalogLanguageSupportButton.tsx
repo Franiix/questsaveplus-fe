@@ -5,8 +5,9 @@ import CountryFlag from 'react-native-country-flag';
 import { Card } from '@/components/base/display/Card';
 import { ModalCloseButton } from '@/components/base/feedback/ModalCloseButton';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
-import { getGameCatalogInfo } from '@/shared/utils/gameCatalog';
+import type { IgdbRawExtras } from '@/shared/models/IgdbCatalogExtras.model';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
+import { getGameCatalogInfo } from '@/shared/utils/gameCatalog';
 
 const LANGUAGE_REGION_FALLBACK: Record<string, string> = {
  en: 'GB',
@@ -27,7 +28,9 @@ const LANGUAGE_REGION_FALLBACK: Record<string, string> = {
 function getRegionCode(locale?: string | null) {
  if (!locale) return null;
  const [language, regionCandidate] = locale.split(/[-_]/);
- const region = (regionCandidate ?? LANGUAGE_REGION_FALLBACK[language?.toLowerCase() ?? ''])?.toUpperCase();
+ const region = (
+  regionCandidate ?? LANGUAGE_REGION_FALLBACK[language?.toLowerCase() ?? '']
+ )?.toUpperCase();
  if (!region || region.length !== 2) return null;
  return region;
 }
@@ -40,7 +43,7 @@ function getLocalePrefix(locale?: string | null) {
 
 type GameCatalogLanguageSupportButtonProps = {
  providerId?: string | null;
- raw?: unknown | null;
+ raw?: IgdbRawExtras | null;
  title: string;
  openLabel: string;
  closeLabel: string;
@@ -97,7 +100,12 @@ export function GameCatalogLanguageSupportButton({
     </View>
    </Pressable>
 
-   <Modal visible={visible} animationType="slide" transparent onRequestClose={() => setVisible(false)}>
+   <Modal
+    visible={visible}
+    animationType="slide"
+    transparent
+    onRequestClose={() => setVisible(false)}
+   >
     <View style={{ flex: 1, backgroundColor: 'rgba(7,8,16,0.56)', justifyContent: 'flex-end' }}>
      <View
       style={{
@@ -120,9 +128,15 @@ export function GameCatalogLanguageSupportButton({
 
       <View style={{ flexDirection: 'row', paddingBottom: spacing.sm }}>
        <Text style={{ flex: 2, color: colors.text.tertiary }}>{labels.language}</Text>
-       <Text style={{ flex: 1, color: colors.text.tertiary, textAlign: 'center' }}>{labels.interface}</Text>
-       <Text style={{ flex: 1, color: colors.text.tertiary, textAlign: 'center' }}>{labels.audio}</Text>
-       <Text style={{ flex: 1, color: colors.text.tertiary, textAlign: 'center' }}>{labels.subtitles}</Text>
+       <Text style={{ flex: 1, color: colors.text.tertiary, textAlign: 'center' }}>
+        {labels.interface}
+       </Text>
+       <Text style={{ flex: 1, color: colors.text.tertiary, textAlign: 'center' }}>
+        {labels.audio}
+       </Text>
+       <Text style={{ flex: 1, color: colors.text.tertiary, textAlign: 'center' }}>
+        {labels.subtitles}
+       </Text>
       </View>
 
       <ScrollView
@@ -134,7 +148,11 @@ export function GameCatalogLanguageSupportButton({
         const regionCode = getRegionCode(row.locale);
         const localePrefix = getLocalePrefix(row.locale);
         return (
-         <Card key={`${row.language}-${row.locale ?? 'base'}`} variant="outlined" style={{ padding: spacing.md }}>
+         <Card
+          key={`${row.language}-${row.locale ?? 'base'}`}
+          variant="outlined"
+          style={{ padding: spacing.md }}
+         >
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
            <View style={{ flex: 2, gap: spacing.xs }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>

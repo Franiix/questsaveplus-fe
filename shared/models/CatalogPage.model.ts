@@ -1,4 +1,5 @@
 import type { CatalogProviderId } from '@/shared/enums/CatalogProvider.enum';
+import type { JsonObject } from '@/shared/models/JsonValue.model';
 
 export type CatalogPage<TItem> = {
  items: TItem[];
@@ -8,5 +9,5 @@ export type CatalogPage<TItem> = {
  nextPage?: number;
  previousPage?: number;
  providerId: CatalogProviderId;
- metadata?: Record<string, unknown>;
+ metadata?: JsonObject;
 };

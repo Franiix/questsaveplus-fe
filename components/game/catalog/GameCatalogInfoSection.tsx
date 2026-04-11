@@ -1,18 +1,19 @@
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { Card } from '@/components/base/display/Card';
-import { GameCatalogInfoBadgeGroup } from '@/components/game/catalog/GameCatalogInfoBadgeGroup';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
 import { GameCatalogAgeRatingsButton } from '@/components/game/catalog/GameCatalogAgeRatingsButton';
-import { GameCatalogLinksButton } from '@/components/game/catalog/GameCatalogLinksButton';
+import { GameCatalogInfoBadgeGroup } from '@/components/game/catalog/GameCatalogInfoBadgeGroup';
 import { GameCatalogLanguageSupportButton } from '@/components/game/catalog/GameCatalogLanguageSupportButton';
+import { GameCatalogLinksButton } from '@/components/game/catalog/GameCatalogLinksButton';
 import { GameCatalogReleaseDatesButton } from '@/components/game/catalog/GameCatalogReleaseDatesButton';
-import { getGameCatalogInfo, hasGameCatalogInfoContent } from '@/shared/utils/gameCatalog';
+import type { IgdbRawExtras } from '@/shared/models/IgdbCatalogExtras.model';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
+import { getGameCatalogInfo, hasGameCatalogInfoContent } from '@/shared/utils/gameCatalog';
 
 type GameCatalogInfoSectionProps = {
  providerId?: string | null;
- raw?: unknown | null;
+ raw?: IgdbRawExtras | null;
  locale?: string;
 };
 
@@ -43,7 +44,11 @@ function InfoBlock({ title }: { title: string }) {
  );
 }
 
-export function GameCatalogInfoSection({ providerId, raw, locale = 'en' }: GameCatalogInfoSectionProps) {
+export function GameCatalogInfoSection({
+ providerId,
+ raw,
+ locale = 'en',
+}: GameCatalogInfoSectionProps) {
  const { t } = useTranslation();
  if (providerId !== 'igdb' || !raw) return null;
 
@@ -53,8 +58,10 @@ export function GameCatalogInfoSection({ providerId, raw, locale = 'en' }: GameC
 
  if (!hasContent) return null;
 
- const hasGameplay = info.gameModes.length > 0 || info.playerPerspectives.length > 0 || info.themes.length > 0;
- const hasEnginesMeta = info.engines.length > 0 || Boolean(info.typeValue) || Boolean(info.parentGame);
+ const hasGameplay =
+  info.gameModes.length > 0 || info.playerPerspectives.length > 0 || info.themes.length > 0;
+ const hasEnginesMeta =
+  info.engines.length > 0 || Boolean(info.typeValue) || Boolean(info.parentGame);
  const hasUniverse = Boolean(info.franchise) || Boolean(info.collection);
  const hasMultiplayer = info.multiplayer.length > 0;
 

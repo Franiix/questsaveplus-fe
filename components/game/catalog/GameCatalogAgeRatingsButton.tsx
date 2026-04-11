@@ -1,16 +1,17 @@
-import { useMemo, useState } from 'react';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { Badge } from '@/components/base/display/Badge';
 import { Card } from '@/components/base/display/Card';
 import { ModalCloseButton } from '@/components/base/feedback/ModalCloseButton';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
-import { getGameCatalogAgeRatingItems } from '@/shared/utils/gameCatalog';
+import type { IgdbRawExtras } from '@/shared/models/IgdbCatalogExtras.model';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
+import { getGameCatalogAgeRatingItems } from '@/shared/utils/gameCatalog';
 
 type GameCatalogAgeRatingsButtonProps = {
  providerId?: string | null;
- raw?: unknown | null;
+ raw?: IgdbRawExtras | null;
  title: string;
  openLabel: string;
  closeLabel: string;
@@ -62,7 +63,12 @@ export function GameCatalogAgeRatingsButton({
     </View>
    </Pressable>
 
-   <Modal visible={isOpen} animationType="slide" transparent onRequestClose={() => setIsOpen(false)}>
+   <Modal
+    visible={isOpen}
+    animationType="slide"
+    transparent
+    onRequestClose={() => setIsOpen(false)}
+   >
     <View style={{ flex: 1, backgroundColor: 'rgba(7,8,16,0.56)', justifyContent: 'flex-end' }}>
      <View
       style={{
@@ -89,7 +95,9 @@ export function GameCatalogAgeRatingsButton({
       >
        {ageRatingItems.map((item) => (
         <Card key={item.key} variant="outlined" style={{ padding: spacing.md, gap: spacing.sm }}>
-         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+         <View
+          style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+         >
           {item.system ? (
            <Badge
             label={item.system}

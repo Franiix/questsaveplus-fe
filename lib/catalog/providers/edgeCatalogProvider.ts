@@ -4,8 +4,12 @@ import type {
  EdgeDetailResponse,
  EdgeSearchResponse,
 } from '@/lib/catalog/contracts/edge';
-import { mapEdgeDetailToCatalog, mapEdgeGameToCatalog } from '@/lib/catalog/providers/edgeCatalogMappers';
+import {
+ mapEdgeDetailToCatalog,
+ mapEdgeGameToCatalog,
+} from '@/lib/catalog/providers/edgeCatalogMappers';
 import { supabase } from '@/lib/supabase';
+import type { CatalogTaxonomyKind } from '@/shared/enums/CatalogTaxonomyKind.enum';
 import type {
  CatalogCompany,
  CatalogGame,
@@ -14,8 +18,8 @@ import type {
  CatalogPage,
  CatalogPlatform,
 } from '@/shared/models/Catalog.model';
-import type { CatalogTaxonomyKind } from '@/shared/enums/CatalogTaxonomyKind.enum';
 import type { CatalogSearchParams } from '@/shared/models/CatalogSearchParams.model';
+import type { JsonObject } from '@/shared/models/JsonValue.model';
 
 const EDGE_FUNCTIONS: EdgeCatalogFunctionConfig = {
  searchGames: process.env.EXPO_PUBLIC_CATALOG_EDGE_SEARCH_GAMES_FN ?? 'search-games',
@@ -43,9 +47,9 @@ function unwrapEdgeData<TData>(payload: EdgeCatalogResponse<TData> | TData | nul
  return payload;
 }
 
-async function invokeEdgeFunction<TData>(
+async function invokeEdgeFunction<TData, TBody extends JsonObject = JsonObject>(
  functionName: string,
- body?: Record<string, unknown>,
+ body?: TBody,
 ): Promise<TData> {
  const { data, error } = await supabase.functions.invoke(functionName, {
   body,
@@ -72,7 +76,7 @@ export async function searchEdgeCatalogGames(params: CatalogSearchParams) {
   pageSize: response.pageSize,
   nextPage: response.nextPage ?? undefined,
   providerId: response.provider,
- metadata: { provider: response.provider },
+  metadata: { provider: response.provider },
  } satisfies CatalogPage<CatalogGame>;
 }
 
@@ -96,7 +100,10 @@ export function listEdgeCatalogTaxonomy(kind: CatalogTaxonomyKind) {
  return invokeEdgeFunction<CatalogGenre[] | CatalogPlatform[] | CatalogCompany[]>(fnByKind[kind]);
 }
 
-export function listEdgeCatalogRelatedGames(gameId: number, relation: 'series' | 'additions' | 'similar') {
+export function listEdgeCatalogRelatedGames(
+ gameId: number,
+ relation: 'series' | 'additions' | 'similar',
+) {
  return invokeEdgeFunction<CatalogPage<CatalogGame>>(
   relation === 'series'
    ? EDGE_FUNCTIONS.gameSeries
