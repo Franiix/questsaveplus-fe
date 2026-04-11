@@ -182,12 +182,12 @@
   searchPlaceholder: 'Search your backlog...',
   filterAll: 'All',
   status: {
-   WISHLIST: 'ðŸ›ï¸ Wishlist',
-   WANT_TO_PLAY: 'ðŸ•¹ï¸ Want to play',
-   PLAYING: 'â–¶ï¸ Playing',
-   ONGOING: 'ðŸ” Ongoing',
-   COMPLETED: 'âœ… Completed',
-   ABANDONED: 'âŒ Abandoned',
+   WISHLIST: 'Wishlist',
+   WANT_TO_PLAY: 'Want to play',
+   PLAYING: 'Playing',
+   ONGOING: 'Ongoing',
+   COMPLETED: 'Completed',
+   ABANDONED: 'Abandoned',
   },
   emptyAll: {
    title: 'Your backlog is empty',
@@ -492,7 +492,7 @@
   },
   login: {
    title: 'Welcome back, player',
-   subtitle: 'â–¶ Loading save file...',
+   subtitle: 'Loading save file...',
    emailLabel: 'Email',
    emailPlaceholder: 'Enter your email',
    passwordLabel: 'Password',
@@ -518,7 +518,6 @@
    loginLink: 'Sign in',
   },
   checkEmail: {
-   icon: 'ðŸ“¬',
    title: 'Check your email',
    subtitle: "We've sent you a confirmation link.",
    hint:
@@ -527,7 +526,7 @@
   },
   callback: {
    loading: 'Verifying your account...',
-   success: 'ðŸ† Account confirmed!',
+   success: 'Account confirmed!',
    successSub: 'Achievement unlocked: new player!\nWelcome to QuestSave+.',
    goToDashboard: 'Go to dashboard',
    error: 'Something went wrong. Please try again.',
@@ -552,7 +551,7 @@
    emailLabel: 'Email',
    emailPlaceholder: 'Enter your email',
    submitButton: 'Send reset link',
-   successTitle: 'ðŸ“¬ Check your email',
+   successTitle: 'Check your email',
    successSubtitle: "We've sent a password reset link. Follow the instructions in the email.",
    backToLogin: 'Back to login',
   },
@@ -562,7 +561,7 @@
    newEmailLabel: 'New email',
    newEmailPlaceholder: 'Enter new email',
    submitButton: 'Send confirmation',
-   successTitle: 'ðŸ“¬ Check your new email',
+   successTitle: 'Check your new email',
    successSubtitle: "We've sent a confirmation link. Click it to complete the change.",
    errors: { generic: 'Something went wrong. Please try again.' },
   },
@@ -618,4 +617,3 @@
 } as const;
 
 export default en;
-

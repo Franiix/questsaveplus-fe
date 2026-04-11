@@ -1,3 +1,4 @@
+import { AuthStatusIcon } from '@/components/auth/AuthStatusIcon';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -40,18 +41,20 @@ export default function ChangeEmailScreen() {
      paddingVertical: spacing['2xl'],
     }}
    >
-    <HintBox>
+    <HintBox style={{ alignItems: 'center' }}>
+     <AuthStatusIcon name="envelope-open" />
      <Text
       style={{
        color: colors.text.primary,
        fontSize: typography.size.lg,
        fontWeight: typography.weight.semibold as '600',
        marginBottom: spacing.xs,
+       textAlign: 'center',
       }}
      >
       {t('auth.changeEmail.successTitle')}
      </Text>
-     <Text style={{ color: colors.text.secondary, fontSize: typography.size.md }}>
+     <Text style={{ color: colors.text.secondary, fontSize: typography.size.md, textAlign: 'center' }}>
       {t('auth.changeEmail.successSubtitle')}
      </Text>
     </HintBox>

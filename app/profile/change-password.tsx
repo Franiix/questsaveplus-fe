@@ -1,3 +1,4 @@
+import { FontAwesome5 } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -49,16 +50,20 @@ export default function ChangePasswordScreen() {
     }}
    >
     <HintBox>
-     <Text
-      style={{
-       color: colors.text.primary,
-       fontSize: typography.size.lg,
-       fontWeight: typography.weight.semibold as '600',
-       marginBottom: spacing.xs,
-     }}
-     >
-      {`🔒 ${t('auth.changePassword.successMessage')}`}
-     </Text>
+     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+      <FontAwesome5 name="lock" size={16} color={colors.primary['200']} solid />
+      <Text
+       style={{
+        color: colors.text.primary,
+        fontSize: typography.size.lg,
+        fontWeight: typography.weight.semibold as '600',
+        marginBottom: spacing.xs,
+        flex: 1,
+       }}
+      >
+       {t('auth.changePassword.successMessage')}
+      </Text>
+     </View>
     </HintBox>
    </ScreenContainer>
   );

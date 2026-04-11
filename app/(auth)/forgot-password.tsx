@@ -1,3 +1,4 @@
+import { AuthStatusIcon } from '@/components/auth/AuthStatusIcon';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -64,7 +65,8 @@ export default function ForgotPasswordScreen() {
 
    {sent ? (
     /* Stato successo */
-    <View>
+    <View style={{ alignItems: 'center' }}>
+     <AuthStatusIcon name="envelope-open" />
      <Text
       style={{
        color: colors.text.primary,
@@ -76,7 +78,7 @@ export default function ForgotPasswordScreen() {
      >
       {t('auth.forgotPassword.successTitle')}
      </Text>
-     <HintBox style={{ marginBottom: spacing.xl }}>
+     <HintBox style={{ marginBottom: spacing.xl, width: '100%' }}>
       <Text
        style={{
         color: colors.text.secondary,

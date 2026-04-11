@@ -182,12 +182,12 @@
   searchPlaceholder: 'Cerca nel backlog...',
   filterAll: 'Tutti',
   status: {
-   WISHLIST: 'ðŸ›ï¸ Wishlist',
-   WANT_TO_PLAY: 'ðŸ•¹ï¸ Da giocare',
-   PLAYING: 'â–¶ï¸ In corso',
-   ONGOING: 'ðŸ” Ricorrente',
-   COMPLETED: 'âœ… Completato',
-   ABANDONED: 'âŒ Abbandonato',
+   WISHLIST: 'Wishlist',
+   WANT_TO_PLAY: 'Da giocare',
+   PLAYING: 'In corso',
+   ONGOING: 'Ricorrente',
+   COMPLETED: 'Completato',
+   ABANDONED: 'Abbandonato',
   },
   emptyAll: {
    title: 'Il tuo backlog Ã¨ vuoto',
@@ -492,7 +492,7 @@
   },
   login: {
    title: 'Bentornato, giocatore',
-   subtitle: 'â–¶ Caricamento salvataggio in corso...',
+   subtitle: 'Caricamento salvataggio in corso...',
    emailLabel: 'Email',
    emailPlaceholder: 'Inserisci la tua email',
    passwordLabel: 'Password',
@@ -518,7 +518,6 @@
    loginLink: 'Accedi',
   },
   checkEmail: {
-   icon: 'ðŸ“¬',
    title: 'Controlla la tua email',
    subtitle: 'Ti abbiamo inviato un link di conferma.',
    hint:
@@ -527,7 +526,7 @@
   },
   callback: {
    loading: 'Verifica account in corso...',
-   success: 'ðŸ† Account confermato!',
+   success: 'Account confermato!',
    successSub: 'Achievement sbloccato: nuovo giocatore!\nBenvenuto in QuestSave+.',
    goToDashboard: 'Vai alla dashboard',
    error: 'Qualcosa Ã¨ andato storto. Riprova.',
@@ -552,7 +551,7 @@
    emailLabel: 'Email',
    emailPlaceholder: 'Inserisci la tua email',
    submitButton: 'Invia link di reset',
-   successTitle: 'ðŸ“¬ Controlla la tua email',
+   successTitle: 'Controlla la tua email',
    successSubtitle:
     'Ti abbiamo inviato un link per reimpostare la password. Segui le istruzioni nella mail.',
    backToLogin: 'Torna al login',
@@ -563,7 +562,7 @@
    newEmailLabel: 'Nuova email',
    newEmailPlaceholder: 'Inserisci nuova email',
    submitButton: 'Invia conferma',
-   successTitle: 'ðŸ“¬ Controlla la tua nuova email',
+   successTitle: 'Controlla la tua nuova email',
    successSubtitle: 'Abbiamo inviato un link di conferma. Cliccalo per completare il cambio.',
    errors: { generic: 'Qualcosa Ã¨ andato storto. Riprova.' },
   },
@@ -619,4 +618,3 @@
 } as const;
 
 export default it;
-

@@ -1,3 +1,4 @@
+import { AuthStatusIcon } from '@/components/auth/AuthStatusIcon';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
@@ -14,10 +15,10 @@ export default function CheckEmailScreen() {
   <ScreenContainer
    scrollable={false}
    style={{ justifyContent: 'center', alignItems: 'center' }}
-   contentContainerStyle={{ paddingHorizontal: spacing.xl }}
-  >
-   <View style={{ alignItems: 'center', paddingHorizontal: spacing.xl }}>
-    <Text style={{ fontSize: 72, marginBottom: spacing.lg }}>{t('auth.checkEmail.icon')}</Text>
+  contentContainerStyle={{ paddingHorizontal: spacing.xl }}
+ >
+  <View style={{ alignItems: 'center', paddingHorizontal: spacing.xl }}>
+    <AuthStatusIcon name="envelope-open" />
 
     <Text
      style={{

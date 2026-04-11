@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Text, View } from 'react-native';
+import { AuthStatusIcon } from '@/components/auth/AuthStatusIcon';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { supabase } from '@/lib/supabase';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
@@ -97,8 +98,11 @@ export default function AuthCallbackScreen() {
           paddingHorizontal: spacing.xl,
         }}
       >
-        {/* fontSize 56 intentional — emoji size, not text token */}
-        <Text style={{ fontSize: 56, marginBottom: spacing.lg }}>💀</Text>
+        <AuthStatusIcon
+          name="exclamation-triangle"
+          color={colors.error}
+          backgroundColor={`${colors.error}22`}
+        />
         <Text
           style={{
             color: colors.error,
@@ -129,8 +133,12 @@ export default function AuthCallbackScreen() {
         paddingHorizontal: spacing.xl,
       }}
     >
-      {/* fontSize 72 intentional — emoji size, not text token */}
-      <Text style={{ fontSize: 72, marginBottom: spacing.lg }}>🏆</Text>
+      <AuthStatusIcon
+        name="trophy"
+        color={colors.warning}
+        backgroundColor={`${colors.warning}22`}
+        size={30}
+      />
 
       <Text
         style={{
@@ -154,7 +162,7 @@ export default function AuthCallbackScreen() {
           marginBottom: spacing.xl,
         }}
       >
-        {t('auth.callback.successSub')}
+       {t('auth.callback.successSub')}
       </Text>
 
       <BaseButton
