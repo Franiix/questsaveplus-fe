@@ -1,16 +1,11 @@
 import { ScrollView, Text, View } from 'react-native';
 import { FilterChip } from '@/components/base/inputs/FilterChip';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
-
-type QuickDiscoveryPreset = {
- key: string;
- label: string;
- onPress: () => void;
-};
+import type { HomeQuickPresetAction } from '@/shared/models/home/HomeQuickPresetAction.model';
 
 type QuickDiscoveryPresetsRowProps = {
  title: string;
- presets: QuickDiscoveryPreset[];
+ presets: HomeQuickPresetAction[];
 };
 
 export function QuickDiscoveryPresetsRow({ title, presets }: QuickDiscoveryPresetsRowProps) {

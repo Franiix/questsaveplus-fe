@@ -1,15 +1,10 @@
 import { ScrollView } from 'react-native';
 import { FilterChip } from '@/components/base/inputs/FilterChip';
 import { spacing } from '@/shared/theme/tokens';
-
-type AppliedFilterChip = {
- key: string;
- label: string;
- onRemove: () => void;
-};
+import type { HomeAppliedFilterChip } from '@/shared/models/home/HomeAppliedFilterChip.model';
 
 type AppliedGameFiltersRowProps = {
- filters: AppliedFilterChip[];
+ filters: HomeAppliedFilterChip[];
 };
 
 export function AppliedGameFiltersRow({ filters }: AppliedGameFiltersRowProps) {
