@@ -69,11 +69,6 @@ function getPlatformFamilyLabelKey(platform: CatalogPlatform) {
 type GameFilterSheetProps = {
  isVisible: boolean;
  onClose: () => void;
- title: string;
- genresTitle: string;
- platformsTitle: string;
- applyLabel: string;
- resetLabel: string;
  genres: CatalogGenre[];
  platforms: CatalogPlatform[];
  developers: CatalogCompany[];
@@ -86,10 +81,6 @@ type GameFilterSheetProps = {
  platformsError?: boolean;
  developersError?: boolean;
  publishersError?: boolean;
- developerPlaceholder: string;
- publisherPlaceholder: string;
- genrePlaceholder: string;
- platformPlaceholder: string;
  value: GameDiscoveryFilters;
  onChange: (value: GameDiscoveryFilters) => void;
  onApply: () => void;
@@ -99,11 +90,6 @@ type GameFilterSheetProps = {
 export function GameFilterSheet({
  isVisible,
  onClose,
- title,
- genresTitle,
- platformsTitle,
- applyLabel,
- resetLabel,
  genres,
  platforms,
  developers,
@@ -116,16 +102,21 @@ export function GameFilterSheet({
  platformsError = false,
  developersError = false,
  publishersError = false,
- developerPlaceholder,
- publisherPlaceholder,
- genrePlaceholder,
- platformPlaceholder,
  value,
  onChange,
  onApply,
  onReset,
 }: GameFilterSheetProps) {
  const { t } = useTranslation();
+ const title = t('home.filtersTitle');
+ const genresTitle = t('home.genresTitle');
+ const platformsTitle = t('home.platformsTitle');
+ const applyLabel = t('home.applyFilters');
+ const resetLabel = t('home.resetFilters');
+ const developerPlaceholder = t('home.selectDeveloper');
+ const publisherPlaceholder = t('home.selectPublisher');
+ const genrePlaceholder = t('home.selectGenre');
+ const platformPlaceholder = t('home.selectPlatform');
  const genreOptions = genres.map<SearchableSelectOption>((genre) => ({
   label: genre.slug ? t(`genres.${genre.slug}`, { defaultValue: genre.name }) : genre.name,
   value: genre.externalId,
@@ -159,22 +150,22 @@ export function GameFilterSheet({
  return (
   <BottomSheet isVisible={isVisible} onClose={onClose} title={title}>
    <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 420 }}>
-    <View style={{ gap: spacing.lg }}>
+   <View style={{ gap: spacing.lg }}>
       <View style={{ gap: spacing.sm }}>
-       <Text
-        style={{
-         color: colors.text.primary,
-         fontSize: typography.size.sm,
-         fontFamily: typography.font.semibold,
-        }}
-       >
+      <Text
+       style={{
+        color: colors.text.primary,
+        fontSize: typography.size.sm,
+        fontFamily: typography.font.semibold,
+       }}
+      >
         {genresTitle}
-       </Text>
+      </Text>
        <SearchableSelectInput
         options={genreOptions}
         value={value.genre}
         onChange={(genre) => onChange({ ...value, genre })}
-        placeholder={
+       placeholder={
          genresLoading
           ? t('common.loadingOptions')
           : genresError
@@ -202,7 +193,7 @@ export function GameFilterSheet({
          fontFamily: typography.font.semibold,
         }}
        >
-       {t('home.developersTitle')}
+        {t('home.developersTitle')}
        </Text>
        <SearchableSelectInput
         options={developerOptions}
@@ -239,7 +230,7 @@ export function GameFilterSheet({
          fontFamily: typography.font.semibold,
         }}
        >
-       {t('home.publishersTitle')}
+        {t('home.publishersTitle')}
        </Text>
        <SearchableSelectInput
         options={publisherOptions}

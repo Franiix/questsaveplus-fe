@@ -996,11 +996,6 @@ function handleApplyFilters() {
    <GameFilterSheet
     isVisible={isFilterSheetOpen}
     onClose={() => setIsFilterSheetOpen(false)}
-    title={t('home.filtersTitle')}
-    genresTitle={t('home.genresTitle')}
-    platformsTitle={t('home.platformsTitle')}
-    applyLabel={t('home.applyFilters')}
-    resetLabel={t('home.resetFilters')}
     genres={genres}
     platforms={parentPlatforms}
     developers={developers}
@@ -1013,10 +1008,6 @@ function handleApplyFilters() {
     platformsError={isParentPlatformsError}
     developersError={isDevelopersError}
     publishersError={isPublishersError}
-    developerPlaceholder={t('home.selectDeveloper')}
-    publisherPlaceholder={t('home.selectPublisher')}
-    genrePlaceholder={t('home.selectGenre')}
-    platformPlaceholder={t('home.selectPlatform')}
     value={draftFilters}
     onChange={setDraftFilters}
     onApply={handleApplyFilters}
@@ -1025,4 +1016,3 @@ function handleApplyFilters() {
   </SafeAreaView>
  );
 }
-

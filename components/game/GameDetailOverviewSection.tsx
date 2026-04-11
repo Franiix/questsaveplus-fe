@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import { GameBacklogPanel } from '@/components/game/GameBacklogPanel';
 import { GameMetaSection } from '@/components/game/GameMetaSection';
 import { GameSummaryHeader } from '@/components/game/GameSummaryHeader';
-import type { CatalogGameDetail, CatalogPlatform } from '@/shared/models/Catalog.model';
+import type { CatalogGameDetail } from '@/shared/models/Catalog.model';
 import { spacing } from '@/shared/theme/tokens';
 import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 
@@ -76,7 +76,7 @@ export function GameDetailOverviewSection({
     statusLabel={viewModel.backlogStatusLabel}
     statusColor={viewModel.backlogStatusColor}
     releaseYear={viewModel.releaseYear}
-    platforms={game.platforms as CatalogPlatform[]}
+    platforms={game.platforms}
     variant="screen"
    />
 
