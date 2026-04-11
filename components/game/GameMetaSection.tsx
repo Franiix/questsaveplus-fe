@@ -1,5 +1,6 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Animated, {
  Easing,
@@ -12,8 +13,6 @@ import Animated, {
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 
 type GameMetaSectionProps = {
- title?: string | null;
- subtitle?: string | null;
  criticRating: number | null;
  criticRatingCount: number | null;
  igdbCommunityRating: number | null;
@@ -26,16 +25,6 @@ type GameMetaSectionProps = {
  publisherName?: string | null;
  onDeveloperPress?: (() => void) | null;
  onPublisherPress?: (() => void) | null;
- labels: {
-  critic: string;
-  igdbCommunity: string;
-  questSavePlus: string;
-  noVotes: string;
-  ratingsCount: (count: number) => string;
-  releaseDate: string;
-  developer: string;
-  publisher: string;
- };
 };
 
 type ScoreCardProps = {
@@ -229,8 +218,6 @@ function ScoreCard({
 }
 
 export function GameMetaSection({
- title = null,
- subtitle = null,
  criticRating,
  criticRatingCount,
  igdbCommunityRating,
@@ -243,53 +230,52 @@ export function GameMetaSection({
  publisherName,
  onDeveloperPress,
  onPublisherPress,
- labels,
 }: GameMetaSectionProps) {
+ const { t } = useTranslation();
  const criticCaption =
   criticRatingCount && criticRatingCount > 0
-   ? labels.ratingsCount(criticRatingCount)
-   : labels.noVotes;
+   ? t('gameDetail.ratingsCount', { count: criticRatingCount, defaultValue: `${criticRatingCount}` })
+   : t('gameDetail.noVotes');
  const igdbCommunityCaption =
   igdbCommunityRatingCount && igdbCommunityRatingCount > 0
-   ? labels.ratingsCount(igdbCommunityRatingCount)
-   : labels.noVotes;
+   ? t('gameDetail.ratingsCount', {
+      count: igdbCommunityRatingCount,
+      defaultValue: `${igdbCommunityRatingCount}`,
+     })
+   : t('gameDetail.noVotes');
  const questSaveCaption = isQuestSaveRatingLoading
   ? '...'
   : questSaveRatingCount > 0
-   ? labels.ratingsCount(questSaveRatingCount)
-   : labels.noVotes;
+   ? t('gameDetail.ratingsCount', { count: questSaveRatingCount, defaultValue: `${questSaveRatingCount}` })
+   : t('gameDetail.noVotes');
 
  return (
   <View style={{ gap: spacing.md, marginBottom: spacing.lg }}>
-   {title ? (
-    <View style={{ gap: spacing.xs }}>
-     <Text
-      style={{
-       color: colors.text.primary,
-       fontSize: typography.size.lg,
-       fontFamily: typography.font.bold,
-      }}
-     >
-      {title}
-     </Text>
-     {subtitle ? (
-      <Text
-       style={{
-        color: colors.text.secondary,
-        fontSize: typography.size.sm,
-        fontFamily: typography.font.medium,
-        lineHeight: 18,
-       }}
-      >
-       {subtitle}
-      </Text>
-     ) : null}
-    </View>
-   ) : null}
+   <View style={{ gap: spacing.xs }}>
+    <Text
+     style={{
+      color: colors.text.primary,
+      fontSize: typography.size.lg,
+      fontFamily: typography.font.bold,
+     }}
+    >
+     {t('gameDetail.editorial.snapshot.title')}
+    </Text>
+    <Text
+     style={{
+      color: colors.text.secondary,
+      fontSize: typography.size.sm,
+      fontFamily: typography.font.medium,
+      lineHeight: 18,
+     }}
+    >
+     {t('gameDetail.editorial.snapshot.subtitle')}
+    </Text>
+   </View>
 
    <View style={{ flexDirection: 'row', gap: spacing.sm }}>
     <ScoreCard
-     title={labels.critic}
+     title={t('gameDetail.critic')}
      value={criticRating}
      format="percent"
      caption={criticCaption}
@@ -298,7 +284,7 @@ export function GameMetaSection({
      borderColor="rgba(246,196,83,0.32)"
     />
     <ScoreCard
-     title={labels.igdbCommunity}
+     title={t('gameDetail.igdbCommunity')}
      value={igdbCommunityRating}
      format="percent"
      caption={igdbCommunityCaption}
@@ -307,7 +293,7 @@ export function GameMetaSection({
      borderColor="rgba(0,213,255,0.26)"
     />
     <ScoreCard
-     title={labels.questSavePlus}
+     title={t('gameDetail.questSavePlus')}
      value={isQuestSaveRatingLoading ? null : questSaveRating}
      format="five-point"
      caption={questSaveCaption}
@@ -326,12 +312,12 @@ export function GameMetaSection({
     }}
    >
     {releaseDate ? (
-     <MetaLine icon="calendar-alt" label={labels.releaseDate} value={releaseDate} />
+     <MetaLine icon="calendar-alt" label={t('gameDetail.releaseDate')} value={releaseDate} />
     ) : null}
     {developerName ? (
      <MetaLine
       icon="code"
-      label={labels.developer}
+      label={t('gameDetail.developer')}
       value={developerName}
       onPress={onDeveloperPress}
      />
@@ -339,7 +325,7 @@ export function GameMetaSection({
     {publisherName ? (
      <MetaLine
       icon="building"
-      label={labels.publisher}
+      label={t('gameDetail.publisher')}
       value={publisherName}
       onPress={onPublisherPress}
      />

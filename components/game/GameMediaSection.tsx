@@ -1,6 +1,7 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FlatList, Modal, Pressable, Text, View, useWindowDimensions } from 'react-native';
 import { Card } from '@/components/base/display/Card';
 import { ImageWithFallback } from '@/components/base/display/ImageWithFallback';
@@ -13,14 +14,6 @@ type MediaTab = 'screenshots' | 'artworks' | 'trailers';
 type GameMediaSectionProps = {
  providerId?: string | null;
  raw?: unknown | null;
- labels: {
-  title: string;
-  screenshots: string;
-  artworks: string;
-  trailers: string;
-  empty: string;
-  watchTrailer: string;
- };
 };
 
 const THUMBNAIL_WIDTH = 240;
@@ -41,7 +34,8 @@ function getYoutubeUrl(videoId?: string) {
  return `https://www.youtube.com/watch?v=${videoId}`;
 }
 
-export function GameMediaSection({ providerId, raw, labels }: GameMediaSectionProps) {
+export function GameMediaSection({ providerId, raw }: GameMediaSectionProps) {
+ const { t } = useTranslation();
  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
  const [selectedImage, setSelectedImage] = useState<string | null>(null);
  const [activeTab, setActiveTab] = useState<MediaTab>('screenshots');
@@ -76,9 +70,9 @@ export function GameMediaSection({ providerId, raw, labels }: GameMediaSectionPr
 
  const tabs = (providerId === 'igdb'
   ? [
-     { key: 'trailers' as const, label: labels.trailers, count: trailers.length },
-     { key: 'screenshots' as const, label: labels.screenshots, count: screenshots.length },
-     { key: 'artworks' as const, label: labels.artworks, count: artworks.length },
+     { key: 'trailers' as const, label: t('gameDetail.trailers'), count: trailers.length },
+     { key: 'screenshots' as const, label: t('gameDetail.screenshots'), count: screenshots.length },
+     { key: 'artworks' as const, label: t('gameDetail.artworks'), count: artworks.length },
     ]
   : []
  ).filter((item) => item.count > 0);
@@ -104,9 +98,9 @@ export function GameMediaSection({ providerId, raw, labels }: GameMediaSectionPr
       marginTop: spacing.xl,
       padding: spacing.md,
       gap: spacing.md,
-    }}
+   }}
    >
-    <SectionTitle title={labels.title} />
+    <SectionTitle title={t('gameDetail.media')} />
 
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
      {tabs.map((tab) => {
@@ -205,7 +199,7 @@ export function GameMediaSection({ providerId, raw, labels }: GameMediaSectionPr
             fontFamily: typography.font.semibold,
           }}
          >
-          {labels.watchTrailer}
+          {t('gameDetail.watchTrailer')}
          </Text>
         </View>
        </Card>
@@ -241,7 +235,7 @@ export function GameMediaSection({ providerId, raw, labels }: GameMediaSectionPr
         fontFamily: typography.font.regular,
       }}
      >
-      {labels.empty}
+      {t('gameDetail.noScreenshots')}
      </Text>
     )}
    </Card>

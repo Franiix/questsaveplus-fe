@@ -3,6 +3,13 @@ import type { CatalogGame } from '@/shared/models/Catalog.model';
 import { spacing } from '@/shared/theme/tokens';
 import { GameCarouselSection } from './GameCarouselSection';
 
+type RelatedSection = {
+ key: string;
+ title: string;
+ games: CatalogGame[];
+ isLoading?: boolean;
+};
+
 type GameDetailRelatedSectionsProps = {
   sameSeriesGames: CatalogGame[];
   isSeriesLoading: boolean;
@@ -52,113 +59,82 @@ export function GameDetailRelatedSections({
   onRelatedGamePress,
   registerSectionOffset,
 }: GameDetailRelatedSectionsProps) {
-  const hasRelatedSections =
-    sameSeriesGames.length > 0 ||
-    isSeriesLoading ||
-    dlcGames.length > 0 ||
-    editionGames.length > 0 ||
-    expansionGames.length > 0 ||
-    isAdditionsLoading ||
-    similarGames.length > 0 ||
-    isSimilarGamesLoading ||
-    moreFromDeveloper.length > 0 ||
-    isDeveloperGamesLoading ||
-    moreFromPublisher.length > 0 ||
-    isPublisherGamesLoading;
+  const sections: RelatedSection[] = [
+    {
+      key: 'series',
+      title: seriesTitle,
+      games: sameSeriesGames,
+      isLoading: isSeriesLoading,
+    },
+    {
+      key: 'dlc',
+      title: dlcTitle,
+      games: dlcGames,
+      isLoading: isAdditionsLoading,
+    },
+    {
+      key: 'editions',
+      title: editionsTitle,
+      games: editionGames,
+    },
+    {
+      key: 'expansions',
+      title: expansionsTitle,
+      games: expansionGames,
+    },
+    {
+      key: 'developer-games',
+      title: moreFromDeveloperTitle,
+      games: moreFromDeveloper,
+      isLoading: isDeveloperGamesLoading,
+    },
+    {
+      key: 'publisher-games',
+      title: moreFromPublisherTitle,
+      games: moreFromPublisher,
+      isLoading: isPublisherGamesLoading,
+    },
+    {
+      key: 'similar-games',
+      title: similarGamesTitle,
+      games: similarGames,
+      isLoading: isSimilarGamesLoading,
+    },
+  ];
+  const visibleSections = sections.filter((section) => section.games.length > 0 || section.isLoading);
 
-  if (!hasRelatedSections) return null;
+  if (visibleSections.length === 0) return null;
 
   return (
     <View
       style={{ marginTop: spacing['2xl'], gap: spacing.lg }}
       onLayout={(event) => registerSectionOffset('contents', event.nativeEvent.layout.y)}
     >
-      {sameSeriesGames.length > 0 || isSeriesLoading ? (
-        <View onLayout={(event) => registerSectionOffset('series', event.nativeEvent.layout.y)}>
+      {visibleSections.map((section) => {
+        const content = (
           <GameCarouselSection
-            title={seriesTitle}
-            games={sameSeriesGames}
+            title={section.title}
+            games={section.games}
             cardWidth={relatedCardWidth}
             horizontalPadding={0}
-            isLoading={isSeriesLoading && sameSeriesGames.length === 0}
+            isLoading={Boolean(section.isLoading && section.games.length === 0)}
             onPress={onRelatedGamePress}
           />
-        </View>
-      ) : null}
+        );
 
-      {dlcGames.length > 0 || isAdditionsLoading ? (
-        <View onLayout={(event) => registerSectionOffset('dlc', event.nativeEvent.layout.y)}>
-          <GameCarouselSection
-            title={dlcTitle}
-            games={dlcGames}
-            cardWidth={relatedCardWidth}
-            horizontalPadding={0}
-            isLoading={isAdditionsLoading && dlcGames.length === 0}
-            onPress={onRelatedGamePress}
-          />
-        </View>
-      ) : null}
+        if (section.key === 'similar-games') {
+          return <View key={section.key}>{content}</View>;
+        }
 
-      {editionGames.length > 0 ? (
-        <View onLayout={(event) => registerSectionOffset('editions', event.nativeEvent.layout.y)}>
-          <GameCarouselSection
-            title={editionsTitle}
-            games={editionGames}
-            cardWidth={relatedCardWidth}
-            horizontalPadding={0}
-            onPress={onRelatedGamePress}
-          />
-        </View>
-      ) : null}
-
-      {expansionGames.length > 0 ? (
-        <View onLayout={(event) => registerSectionOffset('expansions', event.nativeEvent.layout.y)}>
-          <GameCarouselSection
-            title={expansionsTitle}
-            games={expansionGames}
-            cardWidth={relatedCardWidth}
-            horizontalPadding={0}
-            onPress={onRelatedGamePress}
-          />
-        </View>
-      ) : null}
-
-      {moreFromDeveloper.length > 0 || isDeveloperGamesLoading ? (
-        <View onLayout={(event) => registerSectionOffset('developer-games', event.nativeEvent.layout.y)}>
-          <GameCarouselSection
-            title={moreFromDeveloperTitle}
-            games={moreFromDeveloper}
-            cardWidth={relatedCardWidth}
-            horizontalPadding={0}
-            isLoading={isDeveloperGamesLoading && moreFromDeveloper.length === 0}
-            onPress={onRelatedGamePress}
-          />
-        </View>
-      ) : null}
-
-      {moreFromPublisher.length > 0 || isPublisherGamesLoading ? (
-        <View onLayout={(event) => registerSectionOffset('publisher-games', event.nativeEvent.layout.y)}>
-          <GameCarouselSection
-            title={moreFromPublisherTitle}
-            games={moreFromPublisher}
-            cardWidth={relatedCardWidth}
-            horizontalPadding={0}
-            isLoading={isPublisherGamesLoading && moreFromPublisher.length === 0}
-            onPress={onRelatedGamePress}
-          />
-        </View>
-      ) : null}
-
-      {similarGames.length > 0 || isSimilarGamesLoading ? (
-        <GameCarouselSection
-          title={similarGamesTitle}
-          games={similarGames}
-          cardWidth={relatedCardWidth}
-          horizontalPadding={0}
-          isLoading={isSimilarGamesLoading && similarGames.length === 0}
-          onPress={onRelatedGamePress}
-        />
-      ) : null}
+        return (
+          <View
+            key={section.key}
+            onLayout={(event) => registerSectionOffset(section.key, event.nativeEvent.layout.y)}
+          >
+            {content}
+          </View>
+        );
+      })}
     </View>
   );
 }

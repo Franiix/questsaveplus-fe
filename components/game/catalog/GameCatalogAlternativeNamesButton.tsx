@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { GameCatalogModalCardList } from '@/components/game/catalog/GameCatalogModalCardList';
@@ -8,18 +9,14 @@ import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens
 type GameCatalogAlternativeNamesButtonProps = {
  providerId?: string | null;
  raw?: unknown | null;
- title: string;
- closeLabel: string;
 };
 
-export function GameCatalogAlternativeNamesButton({
- providerId,
- raw,
- title,
- closeLabel,
-}: GameCatalogAlternativeNamesButtonProps) {
+export function GameCatalogAlternativeNamesButton({ providerId, raw }: GameCatalogAlternativeNamesButtonProps) {
+ const { t } = useTranslation();
  const [visible, setVisible] = useState(false);
  const items = useMemo(() => getGameCatalogAlternativeNames(raw), [raw]);
+ const title = t('gameDetail.openAlsoKnownAs');
+ const closeLabel = t('gameDetail.closeInfo');
 
  if (providerId !== 'igdb' || items.length === 0) return null;
 

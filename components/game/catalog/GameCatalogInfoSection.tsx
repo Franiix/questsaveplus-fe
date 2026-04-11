@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { Card } from '@/components/base/display/Card';
 import { GameCatalogInfoBadgeGroup } from '@/components/game/catalog/GameCatalogInfoBadgeGroup';
@@ -12,44 +13,6 @@ import { colors, spacing, typography } from '@/shared/theme/tokens';
 type GameCatalogInfoSectionProps = {
  providerId?: string | null;
  raw?: unknown | null;
- labels: {
-  title: string;
-  gameModes: string;
-  playerPerspectives: string;
-  themes: string;
-  franchise: string;
-  collection: string;
-  releaseDates: string;
-  releaseDatesOpen: string;
-  ageRatings: string;
-  engines: string;
-  type: string;
-  parentGame: string;
-  multiplayer: string;
-  languageSupport: string;
-  languageSupportOpen: string;
-  websites: string;
-  websitesOpen: string;
-  storeHint: string;
-  closeInfo: string;
-  language: string;
-  interface: string;
-  audio: string;
-  subtitles: string;
-  gameplaySection: string;
-  universeSection: string;
-  multiplayerSection: string;
-  firstRelease: string;
-  showAllDates: (count: number) => string;
-  showLessDates: string;
-  linkGroups: {
-   official: string;
-   store: string;
-   community: string;
-   video: string;
-   social: string;
-  };
- };
  locale?: string;
 };
 
@@ -80,12 +43,8 @@ function InfoBlock({ title }: { title: string }) {
  );
 }
 
-export function GameCatalogInfoSection({
- providerId,
- raw,
- labels,
- locale = 'en',
-}: GameCatalogInfoSectionProps) {
+export function GameCatalogInfoSection({ providerId, raw, locale = 'en' }: GameCatalogInfoSectionProps) {
+ const { t } = useTranslation();
  if (providerId !== 'igdb' || !raw) return null;
 
  const catalogLocale = locale.startsWith('it') ? 'it' : 'en';
@@ -108,80 +67,96 @@ export function GameCatalogInfoSection({
     gap: spacing.md,
    }}
   >
-   <SectionTitle title={labels.title} />
+   <SectionTitle title={t('gameDetail.gameInfo')} />
 
    {hasGameplay ? (
     <>
-     <InfoBlock title={labels.gameplaySection} />
-     <GameCatalogInfoBadgeGroup label={labels.gameModes} values={info.gameModes} closeLabel={labels.closeInfo} />
+     <InfoBlock title={t('gameDetail.gameplaySection')} />
      <GameCatalogInfoBadgeGroup
-      label={labels.playerPerspectives}
-      values={info.playerPerspectives}
-      closeLabel={labels.closeInfo}
+      label={t('gameDetail.gameModes')}
+      values={info.gameModes}
+      closeLabel={t('gameDetail.closeInfo')}
      />
-     <GameCatalogInfoBadgeGroup label={labels.themes} values={info.themes} closeLabel={labels.closeInfo} />
+     <GameCatalogInfoBadgeGroup
+      label={t('gameDetail.playerPerspectives')}
+      values={info.playerPerspectives}
+      closeLabel={t('gameDetail.closeInfo')}
+     />
+     <GameCatalogInfoBadgeGroup
+      label={t('gameDetail.themes')}
+      values={info.themes}
+      closeLabel={t('gameDetail.closeInfo')}
+     />
     </>
    ) : null}
 
    {hasEnginesMeta ? (
     <>
      {hasGameplay ? null : <View style={{ height: 1, backgroundColor: colors.border.DEFAULT }} />}
-     <GameCatalogInfoBadgeGroup label={labels.engines} values={info.engines} closeLabel={labels.closeInfo} />
      <GameCatalogInfoBadgeGroup
-      label={labels.type}
-      values={info.typeValue ? [info.typeValue] : []}
-      closeLabel={labels.closeInfo}
+      label={t('gameDetail.engines')}
+      values={info.engines}
+      closeLabel={t('gameDetail.closeInfo')}
      />
      <GameCatalogInfoBadgeGroup
-      label={labels.parentGame}
+      label={t('gameDetail.type')}
+      values={info.typeValue ? [info.typeValue] : []}
+      closeLabel={t('gameDetail.closeInfo')}
+     />
+     <GameCatalogInfoBadgeGroup
+      label={t('gameDetail.parentGame')}
       values={info.parentGame ? [info.parentGame] : []}
-      closeLabel={labels.closeInfo}
+      closeLabel={t('gameDetail.closeInfo')}
      />
     </>
    ) : null}
 
    {hasUniverse ? (
     <>
-     <InfoBlock title={labels.universeSection} />
+     <InfoBlock title={t('gameDetail.universeSection')} />
      <GameCatalogInfoBadgeGroup
-      label={labels.franchise}
+      label={t('gameDetail.franchise')}
       values={info.franchise ? [info.franchise] : []}
-      closeLabel={labels.closeInfo}
+      closeLabel={t('gameDetail.closeInfo')}
      />
      <GameCatalogInfoBadgeGroup
-      label={labels.collection}
+      label={t('gameDetail.collection')}
       values={info.collection ? [info.collection] : []}
-      closeLabel={labels.closeInfo}
+      closeLabel={t('gameDetail.closeInfo')}
      />
     </>
    ) : null}
 
    {hasMultiplayer ? (
     <>
-     <InfoBlock title={labels.multiplayerSection} />
-     <GameCatalogInfoBadgeGroup label={labels.multiplayer} values={info.multiplayer} closeLabel={labels.closeInfo} />
+     <InfoBlock title={t('gameDetail.multiplayerSection')} />
+     <GameCatalogInfoBadgeGroup
+      label={t('gameDetail.multiplayer')}
+      values={info.multiplayer}
+      closeLabel={t('gameDetail.closeInfo')}
+     />
     </>
    ) : null}
 
    <GameCatalogAgeRatingsButton
     providerId={providerId}
     raw={raw}
-    title={labels.ageRatings}
-    openLabel={labels.ageRatings}
-    closeLabel={labels.closeInfo}
+    title={t('gameDetail.ageRatings')}
+    openLabel={t('gameDetail.ageRatings')}
+    closeLabel={t('gameDetail.closeInfo')}
    />
 
    <GameCatalogLanguageSupportButton
     providerId={providerId}
     raw={raw}
-    title={labels.languageSupport}
-    openLabel={labels.languageSupportOpen}
-    closeLabel={labels.closeInfo}
+    title={t('gameDetail.languageSupport')}
+    openLabel={t('gameDetail.languageSupportOpen')}
+    closeLabel={t('gameDetail.closeInfo')}
     labels={{
-     language: labels.language,
-     interface: labels.interface,
-     audio: labels.audio,
-     subtitles: labels.subtitles,
+     language: t('gameDetail.language'),
+     interface: t('gameDetail.interface'),
+     audio: t('gameDetail.audio'),
+     subtitles: t('gameDetail.subtitles'),
     }}
     locale={locale}
    />
@@ -189,24 +164,30 @@ export function GameCatalogInfoSection({
    <GameCatalogReleaseDatesButton
     providerId={providerId}
     raw={raw}
-    title={labels.releaseDates}
-    openLabel={labels.releaseDatesOpen}
-    closeLabel={labels.closeInfo}
-    showAllLabel={labels.showAllDates}
-    showLessLabel={labels.showLessDates}
-    firstReleaseLabel={labels.firstRelease}
+    title={t('gameDetail.releaseDates')}
+    openLabel={t('gameDetail.releaseDatesOpen')}
+    closeLabel={t('gameDetail.closeInfo')}
+    showAllLabel={(count: number) => t('gameDetail.showAllDates', { count })}
+    showLessLabel={t('gameDetail.showLessDates')}
+    firstReleaseLabel={t('gameDetail.firstRelease')}
     locale={locale}
    />
 
    <GameCatalogLinksButton
     providerId={providerId}
     raw={raw}
-   title={labels.websites}
-   openLabel={labels.websitesOpen}
-    hintLabel={labels.storeHint}
-   closeLabel={labels.closeInfo}
-   groupLabels={labels.linkGroups}
-  />
+    title={t('gameDetail.websites')}
+    openLabel={t('gameDetail.websitesOpen')}
+    hintLabel={t('gameDetail.storeHint')}
+    closeLabel={t('gameDetail.closeInfo')}
+    groupLabels={{
+     official: t('gameDetail.linkGroups.official'),
+     store: t('gameDetail.linkGroups.store'),
+     community: t('gameDetail.linkGroups.community'),
+     video: t('gameDetail.linkGroups.video'),
+     social: t('gameDetail.linkGroups.social'),
+    }}
+   />
   </Card>
  );
 }
