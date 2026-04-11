@@ -18,6 +18,7 @@ import {
 } from '@/shared/utils/gameCatalog';
 import type { CatalogGame, CatalogGameDetail } from '@/shared/models/Catalog.model';
 import { colors } from '@/shared/theme/tokens';
+import { getCatalogGameNumericId } from '@/shared/utils/catalogGame';
 import { formatDate } from '@/shared/utils/date';
 
 const DLC_CATEGORY_KEYS = new Set(['dlc_addon']);
@@ -214,15 +215,6 @@ export function useGameDetailViewModel({
   statusOptions,
   t,
  ]);
-}
-
-function getCatalogGameNumericId(game: CatalogGame) {
- if (typeof game.gameId === 'number' && Number.isFinite(game.gameId)) {
-  return game.gameId;
- }
-
- const externalId = Number(game.externalId);
- return Number.isFinite(externalId) ? externalId : null;
 }
 
 function sanitizeBacklogStatusLabel(label: string) {

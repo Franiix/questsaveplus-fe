@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import type { CatalogGame } from '@/shared/models/Catalog.model';
+import { getCatalogGameNumericId } from '@/shared/utils/catalogGame';
 
 type UseGameDetailNavigationParams = {
  developerCatalogId?: string | null;
@@ -72,13 +73,4 @@ export function useGameDetailNavigation({
   handlePublisherPress,
   handleRelatedGamePress,
  } as const;
-}
-
-function getCatalogGameNumericId(game: CatalogGame) {
- if (typeof game.gameId === 'number' && Number.isFinite(game.gameId)) {
-  return game.gameId;
- }
-
- const externalId = Number(game.externalId);
- return Number.isFinite(externalId) ? externalId : null;
 }

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { searchCatalogGames } from '@/lib/catalog';
-import type { CatalogGame } from '@/shared/models/Catalog.model';
+import { getCatalogGameNumericId } from '@/shared/utils/catalogGame';
 
 type UseRelatedCompanyGamesParams = {
  currentGameId: number;
@@ -32,15 +32,6 @@ export function useRelatedCompanyGames({
     return response.items.filter((game) => getCatalogGameNumericId(game) !== currentGameId);
   },
   enabled: enabled && Number.isFinite(currentGameId) && Boolean(companyExternalId),
-  staleTime: 10 * 60 * 1000,
+ staleTime: 10 * 60 * 1000,
  });
-}
-
-function getCatalogGameNumericId(game: CatalogGame) {
- if (typeof game.gameId === 'number' && Number.isFinite(game.gameId)) {
-  return game.gameId;
- }
-
- const externalId = Number(game.externalId);
- return Number.isFinite(externalId) ? externalId : null;
 }

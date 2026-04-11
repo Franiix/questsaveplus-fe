@@ -5,43 +5,26 @@ import type { CatalogGame } from '@/shared/models/Catalog.model';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import type { HomeOrdering } from '@/shared/models/home/HomeOrdering.model';
 import type { HomeScreenRouteParams } from '@/shared/models/home/HomeScreenRouteParams.model';
+import { createRouteDiscoveryFilters } from '@/shared/utils/homeDiscovery';
+import { createEmptyGameDiscoveryFilters } from '@/shared/utils/gameDiscoveryFilters';
 
 type UseHomeScreenStateParams = {
  params: HomeScreenRouteParams;
 };
 
-const EMPTY_FILTERS: GameDiscoveryFilters = {
- genre: undefined,
- platform: undefined,
- developer: undefined,
- publisher: undefined,
-};
-
-function createEmptyFilters(): GameDiscoveryFilters {
- return { ...EMPTY_FILTERS };
-}
-
 export function useHomeScreenState({ params }: UseHomeScreenStateParams) {
  const router = useRouter();
  const [search, setSearch] = useState('');
  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
- const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(createEmptyFilters);
- const [draftFilters, setDraftFilters] = useState<GameDiscoveryFilters>(createEmptyFilters);
+ const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
+ const [draftFilters, setDraftFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
  const [selectedOrdering, setSelectedOrdering] = useState<HomeOrdering | null>(null);
  const [sheetGame, setSheetGame] = useState<CatalogGame | null>(null);
  const [scrollRequestKey, setScrollRequestKey] = useState(0);
  const debouncedSearch = useDebounce(search, 400);
  const lastRouteFilterSignatureRef = useRef<string | null>(null);
 
- const routeDiscoveryFilters = useMemo(
-  () => ({
-   genre: typeof params.genreSlug === 'string' ? params.genreSlug : undefined,
-   developer: typeof params.developerId === 'string' ? params.developerId : undefined,
-   publisher: typeof params.publisherId === 'string' ? params.publisherId : undefined,
-   platform: typeof params.parentPlatformId === 'string' ? params.parentPlatformId : undefined,
-  }),
-  [params.developerId, params.genreSlug, params.parentPlatformId, params.publisherId],
- );
+ const routeDiscoveryFilters = useMemo(() => createRouteDiscoveryFilters(params), [params]);
 
  const hasActiveFilters =
   Boolean(appliedFilters.genre) ||
@@ -75,7 +58,7 @@ export function useHomeScreenState({ params }: UseHomeScreenStateParams) {
  }, [draftFilters, requestScrollToTop]);
 
  const resetFilters = useCallback(() => {
-  const nextFilters = createEmptyFilters();
+  const nextFilters = createEmptyGameDiscoveryFilters();
   setDraftFilters(nextFilters);
   setAppliedFilters(nextFilters);
   setSelectedOrdering(null);

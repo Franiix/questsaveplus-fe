@@ -37,15 +37,6 @@ function matchesMetadataFilter(
  return !selectedValue || (values ?? []).includes(selectedValue);
 }
 
-export function createEmptyGameDiscoveryFilters(): GameDiscoveryFilters {
- return {
-  genre: undefined,
-  platform: undefined,
-  developer: undefined,
-  publisher: undefined,
- };
-}
-
 export function shouldLoadBacklogMetadata(filters: GameDiscoveryFilters) {
  return hasDiscoveryFilters(filters);
 }

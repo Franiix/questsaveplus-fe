@@ -20,8 +20,8 @@ import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
+import { createEmptyGameDiscoveryFilters } from '@/shared/utils/gameDiscoveryFilters';
 import {
- createEmptyGameDiscoveryFilters,
  shouldLoadBacklogMetadata,
 } from '@/shared/utils/backlogScreen';
 import { useAuthStore } from '@/stores/auth.store';

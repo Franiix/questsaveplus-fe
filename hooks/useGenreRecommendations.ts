@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { searchCatalogGames } from '@/lib/catalog';
-import type { CatalogGame } from '@/shared/models/Catalog.model';
+import { getCatalogGameNumericId } from '@/shared/utils/catalogGame';
 
 type UseGenreRecommendationsParams = {
  currentGameId: number;
@@ -35,15 +35,6 @@ export function useGenreRecommendations({
     });
   },
   enabled: enabled && Number.isFinite(currentGameId) && Boolean(genreSlug),
-  staleTime: 10 * 60 * 1000,
+ staleTime: 10 * 60 * 1000,
  });
-}
-
-function getCatalogGameNumericId(game: CatalogGame) {
- if (typeof game.gameId === 'number' && Number.isFinite(game.gameId)) {
-  return game.gameId;
- }
-
- const externalId = Number(game.externalId);
- return Number.isFinite(externalId) ? externalId : null;
 }
