@@ -20,6 +20,10 @@ import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
+import {
+ createEmptyGameDiscoveryFilters,
+ shouldLoadBacklogMetadata,
+} from '@/shared/utils/backlogScreen';
 import { useAuthStore } from '@/stores/auth.store';
 import { useBacklogStore } from '@/stores/backlog.store';
 import { useToastStore } from '@/stores/toast.store';
@@ -41,14 +45,8 @@ export default function BacklogScreen() {
   const [search, setSearch] = useState('');
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const [pendingDeleteItem, setPendingDeleteItem] = useState<BacklogItemEntity | null>(null);
-  const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>({
-    genre: undefined,
-    platform: undefined,
-  });
-  const [draftFilters, setDraftFilters] = useState<GameDiscoveryFilters>({
-    genre: undefined,
-    platform: undefined,
-  });
+  const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
+  const [draftFilters, setDraftFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
  const { data: genres = [], isLoading: isGenresLoading, isError: isGenresError } = useCatalogGenres();
  const {
   data: parentPlatforms = [],
@@ -65,14 +63,9 @@ export default function BacklogScreen() {
   isLoading: isPublishersLoading,
   isError: isPublishersError,
  } = useCatalogPublishers();
-  const shouldLoadBacklogMetadata =
-  Boolean(appliedFilters.genre) ||
-  Boolean(appliedFilters.platform) ||
-  Boolean(appliedFilters.developer) ||
-  Boolean(appliedFilters.publisher);
   const { data: backlogMetadata } = useBacklogGameMetadata(
     backlogItems.map((item) => item.game_id),
-    shouldLoadBacklogMetadata,
+    shouldLoadBacklogMetadata(appliedFilters),
   );
 
   const userId = session?.user?.id;
@@ -105,18 +98,8 @@ export default function BacklogScreen() {
   }
 
   function handleResetFilters() {
-    setDraftFilters({
-       genre: undefined,
-       platform: undefined,
-       developer: undefined,
-       publisher: undefined,
-      });
-    setAppliedFilters({
-       genre: undefined,
-       platform: undefined,
-       developer: undefined,
-       publisher: undefined,
-      });
+    setDraftFilters(createEmptyGameDiscoveryFilters());
+    setAppliedFilters(createEmptyGameDiscoveryFilters());
   }
 
   const refetch = useCallback(() => {
@@ -185,13 +168,15 @@ export default function BacklogScreen() {
       </View>
 
       <BacklogScreenContent
-        activeFilter={activeFilter}
         colorMap={colorMap}
-        error={error}
-        filteredItems={filteredItems}
-        hasAppliedFilters={hasAppliedFilters}
-        isReadingList={isReadingList}
         labelMap={labelMap}
+        state={{
+          activeFilter,
+          error,
+          filteredItems,
+          hasAppliedFilters,
+          isReadingList,
+        }}
         onFilterChange={setActiveFilter}
         onItemPress={handleItemPress}
         onRefetch={() => void refetch()}

@@ -1,21 +1,22 @@
 import { FlatList, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { BacklogListItem } from '@/components/backlog/BacklogListItem';
 import { EmptyState } from '@/components/base/feedback/EmptyState';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { FilterChipRow } from '@/components/game/FilterChipRow';
-import { BacklogListItem } from '@/components/backlog/BacklogListItem';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
+import type {
+ BacklogScreenContentState,
+ BacklogStatusColorMap,
+ BacklogStatusLabelMap,
+} from '@/shared/models/backlog/BacklogScreenContent.model';
 import { spacing } from '@/shared/theme/tokens';
 
 type BacklogScreenContentProps = {
- activeFilter: BacklogStatusEnum | null;
- colorMap: Record<string, string>;
- error?: string | null;
- filteredItems: BacklogItemEntity[];
- hasAppliedFilters: boolean;
- isReadingList: boolean;
- labelMap: Record<string, string>;
+ colorMap: BacklogStatusColorMap;
+ labelMap: BacklogStatusLabelMap;
+ state: BacklogScreenContentState;
  onFilterChange: (value: BacklogStatusEnum | null) => void;
  onItemPress: (item: BacklogItemEntity) => void;
  onRefetch: () => void;
@@ -27,13 +28,9 @@ type BacklogScreenContentProps = {
 const HORIZONTAL_PADDING = spacing.md;
 
 export function BacklogScreenContent({
- activeFilter,
  colorMap,
- error,
- filteredItems,
- hasAppliedFilters,
- isReadingList,
  labelMap,
+ state,
  onFilterChange,
  onItemPress,
  onRefetch,
@@ -43,11 +40,11 @@ export function BacklogScreenContent({
 }: BacklogScreenContentProps) {
  const { t } = useTranslation();
 
- if (isReadingList) {
+ if (state.isReadingList) {
   return <LoadingSpinner fullScreen />;
  }
 
- if (error) {
+ if (state.error) {
   return (
    <View style={{ paddingTop: spacing.md }}>
     <EmptyState
@@ -62,20 +59,20 @@ export function BacklogScreenContent({
  return (
   <>
    <View style={{ marginBottom: spacing.xs }}>
-    <FilterChipRow activeFilter={activeFilter} onFilterChange={onFilterChange} />
+    <FilterChipRow activeFilter={state.activeFilter} onFilterChange={onFilterChange} />
    </View>
 
-   {filteredItems.length === 0 ? (
+   {state.filteredItems.length === 0 ? (
     <View style={{ paddingTop: spacing.md }}>
      <EmptyState
       icon="gamepad"
-      title={hasAppliedFilters ? t('backlog.emptyFiltered.title') : t('backlog.emptyAll.title')}
-      subtitle={hasAppliedFilters ? t('backlog.emptyFiltered.subtitle') : t('backlog.emptyAll.subtitle')}
+      title={state.hasAppliedFilters ? t('backlog.emptyFiltered.title') : t('backlog.emptyAll.title')}
+      subtitle={state.hasAppliedFilters ? t('backlog.emptyFiltered.subtitle') : t('backlog.emptyAll.subtitle')}
      />
     </View>
    ) : (
     <FlatList
-     data={filteredItems}
+     data={state.filteredItems}
      renderItem={({ item }) => (
       <BacklogListItem
        item={item}
