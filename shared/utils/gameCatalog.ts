@@ -1,12 +1,12 @@
+import { IGDB_REGION_NAMES } from '@/shared/consts/IgdbRegionNames.const';
 import { IGDB_GAME_CATEGORY_TRANSLATION_KEYS } from '@/shared/enums/GameCategory.enum';
 import type { CatalogGame, CatalogGameDetail } from '@/shared/models/Catalog.model';
-import type { GameCatalogScores } from '@/shared/models/GameCatalogScores.model';
 import type { GameCatalogAgeRating, GameCatalogInfo } from '@/shared/models/GameCatalogInfo.model';
 import type { GameCatalogLabel } from '@/shared/models/GameCatalogLabel.model';
 import type { GameCatalogLinkItem, LinkCategory } from '@/shared/models/GameCatalogLinkItem.model';
 import type { GameCatalogReleaseDateItem } from '@/shared/models/GameCatalogReleaseDateItem.model';
+import type { GameCatalogScores } from '@/shared/models/GameCatalogScores.model';
 import type { GameReleaseReadiness } from '@/shared/models/GameReleaseReadiness.model';
-import { formatDate } from '@/shared/utils/date';
 import type {
  CatalogLocale,
  IgdbAgeRating,
@@ -19,6 +19,8 @@ import type {
  IgdbReleaseDate,
  IgdbWebsite,
 } from '@/shared/models/IgdbCatalogExtras.model';
+import { formatDate } from '@/shared/utils/date';
+import { getIgdbStatusName } from '@/shared/utils/igdb';
 
 type TranslateFn = (key: string, options?: Record<string, unknown>) => string;
 
@@ -141,17 +143,6 @@ const EXTERNAL_SOURCE_CATEGORY: Record<number, LinkCategory> = {
  36: 'store',
 };
 
-const IGDB_REGION_NAMES: Record<number, string> = {
- 1: 'EU',
- 2: 'NA',
- 3: 'AU',
- 4: 'NZ',
- 5: 'JP',
- 6: 'CN',
- 7: 'AS',
- 8: 'WW',
-};
-
 const EXTERNAL_SOURCE_LABELS: Record<number, string> = {
  1: 'Steam',
  5: 'GOG',
@@ -243,6 +234,14 @@ function asSingleName(value: unknown): string | null {
  return typeof name === 'string' && name.trim().length > 0 ? name.trim() : null;
 }
 
+function asIgdbExtras(value: unknown): IgdbRawExtras | null {
+ return value && typeof value === 'object' ? (value as IgdbRawExtras) : null;
+}
+
+function getNamedItemNames(values?: IgdbNamedItem[] | null): string[] {
+ return uniqueStrings((values ?? []).map((item) => item.name?.trim() ?? null));
+}
+
 function asFirstArrayName(value: unknown): string | null {
  if (!Array.isArray(value)) return null;
  for (const item of value) {
@@ -319,7 +318,7 @@ function asReleaseDateItems(value: unknown, locale: string): GameCatalogReleaseD
       : null;
    if (!platformName || !dateLabel) return null;
    const regionCode =
-    typeof release.region === 'number' ? IGDB_REGION_NAMES[release.region] ?? null : null;
+    typeof release.region === 'number' ? (IGDB_REGION_NAMES[release.region] ?? null) : null;
    return {
     key: `${platformName}-${regionCode ?? ''}-${timestampMs || dateLabel}`,
     platformName,
@@ -363,13 +362,13 @@ function asAgeRatingItems(value: unknown): GameCatalogAgeRating[] {
   const rating = item as IgdbAgeRating;
   const system =
    typeof (rating.organization ?? rating.category) === 'number'
-    ? AGE_CATEGORY_LABELS[rating.organization ?? rating.category] ??
-      `System ${rating.organization ?? rating.category}`
+    ? (AGE_CATEGORY_LABELS[rating.organization ?? rating.category] ??
+      `System ${rating.organization ?? rating.category}`)
     : null;
   const ratingLabel =
    typeof (rating.rating_category ?? rating.rating) === 'number'
-    ? AGE_VALUE_LABELS[rating.rating_category ?? rating.rating] ??
-      String(rating.rating_category ?? rating.rating)
+    ? (AGE_VALUE_LABELS[rating.rating_category ?? rating.rating] ??
+      String(rating.rating_category ?? rating.rating))
     : null;
   if (!system && !ratingLabel) continue;
   const key = `${system ?? ''}-${ratingLabel ?? ''}`;
@@ -435,12 +434,23 @@ function asMultiplayerModes(value: unknown): GameCatalogLabel[] {
 function asLanguageSupportRows(value: unknown) {
  const entries = Array.isArray(value) ? value : value && typeof value === 'object' ? [value] : [];
  if (entries.length === 0) return [];
- const rows = new Map<string, { language: string; locale?: string | null; interface: boolean; audio: boolean; subtitles: boolean }>();
+ const rows = new Map<
+  string,
+  {
+   language: string;
+   locale?: string | null;
+   interface: boolean;
+   audio: boolean;
+   subtitles: boolean;
+  }
+ >();
  for (const item of entries as IgdbLanguageSupport[]) {
   const locale = item.language?.locale?.trim() ?? null;
   const regionCode = locale?.split(/[-_]/)[1]?.toUpperCase() ?? null;
   const baseLanguageName =
-   item.language?.name?.trim() ?? item.language?.native_name?.trim() ?? item.language?.locale?.trim();
+   item.language?.name?.trim() ??
+   item.language?.native_name?.trim() ??
+   item.language?.locale?.trim();
   const language =
    baseLanguageName && regionCode ? `${baseLanguageName} (${regionCode})` : baseLanguageName;
   const supportType = item.language_support_type?.name?.toLowerCase();
@@ -487,14 +497,15 @@ function asWebsiteItems(value: unknown): GameCatalogLinkItem[] {
    (typeof numericType === 'number' ? WEBSITE_TYPE_LABELS[numericType] : null) ||
    'Link';
   const category =
-   typeof numericType === 'number' ? WEBSITE_TYPE_CATEGORY[numericType] ?? null : null;
+   typeof numericType === 'number' ? (WEBSITE_TYPE_CATEGORY[numericType] ?? null) : null;
 
   seen.add(url);
   items.push({
    title: label,
    subtitle: url,
    url,
-   sourceKey: typeof numericType === 'number' ? String(numericType) : namedType?.toLowerCase() ?? null,
+   sourceKey:
+    typeof numericType === 'number' ? String(numericType) : (namedType?.toLowerCase() ?? null),
    category,
   });
  }
@@ -514,9 +525,7 @@ function asExternalStoreItems(value: unknown): GameCatalogLinkItem[] {
   if (!url || seen.has(url)) continue;
 
   const numericSource =
-   typeof external.external_game_source === 'number'
-    ? external.external_game_source
-    : null;
+   typeof external.external_game_source === 'number' ? external.external_game_source : null;
   const namedSource =
    external.external_game_source &&
    typeof external.external_game_source === 'object' &&
@@ -532,13 +541,16 @@ function asExternalStoreItems(value: unknown): GameCatalogLinkItem[] {
 
   const name = typeof external.name === 'string' ? external.name.trim() : '';
   const category =
-   typeof numericSource === 'number' ? EXTERNAL_SOURCE_CATEGORY[numericSource] ?? null : null;
+   typeof numericSource === 'number' ? (EXTERNAL_SOURCE_CATEGORY[numericSource] ?? null) : null;
   seen.add(url);
   items.push({
    title: source,
    subtitle: name || url,
    url,
-   sourceKey: typeof numericSource === 'number' ? String(numericSource) : namedSource?.toLowerCase() ?? null,
+   sourceKey:
+    typeof numericSource === 'number'
+     ? String(numericSource)
+     : (namedSource?.toLowerCase() ?? null),
    category,
   });
  }
@@ -553,9 +565,9 @@ export function getGameCatalogInfo(
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
  const typeKey =
   typeof extras.game_type?.id === 'number'
-   ? IGDB_GAME_CATEGORY_TRANSLATION_KEYS[extras.game_type.id] ?? null
+   ? (IGDB_GAME_CATEGORY_TRANSLATION_KEYS[extras.game_type.id] ?? null)
    : typeof extras.category === 'number'
-     ? IGDB_GAME_CATEGORY_TRANSLATION_KEYS[extras.category] ?? null
+     ? (IGDB_GAME_CATEGORY_TRANSLATION_KEYS[extras.category] ?? null)
      : null;
  const typeValue = typeKey
   ? {
@@ -576,9 +588,9 @@ export function getGameCatalogInfo(
   typeValue,
   engines: asPlainNamedList(extras.game_engines),
   parentGame: asSingleName(extras.parent_game),
- multiplayer: asMultiplayerModes(extras.multiplayer_modes),
- languageSupportRows: asLanguageSupportRows(extras.language_supports),
- websites: asWebsiteItems(extras.websites).map((item) => `${item.title} - ${item.subtitle}`),
+  multiplayer: asMultiplayerModes(extras.multiplayer_modes),
+  languageSupportRows: asLanguageSupportRows(extras.language_supports),
+  websites: asWebsiteItems(extras.websites).map((item) => `${item.title} - ${item.subtitle}`),
  };
 }
 
@@ -609,8 +621,7 @@ export function getGameCatalogFranchiseName(raw?: unknown | null) {
 
 export function getGameCatalogRatings(raw?: unknown | null): GameCatalogScores {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
- const aggregated =
-  typeof extras.aggregated_rating === 'number' ? extras.aggregated_rating : null;
+ const aggregated = typeof extras.aggregated_rating === 'number' ? extras.aggregated_rating : null;
  const aggregatedCount =
   typeof extras.aggregated_rating_count === 'number' ? extras.aggregated_rating_count : null;
  const total = typeof extras.total_rating === 'number' ? extras.total_rating : null;
@@ -708,22 +719,19 @@ export function getIgdbNamedItemExternalId(
 }
 
 export function getIgdbCategoryTranslationKey(raw: unknown | null) {
-  if (!raw) return null;
-  const extras = raw as IgdbRawExtras & { relationKind?: unknown };
-  const category = extras.game_type?.id ?? extras.category;
-  if (typeof category === 'number') {
-   return IGDB_GAME_CATEGORY_TRANSLATION_KEYS[category] ?? null;
-  }
+ if (!raw) return null;
+ const extras = raw as IgdbRawExtras;
+ const category = extras.game_type?.id ?? extras.category;
+ if (typeof category === 'number') {
+  return IGDB_GAME_CATEGORY_TRANSLATION_KEYS[category] ?? null;
+ }
 
-  return typeof extras.relationKind === 'string' ? extras.relationKind : null;
+ return extras.relationKind ?? null;
 }
 
 export function getGameCatalogReleaseStatusKey(raw?: unknown | null) {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
- const status =
-  ((extras as IgdbRawExtras & { game_status?: IgdbNamedItem | null }).game_status?.name?.trim() ??
-   extras.status?.status?.trim() ??
-   extras.status?.name?.trim());
+ const status = getIgdbStatusName(extras);
  if (status) return normalizeReleaseStatusKey(status);
 
  if (typeof extras.first_release_date === 'number') {
@@ -738,10 +746,7 @@ export function getGameCatalogReleaseStatusLabel(
  translate: (key: string, options?: Record<string, unknown>) => string,
 ) {
  const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
- const status =
-  ((extras as IgdbRawExtras & { game_status?: IgdbNamedItem | null }).game_status?.name?.trim() ??
-   extras.status?.status?.trim() ??
-   extras.status?.name?.trim());
+ const status = getIgdbStatusName(extras);
  if (status) {
   const statusKey = normalizeReleaseStatusKey(status);
   return translate(`gameDetail.releaseStatuses.${statusKey}`, { defaultValue: status });
@@ -760,7 +765,9 @@ export function getCatalogGameCategoryTranslationKey(game?: Pick<CatalogGame, 'm
  return getIgdbCategoryTranslationKey(game?.metadata?.raw ?? null);
 }
 
-export function getGameCatalogParentPlatformItems(platforms: Array<{ name?: string | null } | string>) {
+export function getGameCatalogParentPlatformItems(
+ platforms: Array<{ name?: string | null } | string>,
+) {
  const seen = new Set<string>();
  const items: Array<{ slug: string; name: string }> = [];
 
@@ -822,8 +829,7 @@ function hasOnlineCoop(raw: IgdbRawExtras | null | undefined) {
 
 function hasCompetitiveOnline(raw: IgdbRawExtras | null | undefined) {
  return getMultiplayerEntries(raw).some(
-  (entry) =>
-   !entry.onlinecoop && typeof entry.onlinemax === 'number' && entry.onlinemax > 1,
+  (entry) => !entry.onlinecoop && typeof entry.onlinemax === 'number' && entry.onlinemax > 1,
  );
 }
 
@@ -880,11 +886,9 @@ export function getGameEditorialPlaystyle(
   });
  }
 
- const subtitleParts = [
-  themes[0] ?? null,
-  perspectives[0] ?? null,
-  gameModes[0] ?? null,
- ].filter((value): value is string => Boolean(value));
+ const subtitleParts = [themes[0] ?? null, perspectives[0] ?? null, gameModes[0] ?? null].filter(
+  (value): value is string => Boolean(value),
+ );
 
  if (rows.length === 0) return null;
 
@@ -899,13 +903,13 @@ function hasSharedUniverseName(current: CatalogGameDetail, candidate: CatalogGam
   [
    ...(current.collections ?? []),
    ...(current.metadata?.collections ?? []),
-   ...(((current.metadata?.raw?.collections ?? []) as IgdbNamedItem[]).map((item) => item.name?.trim() ?? '')),
+   ...getNamedItemNames(current.metadata?.raw?.collections),
   ].filter(Boolean),
  );
  const candidateCollections = new Set(
   [
-   ...((candidate.metadata?.collections ?? []) as string[]),
-   ...((((candidate.metadata?.raw?.collections ?? []) as IgdbNamedItem[]).map((item) => item.name?.trim() ?? ''))),
+   ...(candidate.metadata?.collections ?? []),
+   ...getNamedItemNames(candidate.metadata?.raw?.collections),
   ].filter(Boolean),
  );
  if (currentCollections.size > 0 && candidateCollections.size > 0) {
@@ -918,13 +922,13 @@ function hasSharedUniverseName(current: CatalogGameDetail, candidate: CatalogGam
   [
    ...(current.franchises ?? []),
    ...(current.metadata?.franchises ?? []),
-   ...(((current.metadata?.raw?.franchises ?? []) as IgdbNamedItem[]).map((item) => item.name?.trim() ?? '')),
+   ...getNamedItemNames(current.metadata?.raw?.franchises),
   ].filter(Boolean),
  );
  const candidateFranchises = new Set(
   [
-   ...((candidate.metadata?.franchises ?? []) as string[]),
-   ...((((candidate.metadata?.raw?.franchises ?? []) as IgdbNamedItem[]).map((item) => item.name?.trim() ?? ''))),
+   ...(candidate.metadata?.franchises ?? []),
+   ...getNamedItemNames(candidate.metadata?.raw?.franchises),
   ].filter(Boolean),
  );
  for (const name of currentFranchises) {
@@ -938,7 +942,10 @@ function normalizeSeriesRoot(value: string) {
  const trimmed = value.trim().toLowerCase();
  const head = trimmed.split(':')[0]?.trim() ?? trimmed;
  return head
-  .replace(/\b(ultimate|deluxe|complete|definitive|gold|special|hd|remastered|remake|edition)\b/g, '')
+  .replace(
+   /\b(ultimate|deluxe|complete|definitive|gold|special|hd|remastered|remake|edition)\b/g,
+   '',
+  )
   .replace(/\s+/g, ' ')
   .trim();
 }
@@ -986,7 +993,11 @@ function hasSharedSeriesTitle(current: CatalogGameDetail, candidate: CatalogGame
  const currentRoot = normalizeSeriesRoot(current.name);
  const candidateRoot = normalizeSeriesRoot(candidate.name);
  if (!currentRoot || !candidateRoot) return false;
- return candidateRoot === currentRoot || candidateRoot.startsWith(`${currentRoot} `) || candidate.name.toLowerCase().includes(currentRoot);
+ return (
+  candidateRoot === currentRoot ||
+  candidateRoot.startsWith(`${currentRoot} `) ||
+  candidate.name.toLowerCase().includes(currentRoot)
+ );
 }
 
 function isMainlineSeriesCandidate(game: CatalogGame) {
@@ -1006,14 +1017,16 @@ export function getGameEditorialSeriesNeighbors(
   .filter((entry) => Number.isFinite(entry.releaseAt))
   .sort((left, right) => left.releaseAt - right.releaseAt);
 
- const universeCandidates = baseCandidates.filter((entry) => hasSharedUniverseName(game, entry.item));
+ const universeCandidates = baseCandidates.filter((entry) =>
+  hasSharedUniverseName(game, entry.item),
+ );
  const titleCandidates = baseCandidates.filter((entry) => hasSharedSeriesTitle(game, entry.item));
  const candidates =
   universeCandidates.length > 0
    ? universeCandidates
    : titleCandidates.length > 0
-    ? titleCandidates
-    : baseCandidates;
+     ? titleCandidates
+     : baseCandidates;
 
  const currentSeries = parseSeriesSequenceToken(game.name);
  const numberedCandidates = candidates
@@ -1025,28 +1038,33 @@ export function getGameEditorialSeriesNeighbors(
 
  const exactPrequel =
   currentSeries.sequence && currentSeries.sequence > 1
-   ? numberedCandidates.find((entry) => entry.parsed.sequence === currentSeries.sequence - 1)?.item ?? null
+   ? (numberedCandidates.find((entry) => entry.parsed.sequence === currentSeries.sequence - 1)
+      ?.item ?? null)
    : null;
- const exactSequel =
-  currentSeries.sequence
-   ? numberedCandidates.find((entry) => entry.parsed.sequence === currentSeries.sequence + 1)?.item ?? null
-   : null;
+ const exactSequel = currentSeries.sequence
+  ? (numberedCandidates.find((entry) => entry.parsed.sequence === currentSeries.sequence + 1)
+     ?.item ?? null)
+  : null;
 
  const unnumberedPrequel =
   currentSeries.sequence === 2
-   ? numberedCandidates.find((entry) => entry.parsed.sequence === null && normalizeSeriesRoot(entry.item.name) === currentSeries.root)?.item ?? null
+   ? (numberedCandidates.find(
+      (entry) =>
+       entry.parsed.sequence === null &&
+       normalizeSeriesRoot(entry.item.name) === currentSeries.root,
+     )?.item ?? null)
    : null;
 
  const prequel =
   exactPrequel ??
   unnumberedPrequel ??
   (Number.isFinite(currentRelease)
-   ? [...candidates].reverse().find((entry) => entry.releaseAt < currentRelease)?.item ?? null
+   ? ([...candidates].reverse().find((entry) => entry.releaseAt < currentRelease)?.item ?? null)
    : null);
  const sequel =
   exactSequel ??
   (Number.isFinite(currentRelease)
-   ? candidates.find((entry) => entry.releaseAt > currentRelease)?.item ?? null
+   ? (candidates.find((entry) => entry.releaseAt > currentRelease)?.item ?? null)
    : null);
 
  return {
@@ -1151,21 +1169,21 @@ export function getGameEditorialPlacement(
      defaultValue: `Versione ${versionTitle}`,
     })
   : seriesName
-   ? translate('gameDetail.editorial.placement.seriesSubtitle', {
-      name: seriesName,
-      defaultValue: `Parte della serie ${seriesName}`,
-     })
-   : collectionName
-    ? translate('gameDetail.editorial.placement.collectionSubtitle', {
-       name: collectionName,
-       defaultValue: `Si colloca nella collezione ${collectionName}`,
+    ? translate('gameDetail.editorial.placement.seriesSubtitle', {
+       name: seriesName,
+       defaultValue: `Parte della serie ${seriesName}`,
       })
-    : linkedTo
-     ? translate('gameDetail.editorial.placement.linkedSubtitle', {
-        name: linkedTo,
-        defaultValue: `Collegato a ${linkedTo}`,
-       })
-     : null;
+    : collectionName
+      ? translate('gameDetail.editorial.placement.collectionSubtitle', {
+         name: collectionName,
+         defaultValue: `Si colloca nella collezione ${collectionName}`,
+        })
+      : linkedTo
+        ? translate('gameDetail.editorial.placement.linkedSubtitle', {
+           name: linkedTo,
+           defaultValue: `Collegato a ${linkedTo}`,
+          })
+        : null;
 
  if (rows.length === 0) return null;
 
@@ -1180,7 +1198,7 @@ export function getGameEditorialAudience(
  raw: unknown | null,
  translate: TranslateFn,
 ): GameEditorialCardContent | null {
- const extras = ((raw ?? game.metadata?.raw ?? null) as IgdbRawExtras | null) ?? null;
+ const extras = asIgdbExtras(raw ?? game.metadata?.raw ?? null);
  const bullets: string[] = [];
 
  const pushBullet = (value: string) => {
@@ -1260,7 +1278,7 @@ export function getGameEditorialAudience(
  if (bullets.length === 0 && hasTheme(extras, /action/i)) {
   pushBullet(
    translate('gameDetail.editorial.audience.action', {
-    defaultValue: "Ideale per chi cerca ritmo e azione immediata",
+    defaultValue: 'Ideale per chi cerca ritmo e azione immediata',
    }),
   );
  }
@@ -1283,7 +1301,8 @@ export function getGameEditorialReleaseReadiness(
  translate: TranslateFn,
  locale = 'en',
 ): GameEditorialCardContent | null {
- const readiness: GameReleaseReadiness | null = game.releaseReadiness ?? game.metadata?.releaseReadiness ?? null;
+ const readiness: GameReleaseReadiness | null =
+  game.releaseReadiness ?? game.metadata?.releaseReadiness ?? null;
  if (!readiness) return null;
 
  const statusValue =

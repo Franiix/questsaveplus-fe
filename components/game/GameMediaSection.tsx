@@ -2,7 +2,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Modal, Pressable, Text, View, useWindowDimensions } from 'react-native';
+import { FlatList, Modal, Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { Card } from '@/components/base/display/Card';
 import { ImageWithFallback } from '@/components/base/display/ImageWithFallback';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
@@ -11,9 +11,22 @@ import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens
 
 type MediaTab = 'screenshots' | 'artworks' | 'trailers';
 
+type MediaTabOption = {
+ key: MediaTab;
+ label: string;
+ count: number;
+};
+
+type TrailerItem = {
+ title: string;
+ videoId: string;
+ url: string;
+ thumbnail: string;
+};
+
 type GameMediaSectionProps = {
  providerId?: string | null;
- raw?: unknown | null;
+ raw?: IgdbRawExtras | null;
 };
 
 const THUMBNAIL_WIDTH = 240;
@@ -34,48 +47,71 @@ function getYoutubeUrl(videoId?: string) {
  return `https://www.youtube.com/watch?v=${videoId}`;
 }
 
+function buildTrailerItems(videos: IgdbRawExtras['videos']): TrailerItem[] {
+ return (videos ?? [])
+  .map((video) => {
+   const videoId = video.video_id ?? null;
+   const url = getYoutubeUrl(video.video_id);
+   const thumbnail = getYoutubeThumbnail(video.video_id);
+
+   if (!videoId || !url || !thumbnail) {
+    return null;
+   }
+
+   return {
+    title: video.name?.trim() || 'Trailer',
+    videoId,
+    url,
+    thumbnail,
+   };
+  })
+  .filter((item): item is TrailerItem => item !== null);
+}
+
+function buildMediaTabOptions(
+ providerId: string | null | undefined,
+ t: ReturnType<typeof useTranslation>['t'],
+ trailersCount: number,
+ screenshotsCount: number,
+ artworksCount: number,
+): MediaTabOption[] {
+ if (providerId !== 'igdb') {
+  return [];
+ }
+
+ return [
+  { key: 'trailers' as const, label: t('gameDetail.trailers'), count: trailersCount },
+  { key: 'screenshots' as const, label: t('gameDetail.screenshots'), count: screenshotsCount },
+  { key: 'artworks' as const, label: t('gameDetail.artworks'), count: artworksCount },
+ ].filter((item) => item.count > 0);
+}
+
 export function GameMediaSection({ providerId, raw }: GameMediaSectionProps) {
  const { t } = useTranslation();
  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
  const [selectedImage, setSelectedImage] = useState<string | null>(null);
  const [activeTab, setActiveTab] = useState<MediaTab>('screenshots');
 
- const media = ((raw ?? {}) as IgdbRawExtras) ?? {};
+ const media = raw ?? null;
  const screenshots = useMemo(
   () =>
-   (media.screenshots ?? [])
+   (media?.screenshots ?? [])
     .map((item) => buildIgdbImageUrl(item.image_id))
     .filter((item): item is string => Boolean(item)),
-  [media.screenshots],
+  [media?.screenshots],
  );
  const artworks = useMemo(
   () =>
-   (media.artworks ?? [])
+   (media?.artworks ?? [])
     .map((item) => buildIgdbImageUrl(item.image_id))
     .filter((item): item is string => Boolean(item)),
-  [media.artworks],
+  [media?.artworks],
  );
- const trailers = useMemo(
-  () =>
-   (media.videos ?? [])
-    .map((video) => ({
-      title: video.name?.trim() || 'Trailer',
-      videoId: video.video_id ?? null,
-      url: getYoutubeUrl(video.video_id),
-      thumbnail: getYoutubeThumbnail(video.video_id),
-    }))
-    .filter((item) => Boolean(item.videoId && item.url && item.thumbnail)),
-  [media.videos],
+ const trailers = useMemo(() => buildTrailerItems(media?.videos), [media?.videos]);
+ const tabs = useMemo(
+  () => buildMediaTabOptions(providerId, t, trailers.length, screenshots.length, artworks.length),
+  [artworks.length, providerId, screenshots.length, t, trailers.length],
  );
-
- const tabs = (providerId === 'igdb'
-  ? [
-     { key: 'trailers' as const, label: t('gameDetail.trailers'), count: trailers.length },
-     { key: 'screenshots' as const, label: t('gameDetail.screenshots'), count: screenshots.length },
-     { key: 'artworks' as const, label: t('gameDetail.artworks'), count: artworks.length },
-    ]
-  : []
- ).filter((item) => item.count > 0);
 
  const defaultTab = tabs[0]?.key ?? 'screenshots';
  useEffect(() => {
@@ -95,10 +131,10 @@ export function GameMediaSection({ providerId, raw }: GameMediaSectionProps) {
    <Card
     variant="outlined"
     style={{
-      marginTop: spacing.xl,
-      padding: spacing.md,
-      gap: spacing.md,
-   }}
+     marginTop: spacing.xl,
+     padding: spacing.md,
+     gap: spacing.md,
+    }}
    >
     <SectionTitle title={t('gameDetail.media')} />
 
@@ -110,12 +146,12 @@ export function GameMediaSection({ providerId, raw }: GameMediaSectionProps) {
         key={tab.key}
         onPress={() => setActiveTab(tab.key)}
         style={{
-          borderRadius: borderRadius.full,
-          paddingHorizontal: spacing.md,
-          paddingVertical: spacing.sm,
-          borderWidth: 1,
-          borderColor: isActive ? colors.primary.DEFAULT : colors.border.subtle,
-          backgroundColor: isActive ? colors.primary.glowSoft : colors.background.elevated,
+         borderRadius: borderRadius.full,
+         paddingHorizontal: spacing.md,
+         paddingVertical: spacing.sm,
+         borderWidth: 1,
+         borderColor: isActive ? colors.primary.DEFAULT : colors.border.subtle,
+         backgroundColor: isActive ? colors.primary.glowSoft : colors.background.elevated,
         }}
        >
         <Text
@@ -143,9 +179,9 @@ export function GameMediaSection({ providerId, raw }: GameMediaSectionProps) {
        <Card
         variant="outlined"
         onPress={() => {
-          if (item.url) {
-            void Linking.openURL(item.url);
-          }
+         if (item.url) {
+          void Linking.openURL(item.url);
+         }
         }}
         style={{ overflow: 'hidden' }}
        >
@@ -158,13 +194,13 @@ export function GameMediaSection({ providerId, raw }: GameMediaSectionProps) {
          />
          <View
           style={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0,
-            alignItems: 'center',
-            justifyContent: 'center',
+           position: 'absolute',
+           top: 0,
+           right: 0,
+           bottom: 0,
+           left: 0,
+           alignItems: 'center',
+           justifyContent: 'center',
           }}
          >
           <View
@@ -185,18 +221,18 @@ export function GameMediaSection({ providerId, raw }: GameMediaSectionProps) {
          <Text
           numberOfLines={2}
           style={{
-            color: colors.text.primary,
-            fontSize: typography.size.base,
-            fontFamily: typography.font.semibold,
+           color: colors.text.primary,
+           fontSize: typography.size.base,
+           fontFamily: typography.font.semibold,
           }}
          >
           {item.title}
          </Text>
          <Text
           style={{
-            color: colors.primary.DEFAULT,
-            fontSize: typography.size.sm,
-            fontFamily: typography.font.semibold,
+           color: colors.primary.DEFAULT,
+           fontSize: typography.size.sm,
+           fontFamily: typography.font.semibold,
           }}
          >
           {t('gameDetail.watchTrailer')}
@@ -230,9 +266,9 @@ export function GameMediaSection({ providerId, raw }: GameMediaSectionProps) {
     ) : (
      <Text
       style={{
-        color: colors.text.secondary,
-        fontSize: typography.size.sm,
-        fontFamily: typography.font.regular,
+       color: colors.text.secondary,
+       fontSize: typography.size.sm,
+       fontFamily: typography.font.regular,
       }}
      >
       {t('gameDetail.noScreenshots')}
@@ -240,7 +276,12 @@ export function GameMediaSection({ providerId, raw }: GameMediaSectionProps) {
     )}
    </Card>
 
-   <Modal visible={Boolean(selectedImage)} transparent animationType="fade" onRequestClose={() => setSelectedImage(null)}>
+   <Modal
+    visible={Boolean(selectedImage)}
+    transparent
+    animationType="fade"
+    onRequestClose={() => setSelectedImage(null)}
+   >
     <View
      style={{
       flex: 1,
@@ -252,18 +293,18 @@ export function GameMediaSection({ providerId, raw }: GameMediaSectionProps) {
      <Pressable
       onPress={() => setSelectedImage(null)}
       style={{
-        position: 'absolute',
-        top: spacing['2xl'],
-        right: spacing.lg,
-        zIndex: 2,
-        width: 42,
-        height: 42,
-        borderRadius: borderRadius.full,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'rgba(255,255,255,0.08)',
-        borderWidth: 1,
-        borderColor: colors.border.strong,
+       position: 'absolute',
+       top: spacing['2xl'],
+       right: spacing.lg,
+       zIndex: 2,
+       width: 42,
+       height: 42,
+       borderRadius: borderRadius.full,
+       alignItems: 'center',
+       justifyContent: 'center',
+       backgroundColor: 'rgba(255,255,255,0.08)',
+       borderWidth: 1,
+       borderColor: colors.border.strong,
       }}
      >
       <FontAwesome5 name="times" size={18} color={colors.text.primary} solid />

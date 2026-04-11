@@ -44,6 +44,13 @@ type MetaLineProps = {
  onPress?: (() => void) | null;
 };
 
+type MetaSectionItem = {
+ icon: React.ComponentProps<typeof FontAwesome5>['name'];
+ label: string;
+ value: string;
+ onPress?: (() => void) | null;
+};
+
 function AnimatedScoreValue({
  value,
  format,
@@ -92,8 +99,8 @@ function AnimatedScoreValue({
   value === null
    ? '--'
    : format === 'percent'
-    ? `${Math.round(displayValue)}%`
-    : `${displayValue.toFixed(1)}/5`;
+     ? `${Math.round(displayValue)}%`
+     : `${displayValue.toFixed(1)}/5`;
 
  return (
   <Animated.Text
@@ -217,6 +224,25 @@ function ScoreCard({
  );
 }
 
+function getRatingsCaption(
+ t: ReturnType<typeof useTranslation>['t'],
+ count: number | null | undefined,
+ isLoading = false,
+) {
+ if (isLoading) {
+  return '...';
+ }
+
+ if (count && count > 0) {
+  return t('gameDetail.ratingsCount', {
+   count,
+   defaultValue: `${count}`,
+  });
+ }
+
+ return t('gameDetail.noVotes');
+}
+
 export function GameMetaSection({
  criticRating,
  criticRatingCount,
@@ -232,22 +258,36 @@ export function GameMetaSection({
  onPublisherPress,
 }: GameMetaSectionProps) {
  const { t } = useTranslation();
- const criticCaption =
-  criticRatingCount && criticRatingCount > 0
-   ? t('gameDetail.ratingsCount', { count: criticRatingCount, defaultValue: `${criticRatingCount}` })
-   : t('gameDetail.noVotes');
- const igdbCommunityCaption =
-  igdbCommunityRatingCount && igdbCommunityRatingCount > 0
-   ? t('gameDetail.ratingsCount', {
-      count: igdbCommunityRatingCount,
-      defaultValue: `${igdbCommunityRatingCount}`,
-     })
-   : t('gameDetail.noVotes');
- const questSaveCaption = isQuestSaveRatingLoading
-  ? '...'
-  : questSaveRatingCount > 0
-   ? t('gameDetail.ratingsCount', { count: questSaveRatingCount, defaultValue: `${questSaveRatingCount}` })
-   : t('gameDetail.noVotes');
+ const criticCaption = getRatingsCaption(t, criticRatingCount);
+ const igdbCommunityCaption = getRatingsCaption(t, igdbCommunityRatingCount);
+ const questSaveCaption = getRatingsCaption(t, questSaveRatingCount, isQuestSaveRatingLoading);
+ const metaItems: MetaSectionItem[] = [];
+
+ if (releaseDate) {
+  metaItems.push({
+   icon: 'calendar-alt',
+   label: t('gameDetail.releaseDate'),
+   value: releaseDate,
+  });
+ }
+
+ if (developerName) {
+  metaItems.push({
+   icon: 'code',
+   label: t('gameDetail.developer'),
+   value: developerName,
+   onPress: onDeveloperPress,
+  });
+ }
+
+ if (publisherName) {
+  metaItems.push({
+   icon: 'building',
+   label: t('gameDetail.publisher'),
+   value: publisherName,
+   onPress: onPublisherPress,
+  });
+ }
 
  return (
   <View style={{ gap: spacing.md, marginBottom: spacing.lg }}>
@@ -311,25 +351,15 @@ export function GameMetaSection({
      borderColor: colors.border.DEFAULT,
     }}
    >
-    {releaseDate ? (
-     <MetaLine icon="calendar-alt" label={t('gameDetail.releaseDate')} value={releaseDate} />
-    ) : null}
-    {developerName ? (
+    {metaItems.map((item) => (
      <MetaLine
-      icon="code"
-      label={t('gameDetail.developer')}
-      value={developerName}
-      onPress={onDeveloperPress}
+      key={`${item.icon}-${item.label}`}
+      icon={item.icon}
+      label={item.label}
+      value={item.value}
+      onPress={item.onPress}
      />
-    ) : null}
-    {publisherName ? (
-     <MetaLine
-      icon="building"
-      label={t('gameDetail.publisher')}
-      value={publisherName}
-      onPress={onPublisherPress}
-     />
-    ) : null}
+    ))}
    </View>
   </View>
  );

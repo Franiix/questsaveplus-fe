@@ -43,7 +43,7 @@ export function Avatar({ uri, name, size = 40 }: AvatarProps) {
     style={{
      color: colors.text.primary,
      fontSize: size * 0.4,
-     fontWeight: typography.weight.semibold as '600',
+     fontFamily: typography.font.semibold,
      lineHeight: size * 0.5,
     }}
    >

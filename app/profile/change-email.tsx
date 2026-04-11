@@ -1,9 +1,9 @@
-import { AuthStatusIcon } from '@/components/auth/AuthStatusIcon';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
+import { AuthStatusIcon } from '@/components/auth/AuthStatusIcon';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { HintBox } from '@/components/base/display/HintBox';
 import { ErrorBox } from '@/components/base/feedback/ErrorBox';
@@ -47,14 +47,16 @@ export default function ChangeEmailScreen() {
       style={{
        color: colors.text.primary,
        fontSize: typography.size.lg,
-       fontWeight: typography.weight.semibold as '600',
+       fontFamily: typography.font.semibold,
        marginBottom: spacing.xs,
        textAlign: 'center',
       }}
      >
       {t('auth.changeEmail.successTitle')}
      </Text>
-     <Text style={{ color: colors.text.secondary, fontSize: typography.size.md, textAlign: 'center' }}>
+     <Text
+      style={{ color: colors.text.secondary, fontSize: typography.size.md, textAlign: 'center' }}
+     >
       {t('auth.changeEmail.successSubtitle')}
      </Text>
     </HintBox>
@@ -74,7 +76,7 @@ export default function ChangeEmailScreen() {
      style={{
       color: colors.text.primary,
       fontSize: typography.size['2xl'],
-      fontWeight: typography.weight.bold as '700',
+      fontFamily: typography.font.bold,
       marginBottom: spacing.xs,
      }}
     >

@@ -1,7 +1,7 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import type React from 'react';
-import { Pressable, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 
@@ -103,7 +103,7 @@ export function ScreenHeader({ title, onBack, rightAction }: ScreenHeaderProps) 
      flex: 1,
      color: colors.text.primary,
      fontSize: typography.size.lg,
-     fontWeight: typography.weight.semibold as '600',
+     fontFamily: typography.font.semibold,
      textAlign: 'center',
      letterSpacing: typography.letterSpacing.tight,
     }}

@@ -74,7 +74,7 @@ export function ConfirmModal({
       style={{
        color: colors.text.primary,
        fontSize: typography.size.lg,
-       fontWeight: typography.weight.semibold as '600',
+       fontFamily: typography.font.semibold,
       }}
      >
       {title}

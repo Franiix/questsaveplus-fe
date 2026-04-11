@@ -1,17 +1,18 @@
 import type {
+ EdgeGameDetail,
+ EdgeGameSearchItem,
+ EdgeSourceProviderId,
+} from '@/lib/catalog/contracts/edge';
+import type { CatalogProviderId } from '@/shared/enums/CatalogProvider.enum';
+import type {
  CatalogCompany,
  CatalogGame,
  CatalogGameDetail,
  CatalogImage,
 } from '@/shared/models/Catalog.model';
 import type { CatalogGameMetadata } from '@/shared/models/CatalogGameMetadata.model';
-import type { CatalogProviderId } from '@/shared/enums/CatalogProvider.enum';
 import { getGameCatalogParentPlatformItems } from '@/shared/utils/gameCatalog';
-import type {
- EdgeGameDetail,
- EdgeGameSearchItem,
- EdgeSourceProviderId,
-} from '@/lib/catalog/contracts/edge';
+import { getIgdbStatusName } from '@/shared/utils/igdb';
 
 type EdgeGameMetadataSource = EdgeGameSearchItem & Partial<EdgeGameDetail>;
 
@@ -43,12 +44,7 @@ function createGameMetadata(game: EdgeGameMetadataSource): CatalogGameMetadata {
   gameId: game.gameId,
   summary: game.summary,
   gameType: game.gameType ?? game.raw?.game_type?.type?.trim() ?? null,
-  releaseStatus:
-   game.status ??
-   game.raw?.game_status?.name?.trim() ??
-   game.raw?.status?.status?.trim() ??
-   game.raw?.status?.name?.trim() ??
-   null,
+  releaseStatus: game.status ?? getIgdbStatusName(game.raw) ?? null,
   aggregatedRating: game.aggregatedRating,
   aggregatedRatingCount: game.aggregatedRatingCount,
   totalRating: game.totalRating,

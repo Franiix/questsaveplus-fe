@@ -56,7 +56,7 @@ export default function ChangePasswordScreen() {
        style={{
         color: colors.text.primary,
         fontSize: typography.size.lg,
-        fontWeight: typography.weight.semibold as '600',
+        fontFamily: typography.font.semibold,
         marginBottom: spacing.xs,
         flex: 1,
        }}
@@ -81,7 +81,7 @@ export default function ChangePasswordScreen() {
      style={{
       color: colors.text.primary,
       fontSize: typography.size['2xl'],
-      fontWeight: typography.weight.bold as '700',
+      fontFamily: typography.font.bold,
       marginBottom: spacing.xs,
      }}
     >

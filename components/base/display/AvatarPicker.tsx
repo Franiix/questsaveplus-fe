@@ -96,7 +96,7 @@ export function AvatarPicker({ uri, onPick, label, buttonLabel, isDisabled }: Av
      style={{
       color: colors.primary.DEFAULT,
       fontSize: typography.size.sm,
-      fontWeight: typography.weight.medium as '500',
+      fontFamily: typography.font.medium,
      }}
     >
      {buttonLabel}

@@ -60,7 +60,7 @@ export default function RegisterScreen() {
      style={{
       color: colors.text.primary,
       fontSize: typography.size['2xl'],
-      fontWeight: typography.weight.bold as '700',
+      fontFamily: typography.font.bold,
       marginBottom: spacing.xs,
      }}
     >

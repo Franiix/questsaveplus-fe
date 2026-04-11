@@ -31,7 +31,7 @@ export function TextLink({ text, linkText, onPress }: TextLinkProps) {
      style={{
       color: colors.primary.DEFAULT,
       fontSize: typography.size.sm,
-      fontWeight: typography.weight.semibold as '600',
+      fontFamily: typography.font.semibold,
      }}
     >
      {linkText}

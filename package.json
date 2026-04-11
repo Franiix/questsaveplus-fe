@@ -8,6 +8,8 @@
 		"android": "expo start --android",
 		"ios": "expo start --ios",
 		"web": "expo start --web",
+		"test": "vitest run",
+		"test:watch": "vitest",
 		"lint": "biome lint .",
 		"format": "biome format --write .",
 		"check": "biome check --write ."
@@ -66,6 +68,8 @@
 		"@types/react": "~19.1.0",
 		"babel-plugin-module-resolver": "^5.0.3",
 		"tailwindcss": "^3.4.19",
-		"typescript": "^5.8.0"
+		"typescript": "^5.8.0",
+		"vite-tsconfig-paths": "^5.1.4",
+		"vitest": "^3.2.4"
 	}
 }

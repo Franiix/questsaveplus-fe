@@ -138,7 +138,7 @@ export function DatePickerInput({
 
    {/* Android: picker nativo diretto */}
    {Platform.OS === 'android' && isOpen ? (
-   <DateTimePicker
+    <DateTimePicker
      value={value ?? new Date()}
      mode={mode === 'datetime' ? 'date' : mode}
      locale={pickerLocale}
@@ -192,17 +192,13 @@ export function DatePickerInput({
          style={{
           color: colors.text.secondary,
           fontSize: typography.size.sm,
-          fontWeight: typography.weight.medium as '500',
+          fontFamily: typography.font.medium,
          }}
         >
          {accessibilityLabel ?? placeholder}
         </Text>
 
-        <ModalCloseButton
-         label={t('common.confirm')}
-         onPress={handleConfirm}
-         iconName="check"
-        />
+        <ModalCloseButton label={t('common.confirm')} onPress={handleConfirm} iconName="check" />
        </View>
 
        <DateTimePicker

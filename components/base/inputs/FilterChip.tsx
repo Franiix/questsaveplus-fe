@@ -23,12 +23,7 @@ type FilterChipProps = {
  * Selected: sfondo tinto (15% opacità) + bordo brand.
  * Unselected: sfondo trasparente + bordo default.
  */
-export function FilterChip({
- label,
- isSelected,
- onPress,
- isDisabled = false,
-}: FilterChipProps) {
+export function FilterChip({ label, isSelected, onPress, isDisabled = false }: FilterChipProps) {
  const selectedColor = colors.primary.DEFAULT;
  const selectedGlow = colors.primary.glow;
  const containerStyle = ({ pressed }: { pressed: boolean }) => ({
@@ -78,7 +73,7 @@ export function FilterChip({
       style={{
        color: '#FFFFFF',
        fontSize: typography.size.sm,
-       fontWeight: typography.weight.semibold as '600',
+       fontFamily: typography.font.semibold,
       }}
      >
       {label}
@@ -97,7 +92,7 @@ export function FilterChip({
       style={{
        color: '#FFFFFF',
        fontSize: typography.size.sm,
-       fontWeight: typography.weight.semibold as '600',
+       fontFamily: typography.font.semibold,
       }}
      >
       {label}

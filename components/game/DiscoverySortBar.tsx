@@ -1,16 +1,17 @@
 import { View } from 'react-native';
 import { FilterChip } from '@/components/base/inputs/FilterChip';
+import type { HomeOrdering } from '@/shared/models/home/HomeOrdering.model';
 import { colors, spacing } from '@/shared/theme/tokens';
 
 type DiscoverySortOption = {
- key: string;
+ key: HomeOrdering;
  label: string;
 };
 
 type DiscoverySortBarProps = {
  options: DiscoverySortOption[];
- selectedKey: string;
- onSelect: (key: string) => void;
+ selectedKey: HomeOrdering;
+ onSelect: (key: HomeOrdering) => void;
 };
 
 export function DiscoverySortBar({ options, selectedKey, onSelect }: DiscoverySortBarProps) {

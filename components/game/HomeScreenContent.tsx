@@ -1,6 +1,7 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import { useEffect, useMemo, useRef } from 'react';
-import { type FlatList, Pressable, type ScrollView, View } from 'react-native';
+import { type ComponentRef, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { type FlatList, Pressable, View } from 'react-native';
 import Animated, {
  useAnimatedScrollHandler,
  useAnimatedStyle,
@@ -9,7 +10,6 @@ import Animated, {
  withSpring,
  withTiming,
 } from 'react-native-reanimated';
-import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/base/feedback/EmptyState';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { RetryState } from '@/components/base/feedback/RetryState';
@@ -20,12 +20,12 @@ import { GameCardSkeleton } from '@/components/game/GameCardSkeleton';
 import { GameCarouselSection } from '@/components/game/GameCarouselSection';
 import { RecentlyAddedRow } from '@/components/game/RecentlyAddedRow';
 import type { CatalogGame } from '@/shared/models/Catalog.model';
-import { colors, spacing } from '@/shared/theme/tokens';
 import type { HomeDiscoveryContextCard } from '@/shared/models/home/HomeDiscoveryContextCard.model';
 import type { HomeDiscoveryEmptyState } from '@/shared/models/home/HomeDiscoveryEmptyState.model';
 import type { HomeOrdering } from '@/shared/models/home/HomeOrdering.model';
 import type { HomeSectionViewModel } from '@/shared/models/home/HomeSectionViewModel.model';
 import type { HomeSortOption } from '@/shared/models/home/HomeSortOption.model';
+import { colors, spacing } from '@/shared/theme/tokens';
 
 const NUM_COLUMNS = 2;
 const COLUMN_GAP = spacing.sm;
@@ -88,8 +88,8 @@ export function HomeScreenContent({
  uiState,
 }: HomeScreenContentProps) {
  const { t } = useTranslation();
- const flatListRef = useRef<FlatList<CatalogGame> | null>(null);
- const scrollViewRef = useRef<ScrollView | null>(null);
+ const flatListRef = useRef<FlatList | null>(null);
+ const scrollViewRef = useRef<ComponentRef<typeof Animated.ScrollView> | null>(null);
  const scrollY = useSharedValue(0);
 
  const scrollHandler = useAnimatedScrollHandler((event) => {
@@ -117,12 +117,7 @@ export function HomeScreenContent({
  const renderDiscoveryItem = useMemo(
   () =>
    ({ item }: { item: CatalogGame }) => (
-    <GameCard
-     game={item}
-     width={cardWidth}
-     onPress={onGamePress}
-     onLongPress={onGameLongPress}
-    />
+    <GameCard game={item} width={cardWidth} onPress={onGamePress} onLongPress={onGameLongPress} />
    ),
   [cardWidth, onGameLongPress, onGamePress],
  );
@@ -194,7 +189,7 @@ export function HomeScreenContent({
   return (
    <>
     <Animated.FlatList
-     ref={flatListRef as never}
+     ref={flatListRef}
      onScroll={scrollHandler}
      scrollEventThrottle={16}
      data={games}
@@ -221,7 +216,7 @@ export function HomeScreenContent({
        <DiscoverySortBar
         options={sortOptions}
         selectedKey={activeOrdering}
-        onSelect={(key) => onSelectOrdering(key as HomeOrdering)}
+        onSelect={onSelectOrdering}
        />
       </View>
      }
@@ -304,7 +299,7 @@ export function HomeScreenContent({
 
  return (
   <Animated.ScrollView
-   ref={scrollViewRef as never}
+   ref={scrollViewRef}
    onScroll={scrollHandler}
    scrollEventThrottle={16}
    showsVerticalScrollIndicator={false}

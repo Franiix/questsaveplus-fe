@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useMemo, useState } from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Modal, Pressable, Text, View } from 'react-native';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { BaseInput } from '@/components/base/inputs/BaseInput';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
@@ -78,7 +78,7 @@ export function DeleteAccountModal({
        style={{
         color: colors.error,
         fontSize: typography.size.sm,
-        fontWeight: typography.weight.semibold as '600',
+        fontFamily: typography.font.semibold,
         letterSpacing: 0.3,
         textTransform: 'uppercase',
        }}
@@ -89,7 +89,7 @@ export function DeleteAccountModal({
        style={{
         color: colors.text.primary,
         fontSize: typography.size.lg,
-        fontWeight: typography.weight.semibold as '600',
+        fontFamily: typography.font.semibold,
        }}
       >
        {t('profile.deleteAccount.title')}
@@ -128,9 +128,9 @@ export function DeleteAccountModal({
        style={{
         color: colors.text.primary,
         fontSize: typography.size.lg,
-        fontWeight: typography.weight.bold as '700',
+        fontFamily: typography.font.bold,
         letterSpacing: 1.4,
-      }}
+       }}
       >
        {REQUIRED_PHRASE}
       </Text>

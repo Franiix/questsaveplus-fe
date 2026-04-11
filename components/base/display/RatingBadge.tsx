@@ -46,7 +46,7 @@ export function RatingBadge({ rating, size = 'sm', style }: RatingBadgeProps) {
     style={{
      color: colors.warning,
      fontSize: font,
-     fontWeight: typography.weight.semibold as '600',
+     fontFamily: typography.font.semibold,
     }}
    >
     {rating}

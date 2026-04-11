@@ -1,7 +1,7 @@
-import { AuthStatusIcon } from '@/components/auth/AuthStatusIcon';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
+import { AuthStatusIcon } from '@/components/auth/AuthStatusIcon';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { HintBox } from '@/components/base/display/HintBox';
 import { ScreenContainer } from '@/components/base/layout/ScreenContainer';
@@ -15,16 +15,16 @@ export default function CheckEmailScreen() {
   <ScreenContainer
    scrollable={false}
    style={{ justifyContent: 'center', alignItems: 'center' }}
-  contentContainerStyle={{ paddingHorizontal: spacing.xl }}
- >
-  <View style={{ alignItems: 'center', paddingHorizontal: spacing.xl }}>
+   contentContainerStyle={{ paddingHorizontal: spacing.xl }}
+  >
+   <View style={{ alignItems: 'center', paddingHorizontal: spacing.xl }}>
     <AuthStatusIcon name="envelope-open" />
 
     <Text
      style={{
       color: colors.text.primary,
       fontSize: typography.size['2xl'],
-      fontWeight: typography.weight.bold as '700',
+      fontFamily: typography.font.bold,
       textAlign: 'center',
       marginBottom: spacing.sm,
      }}

@@ -1,8 +1,8 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
+import { getErrorMessage } from '@/lib/errors';
 import { supabase } from './supabase';
 
-const BASE64_ALPHABET =
- 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+const BASE64_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
 function base64ToArrayBuffer(base64: string) {
  const sanitized = base64.replace(/\s/g, '');
@@ -46,8 +46,11 @@ export async function uploadAvatar(
   const base64 =
    base64Override ??
    (await FileSystem.readAsStringAsync(localUri, {
-    encoding: 'base64' as never,
+    encoding: FileSystem.EncodingType.Base64,
    }));
+  if (!base64) {
+   throw new Error('Avatar image payload is empty');
+  }
   const arrayBuffer = base64ToArrayBuffer(base64);
 
   const { error } = await supabase.storage
@@ -78,7 +81,7 @@ export async function uploadAvatar(
   const { data } = supabase.storage.from('avatars').getPublicUrl(path);
   return data.publicUrl;
  } catch (error) {
-  const message = error instanceof Error ? error.message : 'Unknown avatar upload error';
+  const message = getErrorMessage(error, 'Unknown avatar upload error');
   console.error('Avatar upload failed', { userId, localUri, message });
   throw new Error(message);
  }

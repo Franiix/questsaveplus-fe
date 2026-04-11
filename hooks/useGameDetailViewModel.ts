@@ -1,5 +1,9 @@
-import { useMemo } from 'react';
 import type { TFunction } from 'i18next';
+import { useMemo } from 'react';
+import type { CatalogGame, CatalogGameDetail } from '@/shared/models/Catalog.model';
+import { colors } from '@/shared/theme/tokens';
+import { getCatalogGameNumericId } from '@/shared/utils/catalogGame';
+import { formatDate } from '@/shared/utils/date';
 import {
  getCatalogGameCategoryTranslationKey,
  getGameCatalogFranchiseName,
@@ -16,10 +20,6 @@ import {
  hasGameCatalogInfoContent,
  hasGameCatalogMedia,
 } from '@/shared/utils/gameCatalog';
-import type { CatalogGame, CatalogGameDetail } from '@/shared/models/Catalog.model';
-import { colors } from '@/shared/theme/tokens';
-import { getCatalogGameNumericId } from '@/shared/utils/catalogGame';
-import { formatDate } from '@/shared/utils/date';
 
 const DLC_CATEGORY_KEYS = new Set(['dlc_addon']);
 const EXPANSION_CATEGORY_KEYS = new Set(['expansion', 'standalone_expansion']);
@@ -72,31 +72,22 @@ export function useGameDetailViewModel({
   }
 
   const igdbRaw = game.metadata?.raw ?? null;
-  const sameSeriesGames = gameSeries.filter((seriesGame) => getCatalogGameNumericId(seriesGame) !== gameId);
-  const dlcGames = additions.filter((item) => {
-   const key = getCatalogGameCategoryTranslationKey(item);
-   return key ? DLC_CATEGORY_KEYS.has(key) : false;
-  });
-  const editionGames = additions.filter((item) => {
-   const key = getCatalogGameCategoryTranslationKey(item);
-   return key ? EDITION_CATEGORY_KEYS.has(key) : false;
-  });
-  const expansionGames = additions.filter((item) => {
-   const key = getCatalogGameCategoryTranslationKey(item);
-   return key ? EXPANSION_CATEGORY_KEYS.has(key) : false;
-  });
+  const sameSeriesGames = gameSeries.filter(
+   (seriesGame) => getCatalogGameNumericId(seriesGame) !== gameId,
+  );
+  const dlcGames = filterGamesByCategoryKeys(additions, DLC_CATEGORY_KEYS);
+  const editionGames = filterGamesByCategoryKeys(additions, EDITION_CATEGORY_KEYS);
+  const expansionGames = filterGamesByCategoryKeys(additions, EXPANSION_CATEGORY_KEYS);
   const moreFromDeveloper = developerGames;
   const moreFromPublisher = publisherGames;
-  const excludedIds = new Set(
-   [
-    gameId,
-    ...sameSeriesGames.map(getCatalogGameNumericId),
-    ...dlcGames.map(getCatalogGameNumericId),
-    ...editionGames.map(getCatalogGameNumericId),
-    ...expansionGames.map(getCatalogGameNumericId),
-    ...moreFromDeveloper.map(getCatalogGameNumericId),
-    ...moreFromPublisher.map(getCatalogGameNumericId),
-   ].filter((value): value is number => value !== null),
+  const excludedIds = collectGameIds(
+   gameId,
+   sameSeriesGames,
+   dlcGames,
+   editionGames,
+   expansionGames,
+   moreFromDeveloper,
+   moreFromPublisher,
   );
   const similarGames = similarGamesRaw.filter((item) => {
    const relatedId = getCatalogGameNumericId(item);
@@ -112,13 +103,7 @@ export function useGameDetailViewModel({
    (game.releasedAt
     ? formatDate(game.releasedAt, language, { day: 'numeric', month: 'long', year: 'numeric' })
     : null);
-  const releaseYear = game.releasedAt
-   ? new Date(game.releasedAt).getFullYear().toString()
-   : typeof (igdbRaw as { first_release_date?: number | null } | null)?.first_release_date === 'number'
-    ? new Date((igdbRaw as { first_release_date: number }).first_release_date * 1000)
-       .getFullYear()
-       .toString()
-    : null;
+  const releaseYear = getReleaseYear(game.releasedAt, igdbRaw?.first_release_date);
   const overviewText = getGameCatalogOverviewText(game.summary, igdbRaw) ?? '';
   const storyline = getGameCatalogStoryline(igdbRaw) ?? '';
   const storylineText = storyline && storyline !== overviewText ? storyline : '';
@@ -215,6 +200,33 @@ export function useGameDetailViewModel({
   statusOptions,
   t,
  ]);
+}
+
+function filterGamesByCategoryKeys(games: CatalogGame[], categoryKeys: Set<string>) {
+ return games.filter((game) => {
+  const key = getCatalogGameCategoryTranslationKey(game);
+  return key ? categoryKeys.has(key) : false;
+ });
+}
+
+function collectGameIds(primaryId: number, ...groups: CatalogGame[][]) {
+ return new Set(
+  [primaryId, ...groups.flatMap((group) => group.map(getCatalogGameNumericId))].filter(
+   (value): value is number => value !== null,
+  ),
+ );
+}
+
+function getReleaseYear(releasedAt?: string | null, firstReleaseDate?: number | null) {
+ if (releasedAt) {
+  return new Date(releasedAt).getFullYear().toString();
+ }
+
+ if (typeof firstReleaseDate === 'number') {
+  return new Date(firstReleaseDate * 1000).getFullYear().toString();
+ }
+
+ return null;
 }
 
 function sanitizeBacklogStatusLabel(label: string) {

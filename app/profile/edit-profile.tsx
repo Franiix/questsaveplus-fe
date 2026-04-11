@@ -13,7 +13,7 @@ import { ScreenContainer } from '@/components/base/layout/ScreenContainer';
 import { RhfDatePickerInput } from '@/components/form/RhfDatePickerInput';
 import { RhfSelectInput } from '@/components/form/RhfSelectInput';
 import { RhfTextInput } from '@/components/form/RhfTextInput';
-import { uploadAvatar } from '@/lib/storage';
+import { uploadSelectedAvatar } from '@/lib/avatarUpload';
 import { PROFILE_GENDERS } from '@/shared/enums/ProfileGender.enum';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 import { createEditProfileSchema, type EditProfileForm } from '@/shared/validation/profile.schemas';
@@ -54,16 +54,15 @@ export default function EditProfileScreen() {
   clearError();
   setAvatarError(null);
 
-  let avatarUrl: string | null | undefined;
-  if (avatarUri) {
-   try {
-    avatarUrl = await uploadAvatar(session.user.id, avatarUri, avatarBase64);
-   } catch (uploadError) {
-    setAvatarError(
-     uploadError instanceof Error ? uploadError.message : t('editProfile.errors.avatarUpload'),
-    );
-    return;
-   }
+  const { avatarUrl, errorMessage } = await uploadSelectedAvatar({
+   userId: session.user.id,
+   avatarUri,
+   avatarBase64,
+   fallbackMessage: t('editProfile.errors.avatarUpload'),
+  });
+  if (errorMessage) {
+   setAvatarError(errorMessage);
+   return;
   }
 
   await updateProfile(session.user.id, {
@@ -89,79 +88,79 @@ export default function EditProfileScreen() {
     }}
    >
     <View style={{ marginBottom: spacing.xl }}>
-    <Text
-     style={{
-      color: colors.text.primary,
-      fontSize: typography.size['2xl'],
-      fontWeight: typography.weight.bold as '700',
-      marginBottom: spacing.xs,
-     }}
-    >
-     {t('editProfile.title')}
-    </Text>
-    <Text style={{ color: colors.text.secondary, fontSize: typography.size.md }}>
-     {t('editProfile.subtitle')}
-    </Text>
-   </View>
+     <Text
+      style={{
+       color: colors.text.primary,
+       fontSize: typography.size['2xl'],
+       fontFamily: typography.font.bold,
+       marginBottom: spacing.xs,
+      }}
+     >
+      {t('editProfile.title')}
+     </Text>
+     <Text style={{ color: colors.text.secondary, fontSize: typography.size.md }}>
+      {t('editProfile.subtitle')}
+     </Text>
+    </View>
 
-   <View style={{ alignItems: 'center', marginBottom: spacing.xl }}>
-    <AvatarPicker
-     uri={avatarUri ?? profile?.avatar_url ?? null}
-     onPick={handleAvatarPick}
-     label={t('editProfile.avatarLabel')}
-     buttonLabel={t('editProfile.avatarButton')}
-     isDisabled={isLoading}
+    <View style={{ alignItems: 'center', marginBottom: spacing.xl }}>
+     <AvatarPicker
+      uri={avatarUri ?? profile?.avatar_url ?? null}
+      onPick={handleAvatarPick}
+      label={t('editProfile.avatarLabel')}
+      buttonLabel={t('editProfile.avatarButton')}
+      isDisabled={isLoading}
+     />
+    </View>
+
+    {avatarError ? <ErrorBox message={avatarError} style={{ marginBottom: spacing.md }} /> : null}
+
+    {error ? (
+     <ErrorBox message={t('editProfile.errors.generic')} style={{ marginBottom: spacing.md }} />
+    ) : null}
+
+    <RhfTextInput
+     control={control}
+     name="first_name"
+     label={t('editProfile.firstNameLabel')}
+     placeholder={t('editProfile.firstNamePlaceholder')}
+     editable={!isLoading}
+     required
+     autoCapitalize="words"
+     containerStyle={{ marginBottom: spacing.md }}
     />
-   </View>
 
-   {avatarError ? <ErrorBox message={avatarError} style={{ marginBottom: spacing.md }} /> : null}
+    <RhfTextInput
+     control={control}
+     name="last_name"
+     label={t('editProfile.lastNameLabel')}
+     placeholder={t('editProfile.lastNamePlaceholder')}
+     editable={!isLoading}
+     required
+     autoCapitalize="words"
+     containerStyle={{ marginBottom: spacing.md }}
+    />
 
-   {error ? (
-    <ErrorBox message={t('editProfile.errors.generic')} style={{ marginBottom: spacing.md }} />
-   ) : null}
+    <RhfDatePickerInput
+     control={control}
+     name="birth_date"
+     label={t('editProfile.birthDateLabel')}
+     placeholder={t('editProfile.birthDatePlaceholder')}
+     mode="date"
+     maximumDate={new Date()}
+     isDisabled={isLoading}
+     containerStyle={{ marginBottom: spacing.md }}
+    />
 
-   <RhfTextInput
-    control={control}
-    name="first_name"
-    label={t('editProfile.firstNameLabel')}
-    placeholder={t('editProfile.firstNamePlaceholder')}
-    editable={!isLoading}
-    required
-    autoCapitalize="words"
-    containerStyle={{ marginBottom: spacing.md }}
-   />
-
-   <RhfTextInput
-    control={control}
-    name="last_name"
-    label={t('editProfile.lastNameLabel')}
-    placeholder={t('editProfile.lastNamePlaceholder')}
-    editable={!isLoading}
-    required
-    autoCapitalize="words"
-    containerStyle={{ marginBottom: spacing.md }}
-   />
-
-   <RhfDatePickerInput
-    control={control}
-    name="birth_date"
-    label={t('editProfile.birthDateLabel')}
-    placeholder={t('editProfile.birthDatePlaceholder')}
-   mode="date"
-   maximumDate={new Date()}
-   isDisabled={isLoading}
-   containerStyle={{ marginBottom: spacing.md }}
-  />
-
-  <RhfSelectInput
-   control={control}
-   name="gender"
-   label={t('editProfile.genderLabel')}
-   placeholder={t('editProfile.genderPlaceholder')}
-   options={genderOptions}
-   isDisabled={isLoading}
-   containerStyle={{ marginBottom: spacing.xl }}
-  />
+    <RhfSelectInput
+     control={control}
+     name="gender"
+     label={t('editProfile.genderLabel')}
+     placeholder={t('editProfile.genderPlaceholder')}
+     options={genderOptions}
+     isDisabled={isLoading}
+     containerStyle={{ marginBottom: spacing.xl }}
+    />
 
     <BaseButton
      label={t('editProfile.submitButton')}

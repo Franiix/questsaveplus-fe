@@ -63,7 +63,7 @@ export function BottomSheet({ isVisible, onClose, children, title }: BottomSheet
        style={{
         color: colors.text.primary,
         fontSize: typography.size.lg,
-        fontWeight: typography.weight.semibold as '600',
+        fontFamily: typography.font.semibold,
         marginBottom: spacing.md,
        }}
       >

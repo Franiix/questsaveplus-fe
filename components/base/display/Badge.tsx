@@ -59,7 +59,7 @@ export function Badge({
     style={{
      color,
      fontSize,
-     fontWeight: typography.weight.medium as '500',
+     fontFamily: typography.font.medium,
     }}
    >
     {label}

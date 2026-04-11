@@ -48,8 +48,7 @@ export function MetacriticBadge({ score, size = 'sm' }: MetacriticBadgeProps) {
     style={{
      color,
      fontSize,
-     fontFamily: typography.font.mono,
-     fontWeight: typography.weight.bold as '700',
+     fontFamily: typography.font.bold,
     }}
    >
     {score}
