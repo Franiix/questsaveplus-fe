@@ -12,6 +12,7 @@ import type { IgdbNamedItem } from './igdb/IgdbNamedItem.model';
 import type { IgdbReleaseDate } from './igdb/IgdbReleaseDate.model';
 import type { IgdbVideo } from './igdb/IgdbVideo.model';
 import type { IgdbWebsite } from './igdb/IgdbWebsite.model';
+import type { JsonObject } from './JsonValue.model';
 
 export type CatalogLocale = 'it' | 'en';
 
@@ -33,7 +34,7 @@ export type { IgdbReleaseDate } from './igdb/IgdbReleaseDate.model';
 export type { IgdbVideo } from './igdb/IgdbVideo.model';
 export type { IgdbWebsite } from './igdb/IgdbWebsite.model';
 
-export type IgdbRawExtras = {
+export type IgdbRawExtras = JsonObject & {
  relationKind?: IgdbRelationKind | null;
  game_modes?: IgdbNamedItem[];
  player_perspectives?: IgdbNamedItem[];

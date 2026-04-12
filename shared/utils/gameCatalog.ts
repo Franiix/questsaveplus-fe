@@ -19,10 +19,14 @@ import type {
  IgdbReleaseDate,
  IgdbWebsite,
 } from '@/shared/models/IgdbCatalogExtras.model';
+import type { JsonObject, JsonValue } from '@/shared/models/JsonValue.model';
 import { formatDate } from '@/shared/utils/date';
 import { getIgdbStatusName } from '@/shared/utils/igdb';
 
-type TranslateFn = (key: string, options?: Record<string, unknown>) => string;
+type TranslationValues = Record<string, string | number | boolean | null | undefined>;
+
+type TranslateFn = (key: string, options?: TranslationValues) => string;
+type JsonField = JsonValue | undefined;
 
 export type GameEditorialRow = {
  key: string;
@@ -187,19 +191,53 @@ function resolveCatalogLabels(values: GameCatalogLabel[], translate: TranslateFn
  );
 }
 
-function asPlainNamedList(value: unknown): string[] {
+function normalizeIgdbExtras(raw?: IgdbRawExtras | null): IgdbRawExtras {
+ return raw ?? {};
+}
+
+function isJsonObject(value: JsonField): value is JsonObject {
+ return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isNamedItem(value: JsonField): value is IgdbNamedItem {
+ return isJsonObject(value) && typeof value.name === 'string';
+}
+
+function isAlternativeName(value: JsonField): value is IgdbAlternativeName {
+ return isJsonObject(value) && typeof value.name === 'string';
+}
+
+function isReleaseDate(value: JsonField): value is IgdbReleaseDate {
+ return isJsonObject(value);
+}
+
+function isAgeRating(value: JsonField): value is IgdbAgeRating {
+ return isJsonObject(value);
+}
+
+function isMultiplayerMode(value: JsonField): value is IgdbMultiplayerMode {
+ return isJsonObject(value);
+}
+
+function isLanguageSupport(value: JsonField): value is IgdbLanguageSupport {
+ return isJsonObject(value);
+}
+
+function isWebsite(value: JsonField): value is IgdbWebsite {
+ return isJsonObject(value);
+}
+
+function isExternalGame(value: JsonField): value is IgdbExternalGame {
+ return isJsonObject(value);
+}
+
+function asPlainNamedList(value: JsonField): string[] {
  if (!Array.isArray(value)) return [];
- return uniqueStrings(
-  value.map((item) =>
-   item && typeof item === 'object' && typeof (item as IgdbNamedItem).name === 'string'
-    ? (item as IgdbNamedItem).name?.trim()
-    : null,
-  ),
- );
+ return uniqueStrings(value.map((item) => (isNamedItem(item) ? item.name?.trim() : null)));
 }
 
 function asTranslatableNamedList(
- value: unknown,
+ value: JsonField,
  sectionKey: 'gameModes' | 'playerPerspectives' | 'themes',
 ): GameCatalogLabel[] {
  if (!Array.isArray(value)) return [];
@@ -208,11 +246,9 @@ function asTranslatableNamedList(
  const items: GameCatalogLabel[] = [];
 
  for (const item of value) {
-  if (!item || typeof item !== 'object' || typeof (item as IgdbNamedItem).name !== 'string') {
-   continue;
-  }
+  if (!isNamedItem(item)) continue;
 
-  const fallback = (item as IgdbNamedItem).name?.trim();
+  const fallback = item.name?.trim();
   if (!fallback) continue;
   const normalized = normalizeCatalogTerm(fallback);
   const dedupeKey = `${sectionKey}:${normalized}`;
@@ -228,25 +264,25 @@ function asTranslatableNamedList(
  return items;
 }
 
-function asSingleName(value: unknown): string | null {
- if (!value || typeof value !== 'object') return null;
- const name = (value as IgdbNamedItem).name;
+function asSingleName(value: JsonField): string | null {
+ if (!isNamedItem(value)) return null;
+ const name = value.name;
  return typeof name === 'string' && name.trim().length > 0 ? name.trim() : null;
 }
 
-function asIgdbExtras(value: unknown): IgdbRawExtras | null {
- return value && typeof value === 'object' ? (value as IgdbRawExtras) : null;
+function asIgdbExtras(value: JsonField): IgdbRawExtras | null {
+ return isJsonObject(value) ? value : null;
 }
 
 function getNamedItemNames(values?: IgdbNamedItem[] | null): string[] {
  return uniqueStrings((values ?? []).map((item) => item.name?.trim() ?? null));
 }
 
-function asFirstArrayName(value: unknown): string | null {
+function asFirstArrayName(value: JsonField): string | null {
  if (!Array.isArray(value)) return null;
  for (const item of value) {
-  if (!item || typeof item !== 'object') continue;
-  const name = (item as IgdbNamedItem).name;
+  if (!isNamedItem(item)) continue;
+  const name = item.name;
   if (typeof name === 'string' && name.trim().length > 0) return name.trim();
  }
  return null;
@@ -256,15 +292,9 @@ function normalizeReleaseStatusKey(value: string) {
  return normalizeCatalogTerm(value).replace(/-/g, '_');
 }
 
-function asAlternativeNames(value: unknown): string[] {
+function asAlternativeNames(value: JsonField): string[] {
  if (!Array.isArray(value)) return [];
- return uniqueStrings(
-  value.map((item) =>
-   item && typeof item === 'object' && typeof (item as IgdbAlternativeName).name === 'string'
-    ? (item as IgdbAlternativeName).name?.trim()
-    : null,
-  ),
- );
+ return uniqueStrings(value.map((item) => (isAlternativeName(item) ? item.name?.trim() : null)));
 }
 
 const PARENT_PLATFORM_RULES = [
@@ -302,12 +332,12 @@ type SortableReleaseDateItem = GameCatalogReleaseDateItem & {
  sortValue: number;
 };
 
-function asReleaseDateItems(value: unknown, locale: string): GameCatalogReleaseDateItem[] {
+function asReleaseDateItems(value: JsonField, locale: string): GameCatalogReleaseDateItem[] {
  if (!Array.isArray(value)) return [];
  const items = value
   .map((item) => {
-   if (!item || typeof item !== 'object') return null;
-   const release = item as IgdbReleaseDate;
+   if (!isReleaseDate(item)) return null;
+   const release = item;
    const platformName =
     typeof release.platform?.name === 'string' ? release.platform.name.trim() : null;
    const timestampMs = typeof release.date === 'number' ? release.date * 1000 : Number.NaN;
@@ -347,19 +377,19 @@ function asReleaseDateItems(value: unknown, locale: string): GameCatalogReleaseD
  return deduped.slice(0, 20);
 }
 
-function asReleaseDates(value: unknown, locale: string): string[] {
+function asReleaseDates(value: JsonField, locale: string): string[] {
  return asReleaseDateItems(value, locale).map((item) => `${item.platformName} - ${item.dateLabel}`);
 }
 
-function asAgeRatingItems(value: unknown): GameCatalogAgeRating[] {
+function asAgeRatingItems(value: JsonField): GameCatalogAgeRating[] {
  if (!Array.isArray(value)) return [];
  if (value.length > 0 && typeof value[0] === 'number') return [];
  const seen = new Set<string>();
  const items: GameCatalogAgeRating[] = [];
 
  for (const item of value) {
-  if (!item || typeof item === 'number' || typeof item !== 'object') continue;
-  const rating = item as IgdbAgeRating;
+  if (typeof item === 'number' || !isAgeRating(item)) continue;
+  const rating = item;
   const system =
    typeof (rating.organization ?? rating.category) === 'number'
     ? (AGE_CATEGORY_LABELS[rating.organization ?? rating.category] ??
@@ -384,8 +414,12 @@ function asAgeRatingItems(value: unknown): GameCatalogAgeRating[] {
  return items;
 }
 
-function asMultiplayerModes(value: unknown): GameCatalogLabel[] {
- const entries = Array.isArray(value) ? value : value && typeof value === 'object' ? [value] : [];
+function asMultiplayerModes(value: JsonField): GameCatalogLabel[] {
+ const entries = Array.isArray(value)
+  ? value.filter(isMultiplayerMode)
+  : isMultiplayerMode(value)
+    ? [value]
+    : [];
  if (entries.length === 0) return [];
  const result = new Map<string, GameCatalogLabel>();
 
@@ -398,7 +432,7 @@ function asMultiplayerModes(value: unknown): GameCatalogLabel[] {
   });
  };
 
- for (const item of entries as IgdbMultiplayerMode[]) {
+ for (const item of entries) {
   if (item.onlinecoop) addLabel('onlineCoop', 'Online co-op');
   if (item.offlinecoop) addLabel('offlineCoop', 'Local co-op');
   if (item.splitscreen) addLabel('splitScreen', 'Split-screen');
@@ -431,8 +465,12 @@ function asMultiplayerModes(value: unknown): GameCatalogLabel[] {
  return Array.from(result.values());
 }
 
-function asLanguageSupportRows(value: unknown) {
- const entries = Array.isArray(value) ? value : value && typeof value === 'object' ? [value] : [];
+function asLanguageSupportRows(value: JsonField) {
+ const entries = Array.isArray(value)
+  ? value.filter(isLanguageSupport)
+  : isLanguageSupport(value)
+    ? [value]
+    : [];
  if (entries.length === 0) return [];
  const rows = new Map<
   string,
@@ -444,7 +482,7 @@ function asLanguageSupportRows(value: unknown) {
    subtitles: boolean;
   }
  >();
- for (const item of entries as IgdbLanguageSupport[]) {
+ for (const item of entries) {
   const locale = item.language?.locale?.trim() ?? null;
   const regionCode = locale?.split(/[-_]/)[1]?.toUpperCase() ?? null;
   const baseLanguageName =
@@ -471,14 +509,14 @@ function asLanguageSupportRows(value: unknown) {
  return Array.from(rows.values());
 }
 
-function asWebsiteItems(value: unknown): GameCatalogLinkItem[] {
+function asWebsiteItems(value: JsonField): GameCatalogLinkItem[] {
  if (!Array.isArray(value)) return [];
  const seen = new Set<string>();
  const items: GameCatalogLinkItem[] = [];
 
  for (const item of value) {
-  if (!item || typeof item !== 'object') continue;
-  const website = item as IgdbWebsite;
+  if (!isWebsite(item)) continue;
+  const website = item;
   const url = typeof website.url === 'string' ? website.url.trim() : null;
   if (!url || seen.has(url)) continue;
 
@@ -513,14 +551,14 @@ function asWebsiteItems(value: unknown): GameCatalogLinkItem[] {
  return items;
 }
 
-function asExternalStoreItems(value: unknown): GameCatalogLinkItem[] {
+function asExternalStoreItems(value: JsonField): GameCatalogLinkItem[] {
  if (!Array.isArray(value)) return [];
  const seen = new Set<string>();
  const items: GameCatalogLinkItem[] = [];
 
  for (const item of value) {
-  if (!item || typeof item !== 'object') continue;
-  const external = item as IgdbExternalGame;
+  if (!isExternalGame(item)) continue;
+  const external = item;
   const url = typeof external.url === 'string' ? external.url.trim() : null;
   if (!url || seen.has(url)) continue;
 
@@ -562,7 +600,7 @@ export function getGameCatalogInfo(
  raw?: IgdbRawExtras | null,
  _locale: CatalogLocale = 'en',
 ): GameCatalogInfo {
- const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
+ const extras = normalizeIgdbExtras(raw);
  const typeKey =
   typeof extras.game_type?.id === 'number'
    ? (IGDB_GAME_CATEGORY_TRANSLATION_KEYS[extras.game_type.id] ?? null)
@@ -595,7 +633,7 @@ export function getGameCatalogInfo(
 }
 
 export function getGameCatalogPrimaryReleaseDate(raw?: IgdbRawExtras | null, locale = 'en') {
- const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
+ const extras = normalizeIgdbExtras(raw);
  if (typeof extras.first_release_date === 'number' && Number.isFinite(extras.first_release_date)) {
   return formatCatalogDate(extras.first_release_date * 1000, locale);
  }
@@ -604,7 +642,7 @@ export function getGameCatalogPrimaryReleaseDate(raw?: IgdbRawExtras | null, loc
 }
 
 export function getGameCatalogStoryline(raw?: IgdbRawExtras | null) {
- const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
+ const extras = normalizeIgdbExtras(raw);
  return typeof extras.storyline === 'string' ? extras.storyline.trim() || null : null;
 }
 
@@ -615,12 +653,12 @@ export function getGameCatalogOverviewText(summary?: string | null, raw?: IgdbRa
 }
 
 export function getGameCatalogFranchiseName(raw?: IgdbRawExtras | null) {
- const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
+ const extras = normalizeIgdbExtras(raw);
  return asFirstArrayName(extras.franchises) ?? asSingleName(extras.franchise);
 }
 
 export function getGameCatalogRatings(raw?: IgdbRawExtras | null): GameCatalogScores {
- const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
+ const extras = normalizeIgdbExtras(raw);
  const aggregated = typeof extras.aggregated_rating === 'number' ? extras.aggregated_rating : null;
  const aggregatedCount =
   typeof extras.aggregated_rating_count === 'number' ? extras.aggregated_rating_count : null;
@@ -638,28 +676,28 @@ export function getGameCatalogRatings(raw?: IgdbRawExtras | null): GameCatalogSc
 }
 
 export function getGameCatalogAgeRatingItems(raw?: IgdbRawExtras | null): GameCatalogAgeRating[] {
- const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
+ const extras = normalizeIgdbExtras(raw);
  return asAgeRatingItems(extras.age_ratings);
 }
 
 export function getGameCatalogReleaseDateItems(raw?: IgdbRawExtras | null, locale = 'en') {
- const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
+ const extras = normalizeIgdbExtras(raw);
  return asReleaseDateItems(extras.release_dates, locale);
 }
 
 export function getGameCatalogWebsiteItems(raw?: IgdbRawExtras | null) {
- const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
+ const extras = normalizeIgdbExtras(raw);
  return asWebsiteItems(extras.websites);
 }
 
 export function getGameCatalogExternalStoreItems(raw?: IgdbRawExtras | null) {
- const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
+ const extras = normalizeIgdbExtras(raw);
  return asExternalStoreItems(extras.external_games);
 }
 
 export function getGameCatalogAlternativeNames(raw?: IgdbRawExtras | null) {
  if (!raw) return [];
- return asAlternativeNames((raw as IgdbRawExtras).alternative_names);
+ return asAlternativeNames(raw.alternative_names);
 }
 
 export function hasGameCatalogInfoContent(raw?: IgdbRawExtras | null) {
@@ -683,7 +721,7 @@ export function hasGameCatalogInfoContent(raw?: IgdbRawExtras | null) {
 }
 
 export function hasGameCatalogMedia(raw?: IgdbRawExtras | null) {
- const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
+ const extras = normalizeIgdbExtras(raw);
  return Boolean(
   (extras.screenshots && extras.screenshots.length > 0) ||
    (extras.artworks && extras.artworks.length > 0) ||
@@ -697,7 +735,7 @@ export function getIgdbNamedItemExternalId(
  index = 0,
 ) {
  if (!raw) return null;
- const extras = raw as IgdbRawExtras;
+ const extras = raw;
 
  if (key === 'genres') {
   const values = extras.genres;
@@ -720,7 +758,7 @@ export function getIgdbNamedItemExternalId(
 
 export function getIgdbCategoryTranslationKey(raw: IgdbRawExtras | null) {
  if (!raw) return null;
- const extras = raw as IgdbRawExtras;
+ const extras = raw;
  const category = extras.game_type?.id ?? extras.category;
  if (typeof category === 'number') {
   return IGDB_GAME_CATEGORY_TRANSLATION_KEYS[category] ?? null;
@@ -730,7 +768,7 @@ export function getIgdbCategoryTranslationKey(raw: IgdbRawExtras | null) {
 }
 
 export function getGameCatalogReleaseStatusKey(raw?: IgdbRawExtras | null) {
- const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
+ const extras = normalizeIgdbExtras(raw);
  const status = getIgdbStatusName(extras);
  if (status) return normalizeReleaseStatusKey(status);
 
@@ -743,9 +781,9 @@ export function getGameCatalogReleaseStatusKey(raw?: IgdbRawExtras | null) {
 
 export function getGameCatalogReleaseStatusLabel(
  raw: IgdbRawExtras | null,
- translate: (key: string, options?: Record<string, unknown>) => string,
+ translate: (key: string, options?: TranslationValues) => string,
 ) {
- const extras = ((raw ?? {}) as IgdbRawExtras) ?? {};
+ const extras = normalizeIgdbExtras(raw);
  const status = getIgdbStatusName(extras);
  if (status) {
   const statusKey = normalizeReleaseStatusKey(status);

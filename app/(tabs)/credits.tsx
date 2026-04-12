@@ -10,6 +10,7 @@ import { ExternalLinkCard } from '@/components/base/display/ExternalLinkCard';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { ScreenHeader } from '@/components/base/layout/ScreenHeader';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
+import { getLegalDocumentUrl, type LegalDocumentKey } from '@/shared/config/legal';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 
 type CreditLink = {
@@ -18,7 +19,8 @@ type CreditLink = {
  subtitle: string;
  accentColor: string;
  mark: ReactNode;
- url: string;
+ url?: string;
+ legalDocumentKey?: LegalDocumentKey;
 };
 
 function BrandMark({
@@ -157,7 +159,7 @@ export default function CreditsScreen() {
    subtitle: t('credits.termsSubtitle'),
    accentColor: '#7B73FF',
    mark: <BrandMark iconName="file-contract" accentColor="#7B73FF" label="T" />,
-   url: 'questsave://legal/terms',
+   legalDocumentKey: 'terms',
   },
   {
    key: 'privacy',
@@ -165,7 +167,7 @@ export default function CreditsScreen() {
    subtitle: t('credits.privacySubtitle'),
    accentColor: '#3AA7FF',
    mark: <BrandMark iconName="user-shield" accentColor="#3AA7FF" label="P" />,
-   url: 'questsave://legal/privacy',
+   legalDocumentKey: 'privacy',
   },
   {
    key: 'policy',
@@ -173,7 +175,7 @@ export default function CreditsScreen() {
    subtitle: t('credits.policySubtitle'),
    accentColor: '#14C38E',
    mark: <BrandMark iconName="shield-alt" accentColor="#14C38E" label="S" />,
-   url: 'questsave://legal/policy',
+   legalDocumentKey: 'policy',
   },
  ];
 
@@ -254,14 +256,24 @@ export default function CreditsScreen() {
         primaryAction={{
          label: t('credits.openDocument'),
          iconName: 'folder-open',
-         onPress: () =>
+         onPress: () => {
+          const externalUrl = link.legalDocumentKey
+           ? getLegalDocumentUrl(link.legalDocumentKey)
+           : null;
+
+          if (externalUrl) {
+           void Linking.openURL(externalUrl);
+           return;
+          }
+
           router.push(
            link.key === 'terms'
             ? '/legal/terms'
             : link.key === 'privacy'
               ? '/legal/privacy'
               : '/legal/policy',
-          ),
+          );
+         },
         }}
        />
       ))}

@@ -4,7 +4,7 @@ type LegalDocumentType = 'terms' | 'privacy' | 'policy';
 type SupportedLegalLanguage = 'it' | 'en';
 
 const OWNER_NAME = 'Francesco Scamardella';
-const SUPPORT_EMAIL = 'support@dominiochecomprero.it';
+const SUPPORT_EMAIL = 'questsaveplus@franiix.cloud';
 
 const itDocuments: Record<LegalDocumentType, LegalDocument> = {
  terms: {
@@ -470,4 +470,3 @@ export function getLegalDocumentContent(
 ): LegalDocument {
  return legalDocumentsByLanguage[normalizeLegalLanguage(language)][type];
 }
-

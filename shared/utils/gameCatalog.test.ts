@@ -97,8 +97,10 @@ describe('gameCatalog utilities', () => {
  });
 
  it('builds editorial audience bullets and caps them to three items', () => {
-  const translate = (key: string, options?: Record<string, unknown>) =>
-   String(options?.defaultValue ?? key);
+  const translate = (
+   key: string,
+   options?: Record<string, string | number | boolean | null | undefined>,
+  ) => String(options?.defaultValue ?? key);
 
   const game = createGameDetail({
    metadata: {

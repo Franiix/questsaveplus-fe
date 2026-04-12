@@ -139,6 +139,8 @@ EXPO_PUBLIC_CATALOG_PRIMARY_PROVIDER=igdb
 EXPO_PUBLIC_CATALOG_EDGE_SUPPORTS_FILTERED_SEARCH=true
 EXPO_PUBLIC_CATALOG_EDGE_SUPPORTS_SECTION_DISCOVERY=true
 EXPO_PUBLIC_CATALOG_EDGE_ENABLED=true
+EXPO_PUBLIC_LEGAL_PRIVACY_URL=https://www.franiix.cloud/questsaveplus/privacy/
+EXPO_PUBLIC_LEGAL_SUPPORT_URL=https://www.franiix.cloud/questsaveplus/support/
 ```
 
 ### Avvio
@@ -155,10 +157,21 @@ npm run start_clear
 npm run android
 npm run ios
 npm run web
+npm run build:ios:preview
+npm run build:android:preview
+npm run build:ios:production
+npm run build:android:production
+npm run submit:ios
+npm run submit:android
 npm run lint
 npm run format
 npm run check
 ```
+
+## Release Mobile
+
+La configurazione EAS per iOS e Android e la checklist di rilascio sono documentate in [docs/mobile-release.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/mobile-release.md).
+Per store listing e privacy submission trovi anche [docs/store-metadata.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/store-metadata.md) e [docs/store-privacy-checklist.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/store-privacy-checklist.md).
 
 ## Dipendenze Da Backend
 
@@ -176,5 +189,3 @@ Checklist minima:
 6. i18n base su `it` e `en`
 
 *Made by Franiix*
-
-
