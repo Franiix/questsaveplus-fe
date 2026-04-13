@@ -172,6 +172,7 @@ npm run check
 
 La configurazione EAS per iOS e Android e la checklist di rilascio sono documentate in [docs/mobile-release.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/mobile-release.md).
 Per store listing e privacy submission trovi anche [docs/store-metadata.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/store-metadata.md) e [docs/store-privacy-checklist.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/store-privacy-checklist.md).
+Per un flusso completamente locale, senza dipendere da EAS Cloud, usa [docs/mobile-local-deploy.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/mobile-local-deploy.md).
 
 ## Dipendenze Da Backend
 
