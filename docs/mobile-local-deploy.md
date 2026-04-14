@@ -337,6 +337,11 @@ Poi lancia la build nel terminale gia configurato con Java 21.
 Per APK debug/installabile rapidamente:
 
 ```bash
+cat > /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android/local.properties <<'EOF'
+sdk.dir=/Users/franiix/Library/Android/sdk
+EOF
+```
+```bash
 cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android
 ./gradlew assembleRelease
 ```

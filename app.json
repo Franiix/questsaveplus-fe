@@ -27,6 +27,7 @@
         "backgroundColor": "#0F0F1A"
       },
       "blockedPermissions": [
+        "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
       "package": "com.franiix.questsaveplus",
@@ -45,7 +46,9 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "QuestSave+ needs access to your photo library so you can choose a profile picture."
+          "photosPermission": "QuestSave+ needs access to your photo library so you can choose a profile picture.",
+          "cameraPermission": false,
+          "microphonePermission": false
         }
       ]
     ],
