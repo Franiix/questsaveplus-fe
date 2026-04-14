@@ -14,7 +14,7 @@
       "backgroundColor": "#0F0F1A"
     },
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.franiix.questsaveplus",
       "buildNumber": "1",
       "infoPlist": {
