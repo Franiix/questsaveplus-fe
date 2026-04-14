@@ -107,6 +107,7 @@ Dentro trovi:
 - Android Studio su macOS deve vedere un `node` globale, non solo `nvm`
 - le variabili `EXPO_PUBLIC_*` vanno lette con accesso statico, non con `process.env[name]`, altrimenti la release puo crashare all'avvio
 - non e consigliato committare keystore e segreti nel repo, anche se privato
+- se scegli comunque di versionare la upload key Android, il path previsto dal progetto e `questsaveplus-upload.keystore` nella root di `questsave-fe`
 
 ## Flusso consigliato
 

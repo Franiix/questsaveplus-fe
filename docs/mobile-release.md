@@ -91,6 +91,8 @@ Se scegli consapevolmente di farlo per comodita personale:
 - documenta il rischio
 - evita almeno di committare password in chiaro nel README
 - preparati a ruotare tutto se il repo viene esposto
+- in questo progetto, se scegli questa strada, tieni la keystore in:
+  `/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/questsaveplus-upload.keystore`
 
 La mia raccomandazione tecnica resta: **non committare i segreti**.
 
