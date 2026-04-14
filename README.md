@@ -1,136 +1,38 @@
-﻿# QuestSave+ App
+# QuestSave+ App
 
-App mobile Expo/React Native per scoprire giochi tramite IGDB e gestire un backlog personale persistito su Supabase.
+App mobile Expo/React Native per scoprire videogiochi e gestire un backlog personale persistito su Supabase.
 
-## Stato Attuale
+## Stato attuale
 
-- Routing file-based con Expo Router
-- Autenticazione e persistenza dati utente con Supabase
-- Dati giochi e dettaglio via catalog layer `IGDB-only`
-- Stato locale con Zustand
-- Server state con TanStack Query
-- UI composta principalmente da componenti custom in `components/base` e `components/game`
-- i18n attiva con locale `it` e `en`
+- Expo SDK `54`
+- React Native `0.81`
+- Expo Router
+- Supabase per auth e dati utente
+- Zustand per stato locale
+- TanStack Query per cache e fetching
+- i18n `it` / `en`
+- iOS attualmente iPhone-only
 
-## Stack Tecnologico
-
-| Tecnologia | Uso |
-|---|---|
-| Expo SDK 54 | Runtime mobile e toolchain |
-| React Native 0.81 | UI cross-platform |
-| Expo Router | Routing file-based |
-| TanStack Query | Cache e fetching del catalogo |
-| Supabase JS | Auth e backend catalog |
-| Zustand | Store applicativi |
-| i18next + expo-localization | Traduzioni |
-| react-hook-form + zod | Form e validazione |
-| Biome | Lint / format / check |
-
-## Struttura Reale Del Progetto
+## Struttura principale
 
 ```text
 app/
-  _layout.tsx
-  index.tsx
-  (auth)/
-    _layout.tsx
-    login.tsx
-    register.tsx
-    forgot-password.tsx
-    check-email.tsx
-    profile-setup.tsx
-  (tabs)/
-    _layout.tsx
-    index.tsx
-    backlog.tsx
-    profile.tsx
-    credits.tsx
-  auth/
-    callback.tsx
-  game/
-    [id].tsx
-  profile/
-    edit-profile.tsx
-    change-email.tsx
-    change-password.tsx
-
 components/
-  base/
-    display/
-    feedback/
-    inputs/
-    layout/
-    navigation/
-  form/
-  game/
-    catalog/
-
 hooks/
-  useBacklogGameMetadata.ts
-  useGameBacklogController.ts
-  useGameDetail.ts
-  useGames.ts
-  useHomeSectionGames.ts
-
 lib/
-  catalog/
-  storage.ts
-  supabase.ts
-
 stores/
-  auth.store.ts
-  backlog.store.ts
-  profile.store.ts
-  toast.store.ts
-
 shared/
-  dto/
-  entities/
-  enums/
-  i18n/
-  models/
-  theme/
-  utils/
-  validation/
+docs/
 ```
 
-## Architettura Applicativa
-
-- `app/_layout.tsx` monta provider globali, `QueryClientProvider`, `GluestackUIProvider`, `ToastContainer` e guard auth
-- `app/(tabs)/index.tsx` usa il catalog layer per search, discovery e sezioni home
-- `app/game/[id].tsx` usa `CatalogGameDetail` e componenti `catalog/*` per il detail
-- `lib/catalog/` contiene provider selection, service e provider edge Supabase
-- `stores/*` gestiscono auth, profilo, backlog e toast
-
-## Feature Attualmente Presenti
-
-- Login / register / forgot password
-- Profile setup post registrazione
-- Home con search, discovery e caroselli editoriali
-- Detail gioco IGDB-first
-- Backlog personale con stato, rating e note
-- Profilo utente con modifica profilo, email e password
-- Tab crediti
-- Traduzioni italiane e inglesi
-
-## Setup Locale
-
-### Prerequisiti
-
-- Node.js recente compatibile con Expo SDK 54
-- npm
-- Expo Go oppure simulatore iOS / emulatore Android
-
-### Installazione
+## Setup rapido
 
 ```bash
-cd questsaveplus-fe
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe
 npm install
 ```
 
-### Variabili d'ambiente
-
-Crea un file `.env` in `questsaveplus-fe/` con:
+Crea `.env` con almeno:
 
 ```bash
 EXPO_PUBLIC_SUPABASE_URL=
@@ -143,60 +45,89 @@ EXPO_PUBLIC_LEGAL_PRIVACY_URL=https://www.franiix.cloud/questsaveplus/privacy/
 EXPO_PUBLIC_LEGAL_SUPPORT_URL=https://www.franiix.cloud/questsaveplus/support/
 ```
 
-### Avvio
-
-```bash
-npm run start
-```
-
-Script disponibili:
+## Script utili
 
 ```bash
 npm run start
 npm run start_clear
-npm run android
 npm run ios
+npm run android
 npm run web
-npm run build:ios:preview
-npm run build:android:preview
-npm run build:ios:production
-npm run build:android:production
-npm run submit:ios
-npm run submit:android
 npm run lint
 npm run format
 npm run check
 ```
 
-## Release Mobile
+## Guide operative
 
-La configurazione EAS per iOS e Android e la checklist di rilascio sono documentate in [docs/mobile-release.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/mobile-release.md).
-Per store listing e privacy submission trovi anche [docs/store-metadata.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/store-metadata.md) e [docs/store-privacy-checklist.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/store-privacy-checklist.md).
-Per un flusso completamente locale, senza dipendere da EAS Cloud, usa [docs/mobile-local-deploy.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/mobile-local-deploy.md).
+### Test locale su Xcode e Android Studio
 
-Note operative aggiornate:
+Usa:
 
-- iOS release corrente: iPhone-only (`supportsTablet: false`)
-- URL pubblici legali:
-  - privacy: `https://www.franiix.cloud/questsaveplus/privacy/`
-  - support: `https://www.franiix.cloud/questsaveplus/support/`
-- email supporto store: `questsaveplus@franiix.cloud`
-- Android release locale: usa Java `21`, non Java `25`, altrimenti Gradle puo fallire con `Unsupported class file major version 69`
-- Android release Play Store: non usare la `debug.keystore`; configura una keystore release dedicata come spiegato in [docs/mobile-local-deploy.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/mobile-local-deploy.md)
+- [docs/mobile-local-deploy.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/mobile-local-deploy.md)
 
-## Dipendenze Da Backend
+Dentro trovi:
 
-L'app si aspetta che il backend Supabase in [README.md](/C:/Users/franiix/Projects/Personale/QuestSave+/questsaveplus-be/README.md) sia gia allineato alla base `v1.0` IGDB-only.
+- prerequisiti macchina
+- setup Node/Android Studio
+- `expo prebuild`
+- test da CLI
+- test con Xcode
+- test con Android Studio
+- test release su iOS
+- test release su Android
+- quando serve rebuildare
 
-## Qualita E Verifica Manuale
+### Release store locali
 
-Checklist minima:
+Usa:
 
-1. Login, register e callback auth
-2. Profile setup e modifica profilo
-3. Home con search/discovery e apertura detail
-4. Add / update / remove backlog
-5. Backlog list e profile stats
-6. i18n base su `it` e `en`
+- [docs/mobile-release.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/mobile-release.md)
+
+Dentro trovi:
+
+- archive iOS
+- validate / upload App Store Connect
+- build `.aab` Android
+- upload Play Console
+- signing release
+- gestione chiavi
+
+### Metadata e privacy store
+
+- [docs/store-metadata.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/store-metadata.md)
+- [docs/store-privacy-checklist.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/store-privacy-checklist.md)
+
+## Note operative importanti
+
+- bundle id iOS: `com.franiix.questsaveplus`
+- package Android: `com.franiix.questsaveplus`
+- versione utente corrente: `0.0.1`
+- Java consigliata per Android: `21`
+- Android Studio su macOS deve vedere un `node` globale, non solo `nvm`
+- le variabili `EXPO_PUBLIC_*` vanno lette con accesso statico, non con `process.env[name]`, altrimenti la release puo crashare all'avvio
+- non e consigliato committare keystore e segreti nel repo, anche se privato
+
+## Flusso consigliato
+
+1. sviluppi e testi in locale
+2. riproduci e risolvi i bug su simulatore/emulatore
+3. testi sempre almeno una build `release` locale su iOS e Android
+4. validi su device reali quando possibile
+5. generi build release locali finali
+6. carichi sugli store
+7. completi listing, privacy e review info
+
+## Checklist minima QA
+
+1. bootstrap app senza freeze o crash
+2. login / register / callback
+3. profile setup
+4. home e search
+5. detail gioco
+6. backlog
+7. profilo
+8. rotte legali
+9. localizzazione `it` / `en`
 
 *Made by Franiix*

@@ -1,123 +1,309 @@
-# Mobile Release Guide
+# Release Store iOS e Android
 
 ## Obiettivo
 
-Questa guida prepara `QuestSave+` per build e rilascio su iOS e Android con Expo EAS.
+Questa guida spiega come rilasciare `QuestSave+` sugli store con build locali:
 
-## Configurazione gia pronta nel progetto
+- iOS con Xcode
+- Android con Gradle / Android Studio
 
-- `app.json` contiene:
-  - `bundleIdentifier` iOS: `com.franiix.questsaveplus`
-  - `package` Android: `com.franiix.questsaveplus`
-  - `buildNumber` iOS iniziale: `1`
-  - `versionCode` Android iniziale: `1`
-  - permission prompt per la libreria foto via `expo-image-picker`
-  - `ITSAppUsesNonExemptEncryption=false`
-- `eas.json` contiene i profili:
-  - `development`
-  - `preview`
-  - `production`
+Non e una guida EAS Cloud-first.
 
-## Variabili d'ambiente richieste
+## Dati attuali del progetto
 
-Copia `.env.example` in `.env` e valorizza:
+- iOS bundle identifier: `com.franiix.questsaveplus`
+- Android package: `com.franiix.questsaveplus`
+- versione utente attuale: `0.0.1`
+- build iOS attesa: `1`
+- versionCode Android atteso: `1`
 
-```bash
-EXPO_PUBLIC_SUPABASE_URL=
-EXPO_PUBLIC_SUPABASE_ANON_KEY=
-EXPO_PUBLIC_CATALOG_PRIMARY_PROVIDER=igdb
-EXPO_PUBLIC_CATALOG_EDGE_SUPPORTS_FILTERED_SEARCH=true
-EXPO_PUBLIC_CATALOG_EDGE_SUPPORTS_SECTION_DISCOVERY=true
-EXPO_PUBLIC_CATALOG_EDGE_ENABLED=true
-```
+## Prima di fare una release
 
-Per EAS Build conviene salvare gli stessi valori anche come secret/env nel progetto Expo.
+Devi verificare:
 
-## Prerequisiti account
+1. bug di startup risolti
+2. login e profilo funzionanti
+3. backlog e detail gioco funzionanti
+4. URL pubblici online:
+   - privacy: `https://www.franiix.cloud/questsaveplus/privacy/`
+   - support: `https://www.franiix.cloud/questsaveplus/support/`
+5. store listing compilato
+6. screenshot pronti
+
+## Prima del rilascio: test release locale obbligatorio
+
+Prima di caricare sugli store conviene sempre testare una release locale.
 
 ### iOS
 
-- Apple Developer Program attivo
-- app registrata con bundle id `com.franiix.questsaveplus`
-- eventuali tester TestFlight configurati
+In Xcode:
+
+1. `Product > Scheme > Edit Scheme`
+2. `Run`
+3. `Build Configuration = Release`
+4. `Run`
 
 ### Android
 
-- Google Play Console attiva
-- app creata con package `com.franiix.questsaveplus`
-- keystore gestito da EAS oppure importato
-
-## Comandi consigliati
-
-Login:
+Da terminale:
 
 ```bash
-eas login
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android
+./gradlew installRelease
 ```
 
-Collegamento progetto Expo, se ancora non esiste:
+Oppure da Android Studio selezionando la variant `release`.
+
+Questa verifica e importante perche:
+
+- la build `debug` usa Metro
+- la build `release` usa il bundle reale
+- molti bug di startup compaiono solo in release
+
+## Gestione chiavi e segreti
+
+## Scelta consigliata
+
+La pratica corretta e:
+
+- **non pushare** keystore, certificati, password e segreti nel repo, anche se privato
+- tenere i segreti fuori dal repository
+- usare file locali macchina-specifici
+
+Perche:
+
+- un repo privato non e un vault
+- i segreti possono finire in fork, backup, export, CI, zip o condivisioni future
+- ruotare chiavi firmate dopo e molto piu costoso che proteggerle bene da subito
+
+## Cosa tenere fuori dal repo
+
+- keystore Android release
+- password keystore
+- `~/.gradle/gradle.properties`
+- `.env` con chiavi sensibili
+
+## Se proprio vuoi tenerli nel repo
+
+Se scegli consapevolmente di farlo per comodita personale:
+
+- fallo solo su un repository davvero privato
+- documenta il rischio
+- evita almeno di committare password in chiaro nel README
+- preparati a ruotare tutto se il repo viene esposto
+
+La mia raccomandazione tecnica resta: **non committare i segreti**.
+
+## Release iOS con Xcode
+
+## 1. Prepara il progetto
 
 ```bash
-eas init
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe
+npx expo prebuild
+cd ios
+pod install
 ```
 
-Build internal QA:
+## 2. Apri il workspace
 
-```bash
-eas build --platform ios --profile preview
-eas build --platform android --profile preview
-```
-
-Build production:
-
-```bash
-eas build --platform ios --profile production
-eas build --platform android --profile production
-```
-
-Submit store:
-
-```bash
-eas submit --platform ios --profile production
-eas submit --platform android --profile production
-```
-
-## Checklist pre-release
-
-1. Verificare login, register, callback auth e reset password.
-2. Verificare profile setup e cambio avatar su device reale.
-3. Verificare search, discovery, detail game e link esterni.
-4. Verificare backlog add/update/remove su iOS e Android.
-5. Verificare localizzazione base `it` e `en`.
-6. Verificare splash, icona app e adaptive icon.
-7. Incrementare `version`, `buildNumber` e `versionCode` per la release successiva.
-
-## Note pratiche
-
-- `production.autoIncrement` in `eas.json` aiuta a non dimenticare l'incremento dei numeri build nelle build cloud.
-- La versione mostrata all'utente resta governata da `expo.version` in `app.json`.
-- Prima del primo submit conviene preparare store listing, screenshot e privacy details nei rispettivi portali.
-
-## Documenti collegati
-
-- metadata store: [store-metadata.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/store-metadata.md)
-- checklist privacy store: [store-privacy-checklist.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/store-privacy-checklist.md)
-
-## Hosting Legali Consigliato
-
-Se il tuo hosting gestisce piu facilmente cartelle web rispetto ai sottodomini dedicati, la struttura consigliata e:
+Apri:
 
 ```text
-www.franiix.cloud/
-  questsaveplus/
-    legal.css
-    privacy/
-      index.html
-    support/
-      index.html
+/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/ios/QuestSave+.xcworkspace
 ```
 
-Con URL pubblici:
+## 3. Verifica signing
 
-- `https://www.franiix.cloud/questsaveplus/privacy/`
-- `https://www.franiix.cloud/questsaveplus/support/`
+In Xcode:
+
+1. target app
+2. `Signing & Capabilities`
+3. `Automatically manage signing`
+4. team Apple corretto
+5. bundle identifier corretto
+
+## 4. Test finale locale
+
+Fai una run su:
+
+- simulatore
+- device reale, se possibile
+
+## 5. Archive
+
+In Xcode:
+
+1. seleziona `Any iOS Device (arm64)`
+2. `Product > Archive`
+
+## 6. Validate
+
+Da Organizer:
+
+1. seleziona l'archive
+2. `Validate App`
+
+Warning sui `dSYM` dei framework React Native/Hermes possono comparire.
+Non sempre bloccano l'upload, ma vanno monitorati.
+
+## 7. Upload
+
+Sempre da Organizer:
+
+1. `Distribute App`
+2. `App Store Connect`
+3. `Upload`
+
+## 8. App Store Connect
+
+Prima del submit finale verifica:
+
+- screenshots iPhone corretti
+- se l'app supporta iPad, servono anche screenshot iPad
+- age rating
+- privacy
+- support URL
+- privacy policy URL
+- copyright
+- build associata alla versione
+- informazioni per il team review
+
+## 9. Submit for Review
+
+Quando tutto e completo:
+
+1. `Add for Review`
+2. `Submit for Review`
+
+## Release Android per Play Store
+
+## 1. Verifica Java 21
+
+```bash
+java -version
+```
+
+Se non e `21`, imposta Java 21:
+
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export PATH="$JAVA_HOME/bin:$PATH"
+```
+
+## 2. Verifica SDK path
+
+Assicurati che esista:
+
+```text
+/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android/local.properties
+```
+
+con:
+
+```properties
+sdk.dir=/Users/franiix/Library/Android/sdk
+```
+
+## 3. Rigenera il progetto se hai cambiato config native
+
+```bash
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe
+npx expo prebuild --clean
+```
+
+Se invece hai cambiato solo codice applicativo, non serve per forza il clean.
+
+## 4. Build release AAB
+
+```bash
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android
+./gradlew --stop
+./gradlew bundleRelease
+```
+
+Output atteso:
+
+```text
+/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android/app/build/outputs/bundle/release/app-release.aab
+```
+
+## 5. Signing release Android
+
+La build release deve usare una keystore release vera, non la debug keystore.
+
+Il progetto e gia configurato per usare:
+
+- `signingConfigs.release`
+- proprieta lette da Gradle
+
+Il posto corretto per questi valori e:
+
+```text
+~/.gradle/gradle.properties
+```
+
+Esempio:
+
+```properties
+MYAPP_UPLOAD_STORE_FILE=/percorso/alla/keystore.keystore
+MYAPP_UPLOAD_KEY_ALIAS=alias
+MYAPP_UPLOAD_STORE_PASSWORD=...
+MYAPP_UPLOAD_KEY_PASSWORD=...
+org.gradle.java.home=/percorso/java21
+```
+
+## 6. Upload in Play Console
+
+Vai in:
+
+- `Google Play Console`
+- track `Internal`, `Closed` o `Production`
+
+Carica `app-release.aab`.
+
+## 7. Errori Play Console comuni
+
+### `debug signed`
+
+Hai caricato un bundle firmato con la debug keystore.
+Devi rigenerare la release corretta.
+
+### upload key mismatch
+
+La chiave di caricamento usata localmente non coincide con quella registrata in Play Console.
+In quel caso:
+
+- recuperi la vecchia upload key
+- oppure fai il reset della upload key
+
+### `android.permission.CAMERA`
+
+Il bundle dichiara ancora permessi che Play considera sensibili.
+In quel caso:
+
+- controlla `app.json`
+- rigenera con `npx expo prebuild --clean`
+- ricrea l'AAB
+
+## 8. Store listing Play
+
+Prima del submit verifica:
+
+- descrizione breve
+- descrizione completa
+- privacy policy URL
+- data safety
+- account deletion URL
+- screenshots
+- icona / grafica store
+
+## Flusso consigliato per ogni release
+
+1. fix bug
+2. test locale iOS e Android
+3. nuova build release iOS
+4. nuova build release Android
+5. upload sugli store
+6. verifica listing e privacy
+7. submit

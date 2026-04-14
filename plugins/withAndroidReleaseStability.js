@@ -1,0 +1,71 @@
+const {
+  withAppBuildGradle,
+  createRunOncePlugin,
+} = require('@expo/config-plugins');
+
+const pkg = require('../package.json');
+
+function ensureAppBuildGradle(content) {
+  let next = content;
+
+  if (!next.includes("signingConfigs {\n        debug")) {
+    return next;
+  }
+
+  if (!next.includes('signingConfigs {\n        debug') || next.includes('signingConfigs {\n        debug') === false) {
+    return next;
+  }
+
+  if (!next.includes('signingConfigs {\n        debug') || next.includes('signingConfigs {\n        debug') === false) {
+    return next;
+  }
+
+  if (!next.includes('release {\n            if (')) {
+    next = next.replace(
+      /signingConfigs \{\n([\s\S]*?)\n    \}/,
+      `signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+        release {
+            if (
+                project.hasProperty('MYAPP_UPLOAD_STORE_FILE') &&
+                project.hasProperty('MYAPP_UPLOAD_STORE_PASSWORD') &&
+                project.hasProperty('MYAPP_UPLOAD_KEY_ALIAS') &&
+                project.hasProperty('MYAPP_UPLOAD_KEY_PASSWORD')
+            ) {
+                storeFile file(MYAPP_UPLOAD_STORE_FILE)
+                storePassword MYAPP_UPLOAD_STORE_PASSWORD
+                keyAlias MYAPP_UPLOAD_KEY_ALIAS
+                keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+            }
+        }
+    }`
+    );
+  }
+
+  next = next.replace(
+    /release \{\n([\s\S]*?)signingConfig signingConfigs\.debug/,
+    (match, prefix) => `release {\n${prefix}signingConfig signingConfigs.release`
+  );
+
+  return next;
+}
+
+const withAndroidReleaseStability = (config) => {
+  config = withAppBuildGradle(config, (mod) => {
+    mod.modResults.contents = ensureAppBuildGradle(mod.modResults.contents);
+    return mod;
+  });
+
+  return config;
+};
+
+module.exports = createRunOncePlugin(
+  withAndroidReleaseStability,
+  'with-android-release-stability',
+  pkg.version
+);

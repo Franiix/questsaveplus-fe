@@ -28,13 +28,25 @@ export const useAuthStore = create<AuthState>(
   error: null,
 
   initialize: () => {
-   supabase.auth.getSession().then(({ data: { session } }) => {
-    set({
-     session,
-     sessionOrigin: session ? 'restored' : null,
-     isLoading: false,
+   supabase.auth
+    .getSession()
+    .then(({ data: { session } }) => {
+     set({
+      session,
+      sessionOrigin: session ? 'restored' : null,
+      isLoading: false,
+      error: null,
+     });
+    })
+    .catch((error: unknown) => {
+     const message = error instanceof Error ? error.message : 'auth_initialize_failed';
+     set({
+      session: null,
+      sessionOrigin: null,
+      isLoading: false,
+      error: message,
+     });
     });
-   });
    const {
     data: { subscription },
    } = supabase.auth.onAuthStateChange((event, session) => {

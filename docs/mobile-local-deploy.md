@@ -1,31 +1,87 @@
-# Deploy Locale iOS e Android
+# Sviluppo e Test Locale Mobile
 
 ## Obiettivo
 
-Questa guida descrive come compilare, firmare e pubblicare `QuestSave+` senza dipendere da EAS Cloud.
+Questa guida spiega come:
 
-Il flusso consigliato e:
+1. preparare l'ambiente locale
+2. generare i progetti nativi da Expo
+3. testare l'app su Xcode
+4. testare l'app su Android Studio
+5. capire quando serve rigenerare o rebuildare
 
-1. sviluppo e debug locale con `expo run`
-2. generazione dei progetti nativi con `expo prebuild`
-3. build release locali:
-   - iOS con `Xcode`
-   - Android con `Gradle` / `Android Studio`
-4. distribuzione:
-   - `TestFlight` da `Xcode Organizer`
-   - `Google Play Console` caricando `.aab`
+Questa guida e pensata per il flusso di sviluppo e debug, non per il caricamento finale sugli store.
 
 ## Stato attuale del progetto
 
 - Expo SDK `54`
 - React Native `0.81`
-- bundle id iOS: `com.franiix.questsaveplus`
-- package Android: `com.franiix.questsaveplus`
-- al momento le cartelle `ios/` e `android/` non sono committate: verranno generate da `expo prebuild`
+- routing con Expo Router
+- iOS bundle identifier: `com.franiix.questsaveplus`
+- Android package: `com.franiix.questsaveplus`
+- iOS attualmente iPhone-only (`supportsTablet: false`)
+
+## Prerequisiti macchina
+
+### Comuni
+
+- macOS
+- Node.js installato
+- npm installato
+- Xcode Command Line Tools
+- Watchman consigliato
+
+### iOS
+
+- Xcode aggiornato
+- simulatore iOS o device reale
+- account Apple in Xcode se vuoi test su device reale
+
+### Android
+
+- Android Studio
+- Android SDK installato
+- JDK `21`
+- Node globale disponibile anche per le app GUI
+
+## Nota importante su Node e Android Studio
+
+Su macOS e molto comune che:
+
+- nel terminale funzioni `nvm`
+- Android Studio invece non trovi `node`
+
+Per questo progetto, la soluzione consigliata e globale e:
+
+1. installare Node anche con Homebrew
+2. verificare che Android Studio possa usare `node` fuori dal terminale
+
+Comandi utili:
+
+```bash
+/opt/homebrew/bin/node -v
+/usr/local/bin/node -v
+which node
+```
+
+Se `/usr/local/bin/node` non punta al Node globale corretto:
+
+```bash
+sudo ln -sf /opt/homebrew/bin/node /usr/local/bin/node
+```
+
+Poi:
+
+1. chiudi completamente Android Studio
+2. fai logout/login del Mac oppure riavvia
+3. riapri Android Studio
+
+Il repository non deve contenere path assoluti macchina-specifici di Node.
+Il fix corretto e a livello macchina.
 
 ## Variabili ambiente richieste
 
-Nel file `.env` locale devono essere presenti:
+Nel file `.env` locale devono essere presenti almeno:
 
 ```bash
 EXPO_PUBLIC_SUPABASE_URL=
@@ -38,32 +94,13 @@ EXPO_PUBLIC_LEGAL_PRIVACY_URL=https://www.franiix.cloud/questsaveplus/privacy/
 EXPO_PUBLIC_LEGAL_SUPPORT_URL=https://www.franiix.cloud/questsaveplus/support/
 ```
 
-## Prerequisiti macchina
+Nota importante su Expo:
 
-### Comuni
+- le variabili `EXPO_PUBLIC_*` devono essere lette con accesso statico, ad esempio `process.env.EXPO_PUBLIC_SUPABASE_URL`
+- evita accessi dinamici come `process.env[name]`
+- con accesso dinamico le build release possono partire senza valori inlined e crashare all'avvio
 
-- Node.js installato
-- npm installato
-- Xcode Command Line Tools
-- Watchman consigliato
-
-### iOS
-
-- macOS
-- Xcode aggiornato
-- Apple ID loggato in Xcode
-- Apple Developer Program attivo
-- simulatore iOS o dispositivo fisico
-
-### Android
-
-- Android Studio
-- Android SDK installato
-- JDK `21` consigliato
-- non usare Java `25` per Gradle/Android in questo progetto
-- emulatore Android o dispositivo fisico con USB debugging attivo
-
-## Setup iniziale
+## Installazione dipendenze
 
 Dalla root frontend:
 
@@ -74,431 +111,329 @@ npm install
 
 ## Generazione progetti nativi
 
-Se `ios/` e `android/` non esistono ancora:
+Se `ios/` e `android/` non esistono o vanno riallineati:
 
 ```bash
 npx expo prebuild
 ```
 
-Per rigenerare da zero dopo modifiche ai plugin/config nativi:
+Se hai cambiato config native, plugin Expo, permessi, icone, splash o impostazioni di piattaforma:
 
 ```bash
 npx expo prebuild --clean
 ```
 
-Usa `--clean` solo quando serve davvero, perche ricrea i progetti nativi.
+Usa `--clean` solo quando serve davvero, perche rigenera completamente i progetti nativi.
 
-## Debug locale veloce
+## Test rapido da CLI
 
 ### iOS
 
 ```bash
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe
 npx expo run:ios
 ```
-
-Questo:
-
-- genera `ios/` se necessario
-- installa pods
-- compila
-- apre il simulatore o builda sul target selezionato
 
 ### Android
 
 ```bash
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe
 npx expo run:android
+```
+
+Questo e il modo piu rapido per verificare fix UI e logica senza passare dagli store.
+
+## Test release-like locale
+
+Questa e la sezione giusta quando vuoi verificare il comportamento reale della build senza dipendere da Metro.
+
+Differenza chiave:
+
+- `debug` usa Metro
+- `release` non usa Metro
+
+Se il bug succede su TestFlight, App Store o Play Console, devi sempre provare anche una build release locale.
+
+## Test release su iOS
+
+### Opzione consigliata per debug reale
+
+Apri il workspace in Xcode e cambia lo scheme:
+
+1. `Product > Scheme > Edit Scheme`
+2. seleziona `Run`
+3. imposta `Build Configuration` su `Release`
+4. premi `Run`
+
+Questo ti permette di:
+
+- eseguire l'app come release
+- testare startup, bootstrap e routing senza Metro
+- leggere comunque la console di Xcode
+
+### Opzione piu vicina ad App Store
+
+1. `Product > Archive`
+2. da Organizer valida e distribuisci l'archive
+3. usa quella build per TestFlight o review
+
+Se vuoi solo riprodurre un bug di avvio, il `Run` in configurazione `Release` e piu veloce.
+
+## Test release su Android
+
+### Da terminale
+
+```bash
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android
+./gradlew --stop
+./gradlew installRelease
 ```
 
 Questo:
 
-- genera `android/` se necessario
-- compila il progetto Android
-- installa l'app su emulatore o device
+- compila la build release
+- installa l'APK release su emulatore o device collegato
 
-## Firma e release iOS senza EAS Cloud
-
-### 1. Genera il progetto iOS
+Se vuoi generare prima l'APK release senza installarlo:
 
 ```bash
+./gradlew assembleRelease
+```
+
+Se vuoi generare l'AAB da store:
+
+```bash
+./gradlew bundleRelease
+```
+
+### Da Android Studio
+
+In Android Studio:
+
+1. `Build Variants`
+2. per il modulo `app` seleziona `release`
+3. esegui `Run app`
+
+Questo e utile se vuoi:
+
+- testare la release senza Metro
+- vedere Logcat mentre l'app parte
+
+## Quando usare debug e quando release
+
+Usa `debug` quando:
+
+- stai sviluppando UI
+- vuoi hot reload
+- vuoi iterare veloce
+
+Usa `release` quando:
+
+- il bug succede sugli store
+- l'app si blocca solo fuori da Metro
+- vuoi verificare bootstrap, auth, splash o startup reale
+- vuoi controllare problemi di minification o bundling
+
+## Test con Xcode
+
+## 1. Rigenera iOS se necessario
+
+```bash
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe
 npx expo prebuild
 ```
 
-### 2. Installa i pod
+## 2. Installa CocoaPods
 
 ```bash
-cd ios
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/ios
 pod install
-cd ..
 ```
 
-### 3. Apri il workspace in Xcode
+## 3. Apri il workspace
 
 Apri:
 
 ```text
-ios/QuestSave+.xcworkspace
+/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/ios/QuestSave+.xcworkspace
 ```
 
-Se il nome workspace differisce leggermente, usa quello generato in `ios/`.
-
-### 4. Configura signing
+## 4. Esegui in debug
 
 In Xcode:
 
-1. seleziona il target app
-2. vai su `Signing & Capabilities`
-3. scegli il tuo team Apple Developer
-4. verifica:
-   - bundle identifier `com.franiix.questsaveplus`
-   - signing automatico attivo
+1. seleziona un simulatore iPhone oppure un device reale
+2. premi `Run`
 
-### 5. Test locale release
+Questo e il flusso giusto per:
 
-Da Xcode puoi:
+- verificare bug di bootstrap
+- leggere crash nativi
+- vedere warning e log in console
 
-- lanciare su simulatore
-- lanciare su device reale
-- verificare che l'app si apra senza crash
+## 5. Quando serve rebuildare iOS
 
-### 6. Crea archive
+Serve rifare `Run` o ricompilare se cambi:
 
-In Xcode:
+- codice React Native / TypeScript
+- store Zustand
+- query / Supabase bootstrap
+- componenti UI
+- traduzioni
 
-1. seleziona un target `Any iOS Device (arm64)`
-2. menu `Product > Archive`
+Serve rigenerare con `prebuild --clean` se cambi:
 
-### 7. Invia a TestFlight
-
-Quando l'archive e pronta:
-
-1. si apre `Organizer`
-2. seleziona l'archive
-3. `Distribute App`
-4. `App Store Connect`
-5. `Upload`
-
-Poi in App Store Connect:
-
-- completa metadata
-- aggiungi internal/external testers
-
-## Firma e release Android senza EAS Cloud
-
-### 1. Genera il progetto Android
-
-```bash
-cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe
-npx expo prebuild
-```
-
-### 1.1 Verifica Java prima di buildare
-
-Gradle/Android per questo progetto non deve essere eseguito con Java `25`.
-Se vedi un errore come:
-
-```text
-Unsupported class file major version 69
-```
-
-stai quasi certamente usando Java `25`.
-
-Controlla la versione attiva:
-
-```bash
-java -version
-```
-
-Versione consigliata:
-
-```text
-openjdk version "21.x"
-```
-
-Su macOS puoi puntare temporaneamente a Java 21 cosi:
-
-```bash
-export JAVA_HOME=$(/usr/libexec/java_home -v 21)
-export PATH="$JAVA_HOME/bin:$PATH"
-java -version
-```
-
-Se non hai ancora Java 21 installato, installalo prima da:
-
-- Android Studio JetBrains Runtime / JDK
-- Amazon Corretto 21
-- Temurin 21
-
-Per rendere stabile la sessione Android, esegui questi comandi nello stesso terminale in cui lanci Gradle.
-
-### 2. Stato attuale del progetto Android
-
-Attenzione: al momento il progetto usa ancora la `debug.keystore` anche per la build `release`.
-Questo va bene solo per test locali, ma non e la configurazione corretta per una pubblicazione Play Store pulita.
-
-Prima di caricare su Google Play conviene configurare una keystore release tua.
-
-### 3. Crea una keystore release tua
-
-Se non ne hai una, genera una keystore tua e conservala in modo sicuro.
-Esegui dalla cartella `android/app`:
-
-```bash
-cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android/app
-keytool -genkeypair \
-  -v \
-  -storetype PKCS12 \
-  -keystore questsaveplus-upload.keystore \
-  -alias questsaveplus \
-  -keyalg RSA \
-  -keysize 2048 \
-  -validity 10000
-```
-
-Ti serviranno:
-
-- file keystore
-- alias
-- store password
-- key password
-
-Conserva questi 4 elementi in un posto sicuro. Se perdi la chiave di firma, la gestione futura della release Android diventa molto piu delicata.
-
-### 4. Configura signing release
-
-Nel progetto Android configura la signing release tramite:
-
-- `android/gradle.properties`
-- `android/app/build.gradle`
-
-In `android/gradle.properties` aggiungi:
-
-```properties
-MYAPP_UPLOAD_STORE_FILE=questsaveplus-upload.keystore
-MYAPP_UPLOAD_KEY_ALIAS=questsaveplus
-MYAPP_UPLOAD_STORE_PASSWORD=la_tua_store_password
-MYAPP_UPLOAD_KEY_PASSWORD=la_tua_key_password
-```
-
-Poi in `android/app/build.gradle` devi creare una `signingConfigs.release` vera e usarla dentro `buildTypes.release`.
-
-Schema consigliato:
-
-```gradle
-signingConfigs {
-    debug {
-        storeFile file('debug.keystore')
-        storePassword 'android'
-        keyAlias 'androiddebugkey'
-        keyPassword 'android'
-    }
-    release {
-        if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
-            storeFile file(MYAPP_UPLOAD_STORE_FILE)
-            storePassword MYAPP_UPLOAD_STORE_PASSWORD
-            keyAlias MYAPP_UPLOAD_KEY_ALIAS
-            keyPassword MYAPP_UPLOAD_KEY_PASSWORD
-        }
-    }
-}
-
-buildTypes {
-    debug {
-        signingConfig signingConfigs.debug
-    }
-    release {
-        signingConfig signingConfigs.release
-        ...
-    }
-}
-```
-
-Se questa parte non e configurata, la tua build `release` Android continua a usare la chiave debug.
-
-### 5. Build release locale
-
-Prima di lanciare Gradle, assicurati di stare usando Java `21`.
-
-Controllo:
-
-```bash
-java -version
-```
-
-Se non vedi `21.x`, esegui:
-
-```bash
-export JAVA_HOME=$(/usr/libexec/java_home -v 21)
-export PATH="$JAVA_HOME/bin:$PATH"
-java -version
-```
-
-Poi lancia la build nel terminale gia configurato con Java 21.
-
-Per APK debug/installabile rapidamente:
-
-```bash
-cat > /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android/local.properties <<'EOF'
-sdk.dir=/Users/franiix/Library/Android/sdk
-EOF
-```
-```bash
-cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android
-./gradlew assembleRelease
-```
-
-Per Play Console devi preferire `AAB`:
-
-```bash
-cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android
-./gradlew --stop
-./gradlew bundleRelease
-```
-
-Se Gradle continua a usare una JVM sbagliata, lancia nello stesso terminale:
-
-```bash
-export JAVA_HOME=$(/usr/libexec/java_home -v 21)
-export PATH="$JAVA_HOME/bin:$PATH"
-cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android
-./gradlew --stop
-./gradlew bundleRelease
-```
-
-Output atteso:
-
-- APK: `android/app/build/outputs/apk/release/`
-- AAB: `android/app/build/outputs/bundle/release/`
-
-### 6. Carica su Google Play
-
-Vai in Play Console e carica il file:
-
-- `.aab` per internal testing / closed testing / production
-
-Percorso atteso:
-
-```text
-/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android/app/build/outputs/bundle/release/app-release.aab
-```
-
-### 7. Checklist Android prima del caricamento
-
-Prima del deploy Play Store, verifica:
-
-1. `java -version` mostra `21.x`
-2. `android/app/build.gradle` non usa piu `signingConfigs.debug` in `release`
-3. hai una tua `questsaveplus-upload.keystore`
-4. `app-release.aab` esiste davvero nel path di output
-5. package Android corretto: `com.franiix.questsaveplus`
-6. `versionName` e `versionCode` coerenti con la release
-
-## Versioning
-
-Prima di ogni release:
-
-- aggiorna `expo.version` in `app.json`
-- incrementa `ios.buildNumber`
-- incrementa `android.versionCode`
-
-Valori attuali:
-
-- version: `0.0.1`
-- buildNumber iOS: `1`
-- versionCode Android: `1`
-
-## Quando usare quale flusso
-
-### Per debug rapido
-
-Usa:
-
-```bash
-npx expo run:ios
-npx expo run:android
-```
-
-### Per test release locale
-
-Usa:
-
-- iOS: archive da Xcode
-- Android: `bundleRelease` locale
-
-### Per distribuzione a tester
-
-Usa:
-
-- iOS: TestFlight da Xcode Organizer
-- Android: Play Internal Testing caricando `.aab`
-
-## Checklist pre-release
-
-1. Verifica login, register e reset password.
-2. Verifica profile setup e upload avatar.
-3. Verifica home, search, discovery e detail game.
-4. Verifica backlog add/update/remove.
-5. Verifica link legali pubblici.
-6. Verifica che `questsaveplus@franiix.cloud` sia l'email mostrata nei documenti pubblici.
-7. Verifica che le env locali siano presenti prima di compilare.
-
-## Rischi e note importanti
-
-### Expo prebuild
-
-`expo prebuild` traduce `app.json` nei progetti nativi.
-
-Ogni volta che cambi:
-
+- `app.json`
 - plugin Expo
 - permessi nativi
-- splash/icon
-- bundle/package identifiers
+- icone / splash / bundle identifier
 
-devi rigenerare o sincronizzare i progetti nativi.
+## Test con Android Studio
 
-### Non committare segreti
-
-Non salvare:
-
-- password keystore
-- file sensibili
-- certificati privati
-
-direttamente nel repository.
-
-### Signing Android
-
-La keystore Android e critica:
-
-- se la perdi, la gestione futura delle release diventa problematica
-- conservala in backup sicuro
-
-### Signing iOS
-
-Se usi signing automatico Xcode, il flusso e piu semplice, ma dipende dal tuo account Apple Developer e dai profili generati nel portale Apple.
-
-## Comandi rapidi
+## 1. Rigenera Android se necessario
 
 ```bash
 cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe
-npm install
 npx expo prebuild
-npx expo run:ios
-npx expo run:android
 ```
 
-Per Android release:
+## 2. Verifica Java 21
 
 ```bash
-cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android
-./gradlew bundleRelease
+java -version
 ```
 
-## Percorso consigliato per te
+Per questo progetto non usare Java `25`.
 
-Per il tuo caso pratico, la strategia piu sensata e:
+Se serve:
 
-1. usare `expo run` per risolvere crash e bug
-2. usare Xcode per archive/TestFlight
-3. usare Android Studio o `gradlew bundleRelease` per Play Console
-4. usare EAS solo come fallback eventuale, non come flusso principale
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export PATH="$JAVA_HOME/bin:$PATH"
+java -version
+```
+
+## 3. Verifica Android SDK path
+
+Il file corretto e:
+
+```text
+/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android/local.properties
+```
+
+Contenuto:
+
+```properties
+sdk.dir=/Users/franiix/Library/Android/sdk
+```
+
+Se manca, ricrealo.
+
+## 4. Apri il progetto Android
+
+Apri in Android Studio questa cartella:
+
+```text
+/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android
+```
+
+Non aprire la root del frontend: apri proprio `android/`.
+
+## 5. Sync e Run
+
+In Android Studio:
+
+1. aspetta la Gradle sync
+2. seleziona emulatore o device reale
+3. premi `Run app`
+
+## 6. Logcat per crash e freeze
+
+Se l'app crasha o si blocca:
+
+1. apri `Logcat`
+2. seleziona package `com.franiix.questsaveplus`
+3. livello `Error` o `Verbose`
+4. cerca:
+   - `FATAL EXCEPTION`
+   - `AndroidRuntime`
+   - errori JS/Native Modules
+
+## Quando devi rebuildare
+
+### Rebuild semplice
+
+Basta rieseguire `Run app` se hai cambiato:
+
+- codice TypeScript / React
+- componenti
+- store
+- hook
+- bootstrap JS
+
+### Rigenerazione nativa
+
+Serve `npx expo prebuild --clean` se hai cambiato:
+
+- `app.json`
+- plugin Expo
+- signing / package / permission
+- splash / icon / adaptive icon
+
+### Nuova release build
+
+Devi rigenerare una build `release` se hai cambiato:
+
+- qualunque codice React Native / TypeScript che vuoi verificare in comportamento store-like
+- bootstrap auth
+- provider root
+- routing
+- dipendenze che entrano nel bundle
+
+In pratica:
+
+- per verificare i fix attuali di startup, serve una nuova build release
+
+## Errori frequenti e causa
+
+### `command 'node'`
+
+Android Studio non vede `node` a livello GUI.
+Fix:
+
+- Node globale Homebrew
+- symlink corretto in `/usr/local/bin/node`
+- riavvio sessione macOS
+
+### `Unsupported class file major version 69`
+
+Stai usando Java `25`.
+Fix:
+
+- usa Java `21`
+
+### `SDK location not found`
+
+Manca `android/local.properties`.
+
+### App bloccata all'avvio
+
+Controlla prima:
+
+- variabili env Supabase
+- bootstrap auth/profile
+- provider root come `SafeAreaProvider`
+- errori in Logcat / Xcode console
+
+## Checklist rapida di test locale
+
+1. apertura app senza freeze
+2. login / register
+3. callback auth
+4. profile setup
+5. home / discovery
+6. detail gioco
+7. backlog add / update / remove
+8. profile edit
+9. legal routes
+10. supporto `it` e `en`

@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import '@/shared/i18n/i18n.config';
 import { AuthBootScreen } from '@/components/auth/AuthBootScreen';
 import { ToastContainer } from '@/components/base/feedback/ToastNotification';
@@ -22,7 +23,9 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useProfileStore } from '@/stores/profile.store';
 import '@/global.css';
 
-SplashScreen.preventAutoHideAsync();
+void SplashScreen.preventAutoHideAsync().catch(() => {
+ // Avoid crashing the bootstrap if the splash screen is already handled by the native layer.
+});
 
 const queryClient = new QueryClient({
  defaultOptions: {
@@ -98,7 +101,7 @@ function AuthGuard() {
 }
 
 export default function RootLayout() {
- const [fontsLoaded] = useFonts({
+ const [fontsLoaded, fontError] = useFonts({
   Geist_400Regular,
   Geist_500Medium,
   Geist_600SemiBold,
@@ -107,32 +110,40 @@ export default function RootLayout() {
  });
 
  useEffect(() => {
-  if (fontsLoaded) {
-   SplashScreen.hideAsync();
+  if (fontsLoaded || fontError) {
+   void SplashScreen.hideAsync().catch(() => {
+    // Keep the app usable even if the splash screen has already been dismissed.
+   });
   }
- }, [fontsLoaded]);
+ }, [fontsLoaded, fontError]);
 
- if (!fontsLoaded) {
-  return null;
+ if (!fontsLoaded && !fontError) {
+  return (
+   <AuthBootScreen
+    title="QuestSave+"
+    subtitle="Loading interface..."
+   />
+  );
  }
 
  return (
   <GestureHandlerRootView style={{ flex: 1 }}>
-   <QueryClientProvider client={queryClient}>
-    <GluestackUIProvider mode="dark">
-     <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
-      <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
-      <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
-      <Stack.Screen name="game/[id]" options={{ animation: 'slide_from_right' }} />
-      <Stack.Screen name="auth/callback" options={{ animation: 'fade' }} />
-     </Stack>
-     <AuthGuard />
-     <TabBarCustom />
-     <StatusBar style="light" />
-     <ToastContainer />
-    </GluestackUIProvider>
-   </QueryClientProvider>
+   <SafeAreaProvider>
+    <QueryClientProvider client={queryClient}>
+     <GluestackUIProvider mode="dark">
+      <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
+       <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
+       <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
+       <Stack.Screen name="game/[id]" options={{ animation: 'slide_from_right' }} />
+       <Stack.Screen name="auth/callback" options={{ animation: 'fade' }} />
+      </Stack>
+      <AuthGuard />
+      <TabBarCustom />
+      <StatusBar style="light" />
+      <ToastContainer />
+     </GluestackUIProvider>
+    </QueryClientProvider>
+   </SafeAreaProvider>
   </GestureHandlerRootView>
  );
 }
-
