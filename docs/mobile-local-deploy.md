@@ -59,7 +59,8 @@ EXPO_PUBLIC_LEGAL_SUPPORT_URL=https://www.franiix.cloud/questsaveplus/support/
 
 - Android Studio
 - Android SDK installato
-- JDK compatibile con la toolchain Android corrente
+- JDK `21` consigliato
+- non usare Java `25` per Gradle/Android in questo progetto
 - emulatore Android o dispositivo fisico con USB debugging attivo
 
 ## Setup iniziale
@@ -186,20 +187,72 @@ Poi in App Store Connect:
 ### 1. Genera il progetto Android
 
 ```bash
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe
 npx expo prebuild
 ```
 
-### 2. Apri Android Studio
+### 1.1 Verifica Java prima di buildare
 
-Apri la cartella:
+Gradle/Android per questo progetto non deve essere eseguito con Java `25`.
+Se vedi un errore come:
 
 ```text
-android/
+Unsupported class file major version 69
 ```
 
-### 3. Crea o importa keystore release
+stai quasi certamente usando Java `25`.
+
+Controlla la versione attiva:
+
+```bash
+java -version
+```
+
+Versione consigliata:
+
+```text
+openjdk version "21.x"
+```
+
+Su macOS puoi puntare temporaneamente a Java 21 cosi:
+
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export PATH="$JAVA_HOME/bin:$PATH"
+java -version
+```
+
+Se non hai ancora Java 21 installato, installalo prima da:
+
+- Android Studio JetBrains Runtime / JDK
+- Amazon Corretto 21
+- Temurin 21
+
+Per rendere stabile la sessione Android, esegui questi comandi nello stesso terminale in cui lanci Gradle.
+
+### 2. Stato attuale del progetto Android
+
+Attenzione: al momento il progetto usa ancora la `debug.keystore` anche per la build `release`.
+Questo va bene solo per test locali, ma non e la configurazione corretta per una pubblicazione Play Store pulita.
+
+Prima di caricare su Google Play conviene configurare una keystore release tua.
+
+### 3. Crea una keystore release tua
 
 Se non ne hai una, genera una keystore tua e conservala in modo sicuro.
+Esegui dalla cartella `android/app`:
+
+```bash
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android/app
+keytool -genkeypair \
+  -v \
+  -storetype PKCS12 \
+  -keystore questsaveplus-upload.keystore \
+  -alias questsaveplus \
+  -keyalg RSA \
+  -keysize 2048 \
+  -validity 10000
+```
 
 Ti serviranno:
 
@@ -208,6 +261,8 @@ Ti serviranno:
 - store password
 - key password
 
+Conserva questi 4 elementi in un posto sicuro. Se perdi la chiave di firma, la gestione futura della release Android diventa molto piu delicata.
+
 ### 4. Configura signing release
 
 Nel progetto Android configura la signing release tramite:
@@ -215,33 +270,93 @@ Nel progetto Android configura la signing release tramite:
 - `android/gradle.properties`
 - `android/app/build.gradle`
 
-Valori tipici:
+In `android/gradle.properties` aggiungi:
 
 ```properties
 MYAPP_UPLOAD_STORE_FILE=questsaveplus-upload.keystore
 MYAPP_UPLOAD_KEY_ALIAS=questsaveplus
-MYAPP_UPLOAD_STORE_PASSWORD=...
-MYAPP_UPLOAD_KEY_PASSWORD=...
+MYAPP_UPLOAD_STORE_PASSWORD=la_tua_store_password
+MYAPP_UPLOAD_KEY_PASSWORD=la_tua_key_password
 ```
 
-Poi nel `build.gradle` usi quei valori nella `signingConfigs.release`.
+Poi in `android/app/build.gradle` devi creare una `signingConfigs.release` vera e usarla dentro `buildTypes.release`.
+
+Schema consigliato:
+
+```gradle
+signingConfigs {
+    debug {
+        storeFile file('debug.keystore')
+        storePassword 'android'
+        keyAlias 'androiddebugkey'
+        keyPassword 'android'
+    }
+    release {
+        if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+            storeFile file(MYAPP_UPLOAD_STORE_FILE)
+            storePassword MYAPP_UPLOAD_STORE_PASSWORD
+            keyAlias MYAPP_UPLOAD_KEY_ALIAS
+            keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+        }
+    }
+}
+
+buildTypes {
+    debug {
+        signingConfig signingConfigs.debug
+    }
+    release {
+        signingConfig signingConfigs.release
+        ...
+    }
+}
+```
+
+Se questa parte non e configurata, la tua build `release` Android continua a usare la chiave debug.
 
 ### 5. Build release locale
+
+Prima di lanciare Gradle, assicurati di stare usando Java `21`.
+
+Controllo:
+
+```bash
+java -version
+```
+
+Se non vedi `21.x`, esegui:
+
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export PATH="$JAVA_HOME/bin:$PATH"
+java -version
+```
+
+Poi lancia la build nel terminale gia configurato con Java 21.
 
 Per APK debug/installabile rapidamente:
 
 ```bash
-cd android
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android
 ./gradlew assembleRelease
-cd ..
 ```
 
 Per Play Console devi preferire `AAB`:
 
 ```bash
-cd android
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android
+./gradlew --stop
 ./gradlew bundleRelease
-cd ..
+```
+
+Se Gradle continua a usare una JVM sbagliata, lancia nello stesso terminale:
+
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export PATH="$JAVA_HOME/bin:$PATH"
+cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android
+./gradlew --stop
+./gradlew bundleRelease
 ```
 
 Output atteso:
@@ -254,6 +369,23 @@ Output atteso:
 Vai in Play Console e carica il file:
 
 - `.aab` per internal testing / closed testing / production
+
+Percorso atteso:
+
+```text
+/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android/app/build/outputs/bundle/release/app-release.aab
+```
+
+### 7. Checklist Android prima del caricamento
+
+Prima del deploy Play Store, verifica:
+
+1. `java -version` mostra `21.x`
+2. `android/app/build.gradle` non usa piu `signingConfigs.debug` in `release`
+3. hai una tua `questsaveplus-upload.keystore`
+4. `app-release.aab` esiste davvero nel path di output
+5. package Android corretto: `com.franiix.questsaveplus`
+6. `versionName` e `versionCode` coerenti con la release
 
 ## Versioning
 

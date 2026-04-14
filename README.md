@@ -174,6 +174,16 @@ La configurazione EAS per iOS e Android e la checklist di rilascio sono document
 Per store listing e privacy submission trovi anche [docs/store-metadata.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/store-metadata.md) e [docs/store-privacy-checklist.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/store-privacy-checklist.md).
 Per un flusso completamente locale, senza dipendere da EAS Cloud, usa [docs/mobile-local-deploy.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/mobile-local-deploy.md).
 
+Note operative aggiornate:
+
+- iOS release corrente: iPhone-only (`supportsTablet: false`)
+- URL pubblici legali:
+  - privacy: `https://www.franiix.cloud/questsaveplus/privacy/`
+  - support: `https://www.franiix.cloud/questsaveplus/support/`
+- email supporto store: `questsaveplus@franiix.cloud`
+- Android release locale: usa Java `21`, non Java `25`, altrimenti Gradle puo fallire con `Unsupported class file major version 69`
+- Android release Play Store: non usare la `debug.keystore`; configura una keystore release dedicata come spiegato in [docs/mobile-local-deploy.md](/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/mobile-local-deploy.md)
+
 ## Dipendenze Da Backend
 
 L'app si aspetta che il backend Supabase in [README.md](/C:/Users/franiix/Projects/Personale/QuestSave+/questsaveplus-be/README.md) sia gia allineato alla base `v1.0` IGDB-only.
