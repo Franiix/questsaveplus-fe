@@ -46,12 +46,13 @@ export function useHomeScreenViewModel({
 
  // Le query catalog sparano solo quando il pannello filtri è aperto o ci sono
  // filtri attivi — evita 4 richieste di rete inutili al mount dell'home screen.
- const hasActiveFilters =
-  Boolean(appliedFilters.genre) ||
-  Boolean(appliedFilters.platform) ||
-  Boolean(appliedFilters.developer) ||
-  Boolean(appliedFilters.publisher);
- const catalogEnabled = isFilterSheetOpen || hasActiveFilters;
+  const hasCatalogActiveFilters =
+    Boolean(appliedFilters.genre) ||
+    Boolean(appliedFilters.platform) ||
+    Boolean(appliedFilters.developer) ||
+    Boolean(appliedFilters.publisher);
+
+  const catalogEnabled = isFilterSheetOpen || hasCatalogActiveFilters;
 
  const {
   data: genres = [],
