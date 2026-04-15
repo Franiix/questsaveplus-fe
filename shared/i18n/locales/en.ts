@@ -527,7 +527,7 @@
   callback: {
    loading: 'Verifying your account...',
    success: 'Account confirmed!',
-   successSub: 'Achievement unlocked: new player!\nWelcome to QuestSave+.',
+   successSub: 'Your email has been confirmed successfully.\nYou can now sign in again to QuestSave+.',
    goToDashboard: 'Go to dashboard',
    error: 'Something went wrong. Please try again.',
    backToLogin: 'Back to login',
