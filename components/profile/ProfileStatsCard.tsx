@@ -44,33 +44,16 @@ export function ProfileStatsCard({ stats, labels }: ProfileStatsCardProps) {
         elevation: 10,
       }}
     >
-      <View
+      <Text
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          color: colors.text.primary,
+          fontSize: typography.size.lg,
+          fontFamily: typography.font.bold,
           marginBottom: spacing.xs + 2,
         }}
       >
-        <Text
-          style={{
-            color: colors.text.primary,
-            fontSize: typography.size.lg,
-            fontFamily: typography.font.bold,
-          }}
-        >
-          {labels.title}
-        </Text>
-        <Text
-          style={{
-            color: colors.text.tertiary,
-            fontSize: typography.size.sm,
-            fontFamily: typography.font.medium,
-          }}
-        >
-          {stats.total}
-        </Text>
-      </View>
+        {labels.title}
+      </Text>
 
       <Text
         style={{
@@ -81,6 +64,16 @@ export function ProfileStatsCard({ stats, labels }: ProfileStatsCardProps) {
       >
         {labels.subtitle}
       </Text>
+
+      <View style={{ marginBottom: spacing.sm }}>
+        <StatCounter
+          label={labels.total}
+          value={stats.total}
+          color={colors.primary.DEFAULT}
+          icon="layer-group"
+          variant="card"
+        />
+      </View>
 
       <View style={{ flexDirection: 'row', gap: spacing.sm }}>
         <StatCounter
