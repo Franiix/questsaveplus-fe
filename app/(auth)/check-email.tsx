@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
+import { AuthMessageAccent } from '@/components/auth/AuthMessageAccent';
 import { AuthStatusIcon } from '@/components/auth/AuthStatusIcon';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { HintBox } from '@/components/base/display/HintBox';
@@ -46,6 +47,7 @@ export default function CheckEmailScreen() {
     </Text>
 
     <HintBox style={{ marginBottom: spacing['2xl'] }}>
+     <AuthMessageAccent icon="trophy" label={t('auth.checkEmail.badge')} containerStyle={{ marginBottom: spacing.md }} />
      <Text
       style={{
        color: colors.text.secondary,

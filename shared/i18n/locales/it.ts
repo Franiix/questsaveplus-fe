@@ -520,13 +520,14 @@
   checkEmail: {
    title: 'Controlla la tua email',
    subtitle: 'Ti abbiamo inviato un link di conferma.',
-   hint:
-    'Achievement sbloccato: registrazione completata!\nApri l’email e tocca "Conferma" per completarla.',
+   badge: 'Registrazione completata',
+   hint: 'Apri l’email e tocca "Conferma" per completare la registrazione.',
    backToLogin: 'Torna al login',
   },
   callback: {
    loading: 'Verifica account in corso...',
    success: 'Account confermato!',
+   badge: 'Nuovo giocatore',
    successSub: 'La tua email è stata confermata con successo.\nOra puoi accedere di nuovo a QuestSave+.',
    goToDashboard: 'Vai alla dashboard',
    error: 'Qualcosa è andato storto. Riprova.',

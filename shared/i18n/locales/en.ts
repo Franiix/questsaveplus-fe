@@ -520,13 +520,14 @@
   checkEmail: {
    title: 'Check your email',
    subtitle: "We've sent you a confirmation link.",
-   hint:
-    'Achievement unlocked: registration complete!\nOpen the email and tap "Confirm" to complete it.',
+   badge: 'Registration complete',
+   hint: 'Open the email and tap "Confirm" to complete your registration.',
    backToLogin: 'Back to login',
   },
   callback: {
    loading: 'Verifying your account...',
    success: 'Account confirmed!',
+   badge: 'New player',
    successSub: 'Your email has been confirmed successfully.\nYou can now sign in again to QuestSave+.',
    goToDashboard: 'Go to dashboard',
    error: 'Something went wrong. Please try again.',
