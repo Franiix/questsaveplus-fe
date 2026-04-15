@@ -12,14 +12,6 @@ function ensureAppBuildGradle(content) {
     return next;
   }
 
-  if (!next.includes('signingConfigs {\n        debug') || next.includes('signingConfigs {\n        debug') === false) {
-    return next;
-  }
-
-  if (!next.includes('signingConfigs {\n        debug') || next.includes('signingConfigs {\n        debug') === false) {
-    return next;
-  }
-
   if (!next.includes('release {\n            if (')) {
     next = next.replace(
       /signingConfigs \{\n([\s\S]*?)\n    \}/,
@@ -33,7 +25,6 @@ function ensureAppBuildGradle(content) {
         release {
             if (
                 effectiveUploadKeystore != null &&
-                project.hasProperty('MYAPP_UPLOAD_STORE_FILE') &&
                 project.hasProperty('MYAPP_UPLOAD_STORE_PASSWORD') &&
                 project.hasProperty('MYAPP_UPLOAD_KEY_ALIAS') &&
                 project.hasProperty('MYAPP_UPLOAD_KEY_PASSWORD')
@@ -55,21 +46,36 @@ function ensureAppBuildGradle(content) {
         `${match}
     def repoRootUploadKeystore = new File(projectRoot, "questsaveplus-upload.keystore")
     def configuredUploadKeystore = project.hasProperty('MYAPP_UPLOAD_STORE_FILE') ? file(MYAPP_UPLOAD_STORE_FILE) : null
-    def effectiveUploadKeystore = configuredUploadKeystore?.exists()
-        ? configuredUploadKeystore
-        : (repoRootUploadKeystore.exists() ? repoRootUploadKeystore : null)`
+    def effectiveUploadKeystore = repoRootUploadKeystore.exists()
+        ? repoRootUploadKeystore
+        : (configuredUploadKeystore?.exists() ? configuredUploadKeystore : null)`
     );
   }
 
   next = next.replace(
-    /debug \{\n([\s\S]*?)signingConfig signingConfigs\.release/,
-    (match, prefix) => `debug {\n${prefix}signingConfig signingConfigs.debug`
+    /def effectiveUploadKeystore = configuredUploadKeystore\?\.(?:exists\(\))\n\s*\? configuredUploadKeystore\n\s*: \(repoRootUploadKeystore\.exists\(\) \? repoRootUploadKeystore : null\)/,
+    `def effectiveUploadKeystore = repoRootUploadKeystore.exists()
+        ? repoRootUploadKeystore
+        : (configuredUploadKeystore?.exists() ? configuredUploadKeystore : null)`
   );
 
-  next = next.replace(
-    /release \{\n([\s\S]*?)signingConfig signingConfigs\.debug/,
-    (match, prefix) => `release {\n${prefix}signingConfig signingConfigs.release`
-  );
+  next = next.replace(/project\.hasProperty\('MYAPP_UPLOAD_STORE_FILE'\) &&\n\s*/g, '');
+
+  next = next.replace(/buildTypes \{[\s\S]*?\n    \}/, (buildTypesBlock) => {
+    let normalizedBlock = buildTypesBlock;
+
+    normalizedBlock = normalizedBlock.replace(
+      /debug \{\n([\s\S]*?)signingConfig signingConfigs\.(debug|release)/,
+      (match, prefix) => `debug {\n${prefix}signingConfig signingConfigs.debug`
+    );
+
+    normalizedBlock = normalizedBlock.replace(
+      /release \{\n([\s\S]*?)signingConfig signingConfigs\.(debug|release)/,
+      (match, prefix) => `release {\n${prefix}signingConfig signingConfigs.release`
+    );
+
+    return normalizedBlock;
+  });
 
   return next;
 }
