@@ -9,12 +9,14 @@ import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type {
  BacklogScreenContentState,
  BacklogStatusColorMap,
+ BacklogStatusIconMap,
  BacklogStatusLabelMap,
 } from '@/shared/models/backlog/BacklogScreenContent.model';
 import { spacing } from '@/shared/theme/tokens';
 
 type BacklogScreenContentProps = {
  colorMap: BacklogStatusColorMap;
+ iconMap: BacklogStatusIconMap;
  labelMap: BacklogStatusLabelMap;
  state: BacklogScreenContentState;
  onFilterChange: (value: BacklogStatusEnum | null) => void;
@@ -29,6 +31,7 @@ const HORIZONTAL_PADDING = spacing.md;
 
 export function BacklogScreenContent({
  colorMap,
+ iconMap,
  labelMap,
  state,
  onFilterChange,
@@ -81,6 +84,7 @@ export function BacklogScreenContent({
        removeLabel={removeLabel}
        labelMap={labelMap}
        colorMap={colorMap}
+       iconMap={iconMap}
       />
      )}
      keyExtractor={(item) => item.id}

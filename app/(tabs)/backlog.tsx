@@ -32,7 +32,7 @@ const HORIZONTAL_PADDING = spacing.md;
 
 export default function BacklogScreen() {
   const { t } = useTranslation();
-  const { labelMap, colorMap } = useBacklogStatusPresentation();
+  const { labelMap, colorMap, iconMap } = useBacklogStatusPresentation();
   const router = useRouter();
   const { showToast } = useToastStore();
   const handleBackPress = useCallback(() => {
@@ -169,6 +169,7 @@ export default function BacklogScreen() {
 
       <BacklogScreenContent
         colorMap={colorMap}
+        iconMap={iconMap}
         labelMap={labelMap}
         state={{
           activeFilter,

@@ -1,4 +1,5 @@
 import { FontAwesome5 } from '@expo/vector-icons';
+import { memo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { ImageWithFallback } from '@/components/base/display/ImageWithFallback';
@@ -16,15 +17,17 @@ type BacklogListItemProps = {
   removeLabel: string;
   labelMap: Record<BacklogItemEntity['status'], string>;
   colorMap: Record<BacklogItemEntity['status'], string>;
+  iconMap: Record<BacklogItemEntity['status'], React.ComponentProps<typeof FontAwesome5>['name']>;
 };
 
-export function BacklogListItem({
+export const BacklogListItem = memo(function BacklogListItem({
   item,
   onPress,
   onRequestRemove,
   removeLabel,
   labelMap,
   colorMap,
+  iconMap,
 }: BacklogListItemProps) {
   function renderRightActions() {
     return (
@@ -88,6 +91,7 @@ export function BacklogListItem({
             value={item.status}
             colorMap={colorMap}
             labelMap={labelMap}
+            iconMap={iconMap}
           />
         </View>
         {item.personal_rating !== null ? (
@@ -98,4 +102,4 @@ export function BacklogListItem({
       </Pressable>
     </Swipeable>
   );
-}
+});

@@ -1,3 +1,4 @@
+import { FontAwesome5 } from '@expo/vector-icons';
 import { type StyleProp, Text, View, type ViewStyle } from 'react-native';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
 
@@ -8,6 +9,7 @@ type BadgeProps = {
  color?: string;
  backgroundColor?: string;
  size?: BadgeSize;
+ icon?: React.ComponentProps<typeof FontAwesome5>['name'];
  style?: StyleProp<ViewStyle>;
 };
 
@@ -38,6 +40,7 @@ export function Badge({
  color = colors.text.primary,
  backgroundColor = colors.primary.DEFAULT,
  size = 'sm',
+ icon,
  style,
 }: BadgeProps) {
  const { paddingHorizontal, paddingVertical, fontSize } = sizeStyles[size];
@@ -51,10 +54,14 @@ export function Badge({
      paddingHorizontal,
      paddingVertical,
      alignSelf: 'flex-start',
+     flexDirection: 'row',
+     alignItems: 'center',
+     gap: 4,
     },
     style,
    ]}
   >
+   {icon ? <FontAwesome5 name={icon} size={fontSize - 1} color={color} solid /> : null}
    <Text
     style={{
      color,

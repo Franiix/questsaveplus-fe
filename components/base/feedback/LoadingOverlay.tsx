@@ -1,5 +1,5 @@
-﻿import { LinearGradient } from 'expo-linear-gradient';
-import { Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Modal, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -24,7 +24,8 @@ type LoadingOverlayProps = {
 
 /**
  * Molecule: overlay fullscreen con logo QuestSave+ animato.
- * Usa un'animazione di respiro (scale + opacity) sul simbolo +.
+ * Usa Modal nativo per garantire copertura totale dello schermo
+ * indipendentemente dall'albero di componenti (inclusa status bar su Android).
  */
 export function LoadingOverlay({ message = 'Caricamento...', visible = true }: LoadingOverlayProps) {
   const [shouldRender, setShouldRender] = useState(visible);
@@ -79,10 +80,10 @@ export function LoadingOverlay({ message = 'Caricamento...', visible = true }: L
 
     hideTimerRef.current = setTimeout(() => {
       overlayOpacity.value = withTiming(0, { duration: FADE_OUT_MS }, (finished) => {
-      if (finished) {
-        runOnJS(setShouldRender)(false);
-      }
-    });
+        if (finished) {
+          runOnJS(setShouldRender)(false);
+        }
+      });
     }, remaining);
 
     return () => {
@@ -102,108 +103,92 @@ export function LoadingOverlay({ message = 'Caricamento...', visible = true }: L
     opacity: overlayOpacity.value,
   }));
 
-  if (!shouldRender) return null;
-
   return (
-    <Animated.View
-      style={[
-        {
-          position: 'absolute',
-          inset: 0,
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 999,
-        },
-        overlayStyle,
-      ]}
+    <Modal
+      visible={shouldRender}
+      transparent
+      statusBarTranslucent
+      animationType="none"
     >
-      <LinearGradient
-        colors={['rgba(7,8,16,0.12)', 'rgba(9,10,22,0.36)', 'rgba(10,10,20,0.58)']}
-        style={{
-          position: 'absolute',
-          inset: 0,
-        }}
-      />
-
-      <LinearGradient
-        colors={['rgba(123,92,255,0.04)', 'rgba(123,92,255,0.09)', 'rgba(0,0,0,0)']}
-        style={{
-          position: 'absolute',
-          inset: 0,
-        }}
-      />
-
-      <View
-        style={{
-          minWidth: 214,
-          maxWidth: 270,
-          borderRadius: 30,
-          borderWidth: 1,
-          borderColor: 'rgba(255,255,255,0.08)',
-          backgroundColor: 'rgba(15,16,29,0.56)',
-          paddingHorizontal: 26,
-          paddingVertical: 22,
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 12,
-          overflow: 'hidden',
-          shadowColor: '#000',
-          shadowOpacity: 0.24,
-          shadowRadius: 28,
-          shadowOffset: { width: 0, height: 14 },
-          elevation: 14,
-        }}
-      >
+      <Animated.View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }, overlayStyle]}>
         <LinearGradient
-          colors={['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.01)']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={{
-            position: 'absolute',
-            inset: 0,
-          }}
+          colors={['rgba(7,8,16,0.12)', 'rgba(9,10,22,0.36)', 'rgba(10,10,20,0.58)']}
+          style={StyleSheet.absoluteFill}
         />
 
-        <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-          <Text
-            style={{
-              color: colors.text.primary,
-              fontFamily: typography.font.bold,
-              fontSize: typography.size.lg,
-              letterSpacing: typography.letterSpacing.tight,
-            }}
-          >
-            QuestSave
-          </Text>
-          <Animated.Text
-            style={[
-              plusStyle,
-              {
-                color: colors.primary.DEFAULT,
-                fontFamily: typography.font.black,
-                fontSize: typography.size.lg,
-                marginLeft: 2,
-              },
-            ]}
-          >
-            +
-          </Animated.Text>
-        </View>
+        <LinearGradient
+          colors={['rgba(123,92,255,0.04)', 'rgba(123,92,255,0.09)', 'rgba(0,0,0,0)']}
+          style={StyleSheet.absoluteFill}
+        />
 
-        <Text
+        <View
           style={{
-            color: colors.text.secondary,
-            fontFamily: typography.font.medium,
-            fontSize: typography.size.sm,
-            letterSpacing: typography.letterSpacing.normal,
-            textAlign: 'center',
-            opacity: 0.96,
+            minWidth: 214,
+            maxWidth: 270,
+            borderRadius: 30,
+            borderWidth: 1,
+            borderColor: 'rgba(255,255,255,0.08)',
+            backgroundColor: 'rgba(15,16,29,0.56)',
+            paddingHorizontal: 26,
+            paddingVertical: 22,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 12,
+            overflow: 'hidden',
+            shadowColor: '#000',
+            shadowOpacity: 0.24,
+            shadowRadius: 28,
+            shadowOffset: { width: 0, height: 14 },
+            elevation: 14,
           }}
         >
-          {message}
-        </Text>
-      </View>
-    </Animated.View>
+          <LinearGradient
+            colors={['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.01)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+
+          <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+            <Text
+              style={{
+                color: colors.text.primary,
+                fontFamily: typography.font.bold,
+                fontSize: typography.size.lg,
+                letterSpacing: typography.letterSpacing.tight,
+              }}
+            >
+              QuestSave
+            </Text>
+            <Animated.Text
+              style={[
+                plusStyle,
+                {
+                  color: colors.primary.DEFAULT,
+                  fontFamily: typography.font.black,
+                  fontSize: typography.size.lg,
+                  marginLeft: 2,
+                },
+              ]}
+            >
+              +
+            </Animated.Text>
+          </View>
+
+          <Text
+            style={{
+              color: colors.text.secondary,
+              fontFamily: typography.font.medium,
+              fontSize: typography.size.sm,
+              letterSpacing: typography.letterSpacing.normal,
+              textAlign: 'center',
+              opacity: 0.96,
+            }}
+          >
+            {message}
+          </Text>
+        </View>
+      </Animated.View>
+    </Modal>
   );
 }
-

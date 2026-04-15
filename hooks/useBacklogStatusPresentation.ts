@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { colors } from '@/shared/theme/tokens';
+import type { FontAwesome5 } from '@expo/vector-icons';
 
 export function useBacklogStatusPresentation() {
  const { t } = useTranslation();
@@ -25,6 +26,15 @@ export function useBacklogStatusPresentation() {
    [BacklogStatusEnum.ABANDONED]: colors.status.abandoned,
   };
 
+  const iconMap: Record<BacklogStatusEnum, React.ComponentProps<typeof FontAwesome5>['name']> = {
+   [BacklogStatusEnum.WISHLIST]: 'shopping-bag',
+   [BacklogStatusEnum.WANT_TO_PLAY]: 'bookmark',
+   [BacklogStatusEnum.PLAYING]: 'play',
+   [BacklogStatusEnum.ONGOING]: 'sync-alt',
+   [BacklogStatusEnum.COMPLETED]: 'trophy',
+   [BacklogStatusEnum.ABANDONED]: 'ban',
+  };
+
   const statusOptions = [
    { label: labelMap[BacklogStatusEnum.WISHLIST], value: BacklogStatusEnum.WISHLIST },
    { label: labelMap[BacklogStatusEnum.WANT_TO_PLAY], value: BacklogStatusEnum.WANT_TO_PLAY },
@@ -37,6 +47,7 @@ export function useBacklogStatusPresentation() {
   return {
    labelMap,
    colorMap,
+   iconMap,
    statusOptions,
   } as const;
  }, [t]);

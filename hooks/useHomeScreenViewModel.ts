@@ -22,6 +22,7 @@ export type { HomeSectionViewModel } from '@/shared/models/home/HomeSectionViewM
 type UseHomeScreenViewModelParams = {
  appliedFilters: GameDiscoveryFilters;
  debouncedSearch: string;
+ isFilterSheetOpen: boolean;
  params: HomeScreenRouteParams;
  selectedOrdering: HomeOrdering | null;
 };
@@ -29,6 +30,7 @@ type UseHomeScreenViewModelParams = {
 export function useHomeScreenViewModel({
  appliedFilters,
  debouncedSearch,
+ isFilterSheetOpen,
  params,
  selectedOrdering,
 }: UseHomeScreenViewModelParams) {
@@ -42,26 +44,35 @@ export function useHomeScreenViewModel({
  const activeOrdering = selectedOrdering ?? defaultOrdering;
  const orderingParam = activeOrdering === 'relevance' ? undefined : activeOrdering;
 
+ // Le query catalog sparano solo quando il pannello filtri è aperto o ci sono
+ // filtri attivi — evita 4 richieste di rete inutili al mount dell'home screen.
+ const hasActiveFilters =
+  Boolean(appliedFilters.genre) ||
+  Boolean(appliedFilters.platform) ||
+  Boolean(appliedFilters.developer) ||
+  Boolean(appliedFilters.publisher);
+ const catalogEnabled = isFilterSheetOpen || hasActiveFilters;
+
  const {
   data: genres = [],
   isLoading: isGenresLoading,
   isError: isGenresError,
- } = useCatalogGenres();
+ } = useCatalogGenres(catalogEnabled);
  const {
   data: parentPlatforms = [],
   isLoading: isParentPlatformsLoading,
   isError: isParentPlatformsError,
- } = useCatalogParentPlatforms();
+ } = useCatalogParentPlatforms(catalogEnabled);
  const {
   data: developers = [],
   isLoading: isDevelopersLoading,
   isError: isDevelopersError,
- } = useCatalogDevelopers();
+ } = useCatalogDevelopers(catalogEnabled);
  const {
   data: publishers = [],
   isLoading: isPublishersLoading,
   isError: isPublishersError,
- } = useCatalogPublishers();
+ } = useCatalogPublishers(catalogEnabled);
 
  const {
   data,

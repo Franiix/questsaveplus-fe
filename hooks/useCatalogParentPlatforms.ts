@@ -27,12 +27,13 @@ function getPlatformRank(platform: { slug?: string | null; name: string }) {
  return fuzzyIndex >= 0 ? fuzzyIndex : PREFERRED_PLATFORM_ORDER.length + 1;
 }
 
-export function useCatalogParentPlatforms() {
+export function useCatalogParentPlatforms(enabled = true) {
  const catalogSignature = getCatalogQuerySignature();
  return useQuery({
   queryKey: ['catalog-parent-platforms', catalogSignature],
   queryFn: () => listCatalogTaxonomy('parent-platforms'),
   staleTime: 60 * 60 * 1000,
+  enabled,
   select: (platforms) =>
    [...platforms]
     .sort((a, b) => {

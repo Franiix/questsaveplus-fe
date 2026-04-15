@@ -75,6 +75,7 @@ export default function HomeScreen() {
   params,
   debouncedSearch,
   appliedFilters,
+  isFilterSheetOpen,
   selectedOrdering,
  });
 
