@@ -11,56 +11,102 @@ import { colors, spacing, typography } from '@/shared/theme/tokens';
 
 type CallbackStatus = 'loading' | 'success' | 'error';
 
+function getCallbackParams(url: string): URLSearchParams {
+  const parsedUrl = new URL(url);
+  const params = new URLSearchParams(parsedUrl.search);
+  const hashParams = new URLSearchParams(parsedUrl.hash.startsWith('#') ? parsedUrl.hash.slice(1) : parsedUrl.hash);
+
+  hashParams.forEach((value, key) => {
+    if (!params.has(key)) {
+      params.set(key, value);
+    }
+  });
+
+  return params;
+}
+
 export default function AuthCallbackScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const [status, setStatus] = useState<CallbackStatus>('loading');
 
   useEffect(() => {
-    async function handleCallback() {
+    let isResolved = false;
+
+    async function handleCallbackUrl(url: string | null) {
+      if (isResolved) return;
+
       try {
-        const url = await Linking.getInitialURL();
-
         if (!url) {
+          return;
+        }
+
+        const params = getCallbackParams(url);
+        const errorCode = params.get('error_code');
+        const errorDescription = params.get('error_description');
+
+        if (errorCode || errorDescription) {
+          isResolved = true;
           setStatus('error');
           return;
         }
 
-        const fragment = url.split('#')[1] ?? '';
+        const authCode = params.get('code');
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
 
-        if (!fragment) {
+        let authError: Error | null = null;
+
+        if (authCode) {
+          const { error } = await supabase.auth.exchangeCodeForSession(authCode);
+          authError = error;
+        } else if (accessToken && refreshToken) {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          authError = error;
+        } else {
+          return;
+        }
+
+        if (authError) {
+          isResolved = true;
           setStatus('error');
           return;
         }
 
-        const params: Record<string, string> = {};
-        for (const pair of fragment.split('&')) {
-          const [key, value] = pair.split('=');
-          if (key && value) {
-            params[key] = decodeURIComponent(value);
-          }
-        }
-
-        const accessToken = params.access_token;
-        const refreshToken = params.refresh_token;
-
-        if (!accessToken || !refreshToken) {
-          setStatus('error');
-          return;
-        }
-
-        const { error } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken,
-        });
-
-        setStatus(error ? 'error' : 'success');
+        await supabase.auth.signOut();
+        isResolved = true;
+        setStatus('success');
       } catch {
+        isResolved = true;
         setStatus('error');
       }
     }
 
-    handleCallback();
+    Linking.getInitialURL()
+      .then((url) => handleCallbackUrl(url))
+      .catch(() => {
+        isResolved = true;
+        setStatus('error');
+      });
+
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      void handleCallbackUrl(url);
+    });
+
+    const fallbackTimer = setTimeout(() => {
+      if (!isResolved) {
+        setStatus('error');
+      }
+    }, 2500);
+
+    return () => {
+      isResolved = true;
+      clearTimeout(fallbackTimer);
+      subscription.remove();
+    };
   }, []);
 
   if (status === 'loading') {
@@ -175,8 +221,8 @@ export default function AuthCallbackScreen() {
       </Text>
 
       <BaseButton
-        label={t('auth.callback.goToDashboard')}
-        onPress={() => router.replace('/')}
+        label={t('auth.callback.backToLogin')}
+        onPress={() => router.replace('/(auth)/login')}
         fullWidth
       />
     </View>
