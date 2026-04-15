@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Text, View } from 'react-native';
+import { AuthMessageAccent } from '@/components/auth/AuthMessageAccent';
 import { AuthStatusIcon } from '@/components/auth/AuthStatusIcon';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { supabase } from '@/lib/supabase';
@@ -151,6 +152,14 @@ export default function AuthCallbackScreen() {
       >
         {t('auth.callback.success')}
       </Text>
+
+      <AuthMessageAccent
+        icon="user-astronaut"
+        label={t('auth.callback.badge')}
+        iconColor={colors.warning}
+        iconBackgroundColor={`${colors.warning}22`}
+        containerStyle={{ marginBottom: spacing.md }}
+      />
 
       <Text
         style={{
