@@ -6,6 +6,7 @@ import { colors, spacing, typography } from '@/shared/theme/tokens';
 type ProfileStats = {
   total: number;
   wishlist: number;
+  wantToPlay: number;
   playing: number;
   ongoing: number;
   completed: number;
@@ -17,6 +18,7 @@ type ProfileStatsCardProps = {
   labels: {
     total: string;
     wishlist: string;
+    wantToPlay: string;
     playing: string;
     ongoing: string;
     completed: string;
@@ -82,17 +84,17 @@ export function ProfileStatsCard({ stats, labels }: ProfileStatsCardProps) {
 
       <View style={{ flexDirection: 'row', gap: spacing.sm }}>
         <StatCounter
-          label={labels.total}
-          value={stats.total}
-          color={colors.primary.DEFAULT}
-          icon="layer-group"
-          variant="card"
-        />
-        <StatCounter
           label={labels.wishlist}
           value={stats.wishlist}
           color={colors.status.wishlist}
           icon="shopping-bag"
+          variant="card"
+        />
+        <StatCounter
+          label={labels.wantToPlay}
+          value={stats.wantToPlay}
+          color={colors.status.want_to_play}
+          icon="bookmark"
           variant="card"
         />
       </View>

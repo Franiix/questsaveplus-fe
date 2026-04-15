@@ -156,6 +156,7 @@
    subtitle: 'Panorama rapido del tuo ritmo di gioco e di quello che vuoi recuperare.',
    total: 'Backlog',
    wishlist: 'Wishlist',
+   wantToPlay: 'Da giocare',
    playing: 'In corso',
    ongoing: 'Ricorrenti',
    completed: 'Completati',

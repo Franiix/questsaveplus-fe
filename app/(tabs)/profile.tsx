@@ -60,6 +60,7 @@ export default function ProfileScreen() {
     () => ({
       total: backlogItems.length,
       wishlist: backlogItems.filter((item) => item.status === BacklogStatusEnum.WISHLIST).length,
+      wantToPlay: backlogItems.filter((item) => item.status === BacklogStatusEnum.WANT_TO_PLAY).length,
       playing: backlogItems.filter((item) => item.status === BacklogStatusEnum.PLAYING).length,
       ongoing: backlogItems.filter((item) => item.status === BacklogStatusEnum.ONGOING).length,
       completed: backlogItems.filter((item) => item.status === BacklogStatusEnum.COMPLETED).length,
@@ -109,6 +110,7 @@ export default function ProfileScreen() {
             labels={{
               total: t('profile.stats.total'),
               wishlist: t('profile.stats.wishlist'),
+              wantToPlay: t('profile.stats.wantToPlay'),
               playing: t('profile.stats.playing'),
               ongoing: t('profile.stats.ongoing'),
               completed: t('profile.stats.completed'),

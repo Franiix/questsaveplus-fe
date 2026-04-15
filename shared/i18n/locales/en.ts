@@ -156,6 +156,7 @@
    subtitle: 'A quick read of your current play rhythm and what you still want to pick up.',
    total: 'Backlog',
    wishlist: 'Wishlist',
+   wantToPlay: 'Want to play',
    playing: 'Playing',
    ongoing: 'Ongoing',
    completed: 'Completed',
