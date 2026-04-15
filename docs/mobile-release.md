@@ -102,7 +102,7 @@ La mia raccomandazione tecnica resta: **non committare i segreti**.
 
 ```bash
 cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe
-npx expo prebuild
+npx expo prebuild --clean
 cd ios
 pod install
 ```
