@@ -521,7 +521,7 @@
   },
   checkEmail: {
    title: 'Controlla la tua email',
-   subtitle: 'Ti abbiamo inviato un link di conferma.',
+   subtitle: 'Ti abbiamo inviato un link di conferma (Controlla anche nella tua cartella SPAM!).',
    badge: 'Registrazione completata',
    hint: 'Apri l’email e tocca "Conferma" per completare la registrazione.',
    backToLogin: 'Torna al login',
