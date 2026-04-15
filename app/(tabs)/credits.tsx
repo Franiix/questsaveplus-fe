@@ -148,7 +148,7 @@ export default function CreditsScreen() {
    subtitle: t('credits.linkedinSubtitle'),
    accentColor: '#0A66C2',
    mark: <BrandMark iconName="linkedin-in" brand accentColor="#0A66C2" label="in" />,
-   url: 'https://www.linkedin.com/in/francescoscamardella/',
+   url: 'https://www.linkedin.com/in/francesco-scamardella/',
   },
  ];
 

@@ -7,7 +7,6 @@ import { AvatarPicker, type PickedAvatar } from '@/components/base/display/Avata
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { ErrorBox } from '@/components/base/feedback/ErrorBox';
 import { LoadingOverlay } from '@/components/base/feedback/LoadingOverlay';
-import { AppBackground } from '@/components/base/layout/AppBackground';
 import { ScreenContainer } from '@/components/base/layout/ScreenContainer';
 import { RhfDatePickerInput } from '@/components/form/RhfDatePickerInput';
 import { RhfSelectInput } from '@/components/form/RhfSelectInput';
@@ -81,8 +80,7 @@ export default function ProfileSetupScreen() {
  }
 
  return (
-  <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
-   <AppBackground />
+  <View style={{ flex: 1 }}>
    <ScreenContainer
     contentContainerStyle={{
      paddingHorizontal: spacing.lg,

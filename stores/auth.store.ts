@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useBacklogStore } from '@/stores/backlog.store';
 import { useProfileStore } from '@/stores/profile.store';
 
-const authEmailRedirectTo = Linking.createURL('/auth/callback');
+const authEmailRedirectTo = Linking.createURL('auth/callback');
 
 interface AuthState {
  session: Session | null;
