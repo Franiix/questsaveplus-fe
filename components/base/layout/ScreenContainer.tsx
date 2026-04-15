@@ -49,11 +49,8 @@ export function ScreenContainer({
   return (
     <SafeAreaView style={[{ flex: 1, backgroundColor: colors.background.primary }, style]}>
       <AppBackground />
-      {keyboardAvoiding ? (
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
+      {keyboardAvoiding && Platform.OS === 'ios' ? (
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
           {content}
         </KeyboardAvoidingView>
       ) : (

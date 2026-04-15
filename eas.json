@@ -13,9 +13,19 @@
 			"environment": "preview",
 			"distribution": "internal"
 		},
-		"production": {
+		"production-ios": {
 			"environment": "production",
-			"autoIncrement": true
+			"autoIncrement": true,
+			"env": {
+				"APP_VERSION": "0.0.2"
+			}
+		},
+		"production-android": {
+			"environment": "production",
+			"autoIncrement": true,
+			"env": {
+				"APP_VERSION": "0.0.4"
+			}
 		}
 	},
 	"submit": {
