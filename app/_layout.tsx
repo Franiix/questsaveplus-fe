@@ -16,10 +16,12 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import '@/shared/i18n/i18n.config';
 import { AuthBootScreen } from '@/components/auth/AuthBootScreen';
+import { LoadingOverlay } from '@/components/base/feedback/LoadingOverlay';
 import { ToastContainer } from '@/components/base/feedback/ToastNotification';
 import { TabBarCustom } from '@/components/base/navigation/TabBarCustom';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import { useAuthStore } from '@/stores/auth.store';
+import { useLoadingOverlayStore } from '@/stores/loadingOverlay.store';
 import { useProfileStore } from '@/stores/profile.store';
 import '@/global.css';
 
@@ -103,6 +105,11 @@ function AuthGuard() {
  return null;
 }
 
+function GlobalLoadingOverlay() {
+ const { visible, message } = useLoadingOverlayStore();
+ return <LoadingOverlay visible={visible} message={message} />;
+}
+
 export default function RootLayout() {
  const [fontsLoaded, fontError] = useFonts({
   Geist_400Regular,
@@ -144,6 +151,7 @@ export default function RootLayout() {
       <TabBarCustom />
       <StatusBar style="light" />
       <ToastContainer />
+      <GlobalLoadingOverlay />
      </GluestackUIProvider>
     </QueryClientProvider>
    </SafeAreaProvider>

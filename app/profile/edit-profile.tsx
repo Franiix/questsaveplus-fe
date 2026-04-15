@@ -1,13 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { AvatarPicker, type PickedAvatar } from '@/components/base/display/AvatarPicker';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { ErrorBox } from '@/components/base/feedback/ErrorBox';
-import { LoadingOverlay } from '@/components/base/feedback/LoadingOverlay';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { ScreenContainer } from '@/components/base/layout/ScreenContainer';
 import { RhfDatePickerInput } from '@/components/form/RhfDatePickerInput';
@@ -18,6 +17,7 @@ import { PROFILE_GENDERS } from '@/shared/enums/ProfileGender.enum';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 import { createEditProfileSchema, type EditProfileForm } from '@/shared/validation/profile.schemas';
 import { useAuthStore } from '@/stores/auth.store';
+import { useLoadingOverlayStore } from '@/stores/loadingOverlay.store';
 import { useProfileStore } from '@/stores/profile.store';
 
 export default function EditProfileScreen() {
@@ -25,6 +25,7 @@ export default function EditProfileScreen() {
  const router = useRouter();
  const { session } = useAuthStore();
  const { profile, updateProfile, isLoading, error, clearError } = useProfileStore();
+ const { show: showOverlay, hide: hideOverlay } = useLoadingOverlayStore();
  const [avatarUri, setAvatarUri] = useState<string | null>(null);
  const [avatarBase64, setAvatarBase64] = useState<string | null>(null);
  const [avatarError, setAvatarError] = useState<string | null>(null);
@@ -38,6 +39,14 @@ export default function EditProfileScreen() {
    gender: profile?.gender ?? 'UNSPECIFIED',
   },
  });
+
+ useEffect(() => {
+  if (isLoading) {
+   showOverlay(t('editProfile.loading'));
+  } else {
+   hideOverlay();
+  }
+ }, [isLoading, showOverlay, hideOverlay, t]);
 
  const genderOptions = PROFILE_GENDERS.map((gender) => ({
   label: t(`profile.genderOptions.${gender}`),
@@ -169,7 +178,6 @@ export default function EditProfileScreen() {
      fullWidth
     />
    </ScreenContainer>
-   <LoadingOverlay message={t('editProfile.loading')} visible={isLoading} />
   </View>
  );
 }

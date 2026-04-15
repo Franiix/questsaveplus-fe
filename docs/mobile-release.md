@@ -102,7 +102,7 @@ La mia raccomandazione tecnica resta: **non committare i segreti**.
 
 ```bash
 cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe
-APP_VERSION=0.0.2 npx expo prebuild --clean --platform ios
+npx expo prebuild --clean
 cd ios
 pod install
 ```
@@ -211,7 +211,7 @@ sdk.dir=/Users/franiix/Library/Android/sdk
 
 ```bash
 cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe
-APP_VERSION=0.0.4 npx expo prebuild --clean --platform android
+npx expo prebuild --clean
 ```
 
 Se invece hai cambiato solo codice applicativo, non serve per forza il clean.

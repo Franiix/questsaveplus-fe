@@ -1,12 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { AvatarPicker, type PickedAvatar } from '@/components/base/display/AvatarPicker';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { ErrorBox } from '@/components/base/feedback/ErrorBox';
-import { LoadingOverlay } from '@/components/base/feedback/LoadingOverlay';
 import { ScreenContainer } from '@/components/base/layout/ScreenContainer';
 import { RhfDatePickerInput } from '@/components/form/RhfDatePickerInput';
 import { RhfSelectInput } from '@/components/form/RhfSelectInput';
@@ -19,15 +18,25 @@ import {
  type ProfileSetupForm,
 } from '@/shared/validation/profile.schemas';
 import { useAuthStore } from '@/stores/auth.store';
+import { useLoadingOverlayStore } from '@/stores/loadingOverlay.store';
 import { useProfileStore } from '@/stores/profile.store';
 
 export default function ProfileSetupScreen() {
  const { t } = useTranslation();
  const { session } = useAuthStore();
  const { createProfile, isLoading, error, clearError } = useProfileStore();
+ const { show: showOverlay, hide: hideOverlay } = useLoadingOverlayStore();
  const [avatarUri, setAvatarUri] = useState<string | null>(null);
  const [avatarBase64, setAvatarBase64] = useState<string | null>(null);
  const [avatarError, setAvatarError] = useState<string | null>(null);
+
+ useEffect(() => {
+  if (isLoading) {
+   showOverlay(t('auth.profileSetup.loading'));
+  } else {
+   hideOverlay();
+  }
+ }, [isLoading, showOverlay, hideOverlay, t]);
 
  const schema = useMemo(() => createProfileSetupSchema(t), [t]);
  const { control, handleSubmit } = useForm<ProfileSetupForm>({
@@ -184,7 +193,6 @@ export default function ProfileSetupScreen() {
      fullWidth
     />
    </ScreenContainer>
-   <LoadingOverlay message={t('auth.profileSetup.loading')} visible={isLoading} />
   </View>
  );
 }
