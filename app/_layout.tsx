@@ -61,32 +61,38 @@ function AuthGuard() {
 
  // Fetch profilo ogni volta che cambia lo userId
  useEffect(() => {
-  if (session?.user?.id) {
+  const inAuthGroup = segments[0] === '(auth)';
+  const inCheckEmail = inAuthGroup && segments[1] === 'check-email';
+
+  if (session?.user?.id && !inCheckEmail) {
    fetchProfile(session.user.id).then();
-  } else {
+  } else if (!session?.user?.id) {
    clearProfile();
   }
- }, [session?.user?.id, clearProfile, fetchProfile]);
+ }, [session?.user?.id, segments, clearProfile, fetchProfile]);
+
+ const inAuthGroup = segments[0] === '(auth)';
+ const inCheckEmail = inAuthGroup && segments[1] === 'check-email';
 
  const shouldBootstrapProfile =
+  !inCheckEmail &&
   Boolean(session?.user?.id) &&
   (isProfileLoading || currentUserId !== session?.user?.id || !hasResolvedProfile);
 
  useEffect(() => {
   if (isAuthLoading || shouldBootstrapProfile) return;
 
-  const inAuthGroup = segments[0] === '(auth)';
   const inCallbackRoute = segments[0] === 'auth';
   const inProfileSetup = inAuthGroup && segments[1] === 'profile-setup';
 
   if (!session && !inAuthGroup && !inCallbackRoute) {
    router.replace('/(auth)/login');
-  } else if (session && !profile && !inProfileSetup && !inCallbackRoute) {
+  } else if (session && !profile && !inProfileSetup && !inCallbackRoute && !inCheckEmail) {
    router.replace('/(auth)/profile-setup');
-  } else if (session && profile && inAuthGroup) {
+  } else if (session && profile && inAuthGroup && !inCheckEmail) {
    router.replace('/(tabs)');
   }
- }, [session, profile, segments, router, isAuthLoading, shouldBootstrapProfile]);
+ }, [session, profile, segments, router, isAuthLoading, shouldBootstrapProfile, inAuthGroup, inCheckEmail]);
 
  if (isAuthLoading || shouldBootstrapProfile) {
   return (

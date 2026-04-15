@@ -14,6 +14,7 @@ export default function CheckEmailScreen() {
  return (
   <ScreenContainer
    scrollable={false}
+   keyboardAvoiding={false}
    style={{ justifyContent: 'center', alignItems: 'center' }}
    contentContainerStyle={{ paddingHorizontal: spacing.xl }}
   >

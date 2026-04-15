@@ -14,6 +14,8 @@ type ScreenContainerProps = {
   children: ReactNode;
   /** Se true (default) avvolge il contenuto in ScrollView con keyboardShouldPersistTaps. */
   scrollable?: boolean;
+  /** Se true (default) applica KeyboardAvoidingView; disabilitalo per schermate statiche senza input. */
+  keyboardAvoiding?: boolean;
   style?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
 };
@@ -28,28 +30,35 @@ type ScreenContainerProps = {
 export function ScreenContainer({
   children,
   scrollable = true,
+  keyboardAvoiding = true,
   style,
   contentContainerStyle,
 }: ScreenContainerProps) {
+  const content = scrollable ? (
+    <ScrollView
+      contentContainerStyle={[{ flexGrow: 1 }, contentContainerStyle]}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
+      {children}
+    </ScrollView>
+  ) : (
+    children
+  );
+
   return (
     <SafeAreaView style={[{ flex: 1, backgroundColor: colors.background.primary }, style]}>
       <AppBackground />
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        {scrollable ? (
-          <ScrollView
-            contentContainerStyle={[{ flexGrow: 1 }, contentContainerStyle]}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            {children}
-          </ScrollView>
-        ) : (
-          children
-        )}
-      </KeyboardAvoidingView>
+      {keyboardAvoiding ? (
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          {content}
+        </KeyboardAvoidingView>
+      ) : (
+        content
+      )}
     </SafeAreaView>
   );
 }
