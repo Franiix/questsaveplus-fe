@@ -3,13 +3,14 @@ import { useRouter } from 'expo-router';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
+import { AuthRegisterHero } from '@/components/auth/AuthRegisterHero';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { TextLink } from '@/components/base/display/TextLink';
 import { ErrorBox } from '@/components/base/feedback/ErrorBox';
 import { ScreenContainer } from '@/components/base/layout/ScreenContainer';
 import { RhfPasswordInput } from '@/components/form/RhfPasswordInput';
 import { CredentialFields } from '@/components/form/subforms/CredentialFields';
-import { colors, spacing, typography } from '@/shared/theme/tokens';
+import { spacing } from '@/shared/theme/tokens';
 import { createRegisterSchema, type RegisterForm } from '@/shared/validation/auth.schemas';
 import { useAuthStore } from '@/stores/auth.store';
 
@@ -56,19 +57,7 @@ export default function RegisterScreen() {
    }}
   >
    <View style={{ marginBottom: spacing.xl }}>
-    <Text
-     style={{
-      color: colors.text.primary,
-      fontSize: typography.size['2xl'],
-      fontFamily: typography.font.bold,
-      marginBottom: spacing.xs,
-     }}
-    >
-     {t('auth.register.title')}
-    </Text>
-    <Text style={{ color: colors.text.secondary, fontSize: typography.size.md }}>
-     {t('auth.register.subtitle')}
-    </Text>
+    <AuthRegisterHero title={t('auth.register.title')} subtitle={t('auth.register.subtitle')} />
    </View>
 
    {error ? (

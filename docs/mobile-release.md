@@ -219,6 +219,11 @@ Se invece hai cambiato solo codice applicativo, non serve per forza il clean.
 ## 4. Build release AAB
 
 ```bash
+cat > /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android/local.properties <<'EOF'
+sdk.dir=/Users/franiix/Library/Android/sdk
+EOF
+```
+```bash
 cd /Users/franiix/Projects/Personale/QuestSave+/questsave-fe/android
 ./gradlew --stop
 ./gradlew bundleRelease
@@ -238,6 +243,7 @@ Il progetto e gia configurato per usare:
 
 - `signingConfigs.release`
 - proprieta lette da Gradle
+- fallback automatico a `questsaveplus-upload.keystore` nella root di `questsave-fe` dopo `expo prebuild --clean`
 
 Il posto corretto per questi valori e:
 
@@ -248,12 +254,19 @@ Il posto corretto per questi valori e:
 Esempio:
 
 ```properties
-MYAPP_UPLOAD_STORE_FILE=/percorso/alla/keystore.keystore
 MYAPP_UPLOAD_KEY_ALIAS=alias
 MYAPP_UPLOAD_STORE_PASSWORD=...
 MYAPP_UPLOAD_KEY_PASSWORD=...
 org.gradle.java.home=/percorso/java21
 ```
+
+`MYAPP_UPLOAD_STORE_FILE` e opzionale se usi la convenzione del progetto:
+
+```text
+/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/questsaveplus-upload.keystore
+```
+
+In quel caso bastano alias e password nel tuo `~/.gradle/gradle.properties`.
 
 ## 6. Upload in Play Console
 

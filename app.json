@@ -3,7 +3,7 @@
     "name": "QuestSave+",
     "slug": "questsave-plus",
     "description": "Discover games powered by IGDB and track your personal backlog across mobile devices.",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "questsave",
@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.franiix.questsaveplus",
-      "buildNumber": "3",
+      "buildNumber": "4",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -31,7 +31,7 @@
         "android.permission.RECORD_AUDIO"
       ],
       "package": "com.franiix.questsaveplus",
-      "versionCode": 2
+      "versionCode": 3
     },
     "web": {
       "bundler": "metro",

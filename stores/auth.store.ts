@@ -1,8 +1,11 @@
+import * as Linking from 'expo-linking';
 import type { Session } from '@supabase/supabase-js';
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 import { useBacklogStore } from '@/stores/backlog.store';
 import { useProfileStore } from '@/stores/profile.store';
+
+const authEmailRedirectTo = Linking.createURL('/auth/callback');
 
 interface AuthState {
  session: Session | null;
@@ -76,7 +79,13 @@ export const useAuthStore = create<AuthState>(
 
   signUp: async (email, password) => {
    set({ isLoading: true, error: null });
-   const { error } = await supabase.auth.signUp({ email, password });
+   const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+     emailRedirectTo: authEmailRedirectTo,
+    },
+   });
    set({ isLoading: false, error: error ? error.message : null });
   },
 
@@ -93,7 +102,10 @@ export const useAuthStore = create<AuthState>(
 
   updateEmail: async (newEmail) => {
    set({ isLoading: true, error: null });
-   const { error } = await supabase.auth.updateUser({ email: newEmail });
+   const { error } = await supabase.auth.updateUser(
+    { email: newEmail },
+    { emailRedirectTo: authEmailRedirectTo }
+   );
    set({ isLoading: false, error: error ? error.message : null });
   },
 
