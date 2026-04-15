@@ -521,7 +521,7 @@
    title: 'Check your email',
    subtitle: "We've sent you a confirmation link.",
    hint:
-    'Achievement unlocked: registration complete!\nOpen the email and hit "Confirm" to claim it.',
+    'Achievement unlocked: registration complete!\nOpen the email and tap "Confirm" to complete it.',
    backToLogin: 'Back to login',
   },
   callback: {
@@ -559,10 +559,10 @@
    title: 'Change email',
    subtitle: "We'll send a confirmation link to your new email address.",
    newEmailLabel: 'New email',
-   newEmailPlaceholder: 'Enter new email',
-   submitButton: 'Send confirmation',
+   newEmailPlaceholder: 'Enter your new email',
+   submitButton: 'Send confirmation link',
    successTitle: 'Check your new email',
-   successSubtitle: "We've sent a confirmation link. Click it to complete the change.",
+   successSubtitle: "We've sent a confirmation link. Open it to complete the change.",
    errors: { generic: 'Something went wrong. Please try again.' },
   },
   changePassword: {
