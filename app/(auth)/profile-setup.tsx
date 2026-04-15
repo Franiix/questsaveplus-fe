@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
@@ -30,8 +30,9 @@ export default function ProfileSetupScreen() {
  const [avatarBase64, setAvatarBase64] = useState<string | null>(null);
  const [avatarError, setAvatarError] = useState<string | null>(null);
 
+ const schema = useMemo(() => createProfileSetupSchema(t), [t]);
  const { control, handleSubmit } = useForm<ProfileSetupForm>({
-  resolver: zodResolver(createProfileSetupSchema(t)),
+  resolver: zodResolver(schema),
   defaultValues: {
    first_name: '',
    last_name: '',
@@ -41,10 +42,11 @@ export default function ProfileSetupScreen() {
   },
  });
 
- const genderOptions = PROFILE_GENDERS.map((gender) => ({
-  label: t(`profile.genderOptions.${gender}`),
-  value: gender,
- }));
+ const genderOptions = useMemo(
+  () => PROFILE_GENDERS.map((gender) => ({ label: t(`profile.genderOptions.${gender}`), value: gender })),
+  [t],
+ );
+ const today = useMemo(() => new Date(), []);
 
  function handleAvatarPick(avatar: PickedAvatar) {
   setAvatarUri(avatar.uri);
@@ -162,7 +164,7 @@ export default function ProfileSetupScreen() {
      label={t('auth.profileSetup.birthDateLabel')}
      placeholder={t('auth.profileSetup.birthDatePlaceholder')}
      mode="date"
-     maximumDate={new Date()}
+     maximumDate={today}
      isDisabled={isLoading}
      containerStyle={{ marginBottom: spacing.md }}
     />

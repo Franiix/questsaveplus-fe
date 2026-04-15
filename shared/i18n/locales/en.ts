@@ -282,6 +282,7 @@
     closeInfo: 'Close info',
     gameInfo: 'Game info',
     websites: 'Websites and links',
+    websitesOpen: 'Websites and links',
     storeActions: 'Where to buy',
     openStore: 'Open store',
     storeHint: 'You may also find other stores and useful links here.',

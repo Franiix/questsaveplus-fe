@@ -248,10 +248,13 @@ export function GameCard({ game, width, onPress, onLongPress, backlogStatus }: G
        ) : null}
        {releaseDate ? (
         <Text
+         numberOfLines={1}
+         allowFontScaling={false}
          style={{
           color: colors.text.secondary,
           fontSize: typography.size.xs,
           marginLeft: hasPlatforms ? 2 : 0,
+          flexShrink: 1,
          }}
         >
          {releaseDate}

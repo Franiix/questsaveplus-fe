@@ -59,17 +59,14 @@ function AuthGuard() {
   return initialize();
  }, [initialize]);
 
- // Fetch profilo ogni volta che cambia lo userId
+ // Fetch profilo solo quando cambia lo userId (non a ogni navigazione)
  useEffect(() => {
-  const inAuthGroup = segments[0] === '(auth)';
-  const inCheckEmail = inAuthGroup && segments[1] === 'check-email';
-
-  if (session?.user?.id && !inCheckEmail) {
+  if (session?.user?.id) {
    fetchProfile(session.user.id).then();
-  } else if (!session?.user?.id) {
+  } else {
    clearProfile();
   }
- }, [session?.user?.id, segments, clearProfile, fetchProfile]);
+ }, [session?.user?.id, clearProfile, fetchProfile]);
 
  const inAuthGroup = segments[0] === '(auth)';
  const inCheckEmail = inAuthGroup && segments[1] === 'check-email';
