@@ -31,6 +31,15 @@ const NUM_COLUMNS = 2;
 const COLUMN_GAP = spacing.sm;
 const HORIZONTAL_PADDING = spacing.md;
 
+const DISCOVERY_CONTENT_CONTAINER_STYLE = {
+ paddingHorizontal: HORIZONTAL_PADDING,
+ paddingTop: spacing.sm,
+ paddingBottom: 80,
+ gap: COLUMN_GAP,
+} as const;
+
+const DISCOVERY_COLUMN_WRAPPER_STYLE = { gap: COLUMN_GAP } as const;
+
 type HomeScreenContentProps = {
  activeOrdering: HomeOrdering;
  areAllSectionsError: boolean;
@@ -198,6 +207,10 @@ export function HomeScreenContent({
      numColumns={NUM_COLUMNS}
      onEndReached={fetchMoreDiscovery}
      onEndReachedThreshold={0.4}
+     initialNumToRender={8}
+     maxToRenderPerBatch={8}
+     windowSize={8}
+     removeClippedSubviews
      ListHeaderComponent={
       <View style={{ gap: spacing.md, marginBottom: spacing.md }}>
        {discoveryContextCard ? (
@@ -221,13 +234,8 @@ export function HomeScreenContent({
       </View>
      }
      ListFooterComponent={discoveryFooter}
-     contentContainerStyle={{
-      paddingHorizontal: HORIZONTAL_PADDING,
-      paddingTop: spacing.sm,
-      paddingBottom: 80,
-      gap: COLUMN_GAP,
-     }}
-     columnWrapperStyle={{ gap: COLUMN_GAP }}
+     contentContainerStyle={DISCOVERY_CONTENT_CONTAINER_STYLE}
+     columnWrapperStyle={DISCOVERY_COLUMN_WRAPPER_STYLE}
      showsVerticalScrollIndicator={false}
      keyboardShouldPersistTaps="handled"
      keyboardDismissMode="on-drag"

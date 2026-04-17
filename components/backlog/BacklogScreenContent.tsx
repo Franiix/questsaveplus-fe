@@ -1,4 +1,5 @@
-import { FlatList, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BacklogListItem } from '@/components/backlog/BacklogListItem';
 import { EmptyState } from '@/components/base/feedback/EmptyState';
@@ -29,6 +30,15 @@ type BacklogScreenContentProps = {
 
 const HORIZONTAL_PADDING = spacing.md;
 
+const listContentStyle = StyleSheet.create({
+ container: {
+  paddingHorizontal: HORIZONTAL_PADDING,
+  paddingTop: spacing.sm,
+  paddingBottom: 110,
+  gap: spacing.sm,
+ },
+});
+
 export function BacklogScreenContent({
  colorMap,
  iconMap,
@@ -42,6 +52,21 @@ export function BacklogScreenContent({
  retryLabel,
 }: BacklogScreenContentProps) {
  const { t } = useTranslation();
+
+ const renderItem = useCallback(
+  ({ item }: { item: BacklogItemEntity }) => (
+   <BacklogListItem
+    item={item}
+    onPress={onItemPress}
+    onRequestRemove={onRequestRemove}
+    removeLabel={removeLabel}
+    labelMap={labelMap}
+    colorMap={colorMap}
+    iconMap={iconMap}
+   />
+  ),
+  [onItemPress, onRequestRemove, removeLabel, labelMap, colorMap, iconMap],
+ );
 
  if (state.isReadingList) {
   return <LoadingSpinner fullScreen />;
@@ -76,26 +101,15 @@ export function BacklogScreenContent({
    ) : (
     <FlatList
      data={state.filteredItems}
-     renderItem={({ item }) => (
-      <BacklogListItem
-       item={item}
-       onPress={onItemPress}
-       onRequestRemove={onRequestRemove}
-       removeLabel={removeLabel}
-       labelMap={labelMap}
-       colorMap={colorMap}
-       iconMap={iconMap}
-      />
-     )}
+     renderItem={renderItem}
      keyExtractor={(item) => item.id}
-     contentContainerStyle={{
-      paddingHorizontal: HORIZONTAL_PADDING,
-      paddingTop: spacing.sm,
-      paddingBottom: 110,
-      gap: spacing.sm,
-     }}
+     contentContainerStyle={listContentStyle.container}
      showsVerticalScrollIndicator={false}
      keyboardShouldPersistTaps="handled"
+     initialNumToRender={12}
+     maxToRenderPerBatch={10}
+     windowSize={8}
+     removeClippedSubviews
     />
    )}
   </>

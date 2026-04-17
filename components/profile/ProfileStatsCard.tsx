@@ -114,14 +114,14 @@ export function ProfileStatsCard({ stats, labels }: ProfileStatsCardProps) {
           label={labels.completed}
           value={stats.completed}
           color={colors.status.completed}
-          icon="check"
+          icon="trophy"
           variant="card"
         />
         <StatCounter
           label={labels.abandoned}
           value={stats.abandoned}
           color={colors.status.abandoned}
-          icon="times"
+          icon="ban"
           variant="card"
         />
       </View>

@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Animated, {
@@ -87,7 +87,7 @@ function getGamePrimaryGenre(game: GameCardItem) {
  return game.genres[0] ?? null;
 }
 
-export function GameCard({ game, width, onPress, onLongPress, backlogStatus }: GameCardProps) {
+export const GameCard = memo(function GameCard({ game, width, onPress, onLongPress, backlogStatus }: GameCardProps) {
  const { t, i18n } = useTranslation();
  const cardHeight = Math.round(width * 1.42);
  const displayRating = getGameDisplayRating(game);
@@ -268,4 +268,4 @@ export function GameCard({ game, width, onPress, onLongPress, backlogStatus }: G
    </Animated.View>
   </Pressable>
  );
-}
+});

@@ -13,44 +13,23 @@ type FilterDefinition = {
  value: BacklogStatusEnum | null;
  labelKey: string;
  color: string;
+ icon?: string;
 };
 
+const CHIP_ROW_CONTENT_CONTAINER_STYLE = {
+ paddingHorizontal: spacing.md,
+ gap: spacing.sm,
+ paddingVertical: spacing.xs,
+} as const;
+
 const FILTERS: FilterDefinition[] = [
- {
-  value: null,
-  labelKey: 'backlog.filterAll',
-  color: colors.primary.DEFAULT,
- },
- {
-  value: BacklogStatusEnum.WISHLIST,
-  labelKey: 'backlog.status.WISHLIST',
-  color: colors.status.wishlist,
- },
- {
-  value: BacklogStatusEnum.WANT_TO_PLAY,
-  labelKey: 'backlog.status.WANT_TO_PLAY',
-  color: colors.status.want_to_play,
- },
- {
-  value: BacklogStatusEnum.PLAYING,
-  labelKey: 'backlog.status.PLAYING',
-  color: colors.status.playing,
- },
- {
-  value: BacklogStatusEnum.ONGOING,
-  labelKey: 'backlog.status.ONGOING',
-  color: colors.status.ongoing,
- },
- {
-  value: BacklogStatusEnum.COMPLETED,
-  labelKey: 'backlog.status.COMPLETED',
-  color: colors.status.completed,
- },
- {
-  value: BacklogStatusEnum.ABANDONED,
-  labelKey: 'backlog.status.ABANDONED',
-  color: colors.status.abandoned,
- },
+ { value: null, labelKey: 'backlog.filterAll', color: colors.primary.DEFAULT },
+ { value: BacklogStatusEnum.WISHLIST, labelKey: 'backlog.status.WISHLIST', color: colors.status.wishlist, icon: 'shopping-bag' },
+ { value: BacklogStatusEnum.WANT_TO_PLAY, labelKey: 'backlog.status.WANT_TO_PLAY', color: colors.status.want_to_play, icon: 'bookmark' },
+ { value: BacklogStatusEnum.PLAYING, labelKey: 'backlog.status.PLAYING', color: colors.status.playing, icon: 'play' },
+ { value: BacklogStatusEnum.ONGOING, labelKey: 'backlog.status.ONGOING', color: colors.status.ongoing, icon: 'sync-alt' },
+ { value: BacklogStatusEnum.COMPLETED, labelKey: 'backlog.status.COMPLETED', color: colors.status.completed, icon: 'trophy' },
+ { value: BacklogStatusEnum.ABANDONED, labelKey: 'backlog.status.ABANDONED', color: colors.status.abandoned, icon: 'ban' },
 ];
 
 /**
@@ -67,11 +46,7 @@ export function FilterChipRow({ activeFilter, onFilterChange }: FilterChipRowPro
    horizontal
    showsHorizontalScrollIndicator={false}
    keyboardShouldPersistTaps="handled"
-   contentContainerStyle={{
-    paddingHorizontal: spacing.md,
-    gap: spacing.sm,
-    paddingVertical: spacing.xs,
-   }}
+   contentContainerStyle={CHIP_ROW_CONTENT_CONTAINER_STYLE}
   >
    {FILTERS.map((filter) => {
     const label = t(filter.labelKey);
@@ -84,6 +59,7 @@ export function FilterChipRow({ activeFilter, onFilterChange }: FilterChipRowPro
       isSelected={isSelected}
       onPress={() => onFilterChange(filter.value)}
       color={filter.color}
+      icon={filter.icon}
      />
     );
    })}

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { View } from 'react-native';
 import type { CatalogGame } from '@/shared/models/Catalog.model';
 import { spacing } from '@/shared/theme/tokens';
@@ -59,49 +60,40 @@ export function GameDetailRelatedSections({
   onRelatedGamePress,
   registerSectionOffset,
 }: GameDetailRelatedSectionsProps) {
-  const sections: RelatedSection[] = [
-    {
-      key: 'series',
-      title: seriesTitle,
-      games: sameSeriesGames,
-      isLoading: isSeriesLoading,
-    },
-    {
-      key: 'dlc',
-      title: dlcTitle,
-      games: dlcGames,
-      isLoading: isAdditionsLoading,
-    },
-    {
-      key: 'editions',
-      title: editionsTitle,
-      games: editionGames,
-    },
-    {
-      key: 'expansions',
-      title: expansionsTitle,
-      games: expansionGames,
-    },
-    {
-      key: 'developer-games',
-      title: moreFromDeveloperTitle,
-      games: moreFromDeveloper,
-      isLoading: isDeveloperGamesLoading,
-    },
-    {
-      key: 'publisher-games',
-      title: moreFromPublisherTitle,
-      games: moreFromPublisher,
-      isLoading: isPublisherGamesLoading,
-    },
-    {
-      key: 'similar-games',
-      title: similarGamesTitle,
-      games: similarGames,
-      isLoading: isSimilarGamesLoading,
-    },
-  ];
-  const visibleSections = sections.filter((section) => section.games.length > 0 || section.isLoading);
+  const sections: RelatedSection[] = useMemo(
+    () => [
+      { key: 'series', title: seriesTitle, games: sameSeriesGames, isLoading: isSeriesLoading },
+      { key: 'dlc', title: dlcTitle, games: dlcGames, isLoading: isAdditionsLoading },
+      { key: 'editions', title: editionsTitle, games: editionGames },
+      { key: 'expansions', title: expansionsTitle, games: expansionGames },
+      {
+        key: 'developer-games',
+        title: moreFromDeveloperTitle,
+        games: moreFromDeveloper,
+        isLoading: isDeveloperGamesLoading,
+      },
+      {
+        key: 'publisher-games',
+        title: moreFromPublisherTitle,
+        games: moreFromPublisher,
+        isLoading: isPublisherGamesLoading,
+      },
+      { key: 'similar-games', title: similarGamesTitle, games: similarGames, isLoading: isSimilarGamesLoading },
+    ],
+    [
+      seriesTitle, sameSeriesGames, isSeriesLoading,
+      dlcTitle, dlcGames, isAdditionsLoading,
+      editionsTitle, editionGames,
+      expansionsTitle, expansionGames,
+      moreFromDeveloperTitle, moreFromDeveloper, isDeveloperGamesLoading,
+      moreFromPublisherTitle, moreFromPublisher, isPublisherGamesLoading,
+      similarGamesTitle, similarGames, isSimilarGamesLoading,
+    ],
+  );
+  const visibleSections = useMemo(
+    () => sections.filter((section) => section.games.length > 0 || section.isLoading),
+    [sections],
+  );
 
   if (visibleSections.length === 0) return null;
 

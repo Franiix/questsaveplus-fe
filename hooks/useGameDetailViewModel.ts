@@ -28,6 +28,7 @@ const EDITION_CATEGORY_KEYS = new Set(['bundle', 'pack', 'expanded_game']);
 type StatusOption = {
  label: string;
  value: string;
+ icon?: string;
 };
 
 type UseGameDetailViewModelParams = {
@@ -119,13 +120,15 @@ export function useGameDetailViewModel({
    totalRating: igdbCommunityRating,
    totalRatingCount: igdbVotesCount,
   } = getGameCatalogRatings(igdbRaw);
-  const backlogStatusLabel =
+  const matchedStatusOption =
    isInBacklog && selectedStatus
-    ? sanitizeBacklogStatusLabel(
-       statusOptions.find((option) => option.value === selectedStatus)?.label ?? '',
-      )
+    ? (statusOptions.find((o) => o.value === selectedStatus) ?? null)
     : null;
+  const backlogStatusLabel = matchedStatusOption
+   ? sanitizeBacklogStatusLabel(matchedStatusOption.label)
+   : null;
   const backlogStatusColor = isInBacklog ? getBacklogStatusColor(selectedStatus) : null;
+  const backlogStatusIcon = matchedStatusOption?.icon ?? null;
   const catalogLocale = language.startsWith('it') ? 'it' : 'en';
   const howItPlays = getGameEditorialPlaystyle(igdbRaw, t, catalogLocale);
   const seriesNeighbors = getGameEditorialSeriesNeighbors(game, sameSeriesGames);
@@ -137,6 +140,7 @@ export function useGameDetailViewModel({
 
   return {
    backlogStatusColor,
+   backlogStatusIcon,
    backlogStatusLabel,
    criticRating,
    criticRatingCount,

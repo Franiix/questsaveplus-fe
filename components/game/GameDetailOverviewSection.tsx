@@ -13,6 +13,7 @@ type StatusOption = {
 
 type GameDetailOverviewViewModel = {
  backlogStatusColor?: string | null;
+ backlogStatusIcon?: string | null;
  backlogStatusLabel?: string | null;
  criticRating: number | null;
  criticRatingCount: number | null;
@@ -75,6 +76,7 @@ export function GameDetailOverviewSection({
     releaseStatusLabel={viewModel.releaseStatusLabel}
     statusLabel={viewModel.backlogStatusLabel}
     statusColor={viewModel.backlogStatusColor}
+    statusIcon={viewModel.backlogStatusIcon}
     releaseYear={viewModel.releaseYear}
     platforms={game.platforms}
     variant="screen"

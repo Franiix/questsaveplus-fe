@@ -1,3 +1,4 @@
+import { FontAwesome5 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, Text, View } from 'react-native';
 import {
@@ -8,13 +9,35 @@ import {
  typography,
 } from '@/shared/theme/tokens';
 
+const CHIP_CONTENT_STYLE = {
+ minHeight: 39,
+ borderRadius: borderRadius.full,
+ paddingHorizontal: spacing.md + 2,
+ paddingVertical: spacing.sm + 1,
+ alignItems: 'center' as const,
+ justifyContent: 'center' as const,
+} as const;
+
+const CHIP_CONTENT_STYLE_SELECTED = [CHIP_CONTENT_STYLE, { flexDirection: 'row', gap: 5 }] as const;
+
+const CHIP_CONTENT_STYLE_UNSELECTED = [
+ CHIP_CONTENT_STYLE,
+ { backgroundColor: colors.background.elevated, flexDirection: 'row', gap: 5 },
+] as const;
+
+const CHIP_LABEL_STYLE = {
+ color: '#FFFFFF',
+ fontSize: typography.size.sm,
+ fontFamily: typography.font.semibold,
+} as const;
+
 type FilterChipProps = {
  label: string;
  isSelected: boolean;
  onPress: () => void;
  isDisabled?: boolean;
- /** Colore brand del chip quando selezionato. Default: colors.primary.DEFAULT */
  color?: string;
+ icon?: React.ComponentProps<typeof FontAwesome5>['name'];
 };
 
 /**
@@ -23,7 +46,7 @@ type FilterChipProps = {
  * Selected: sfondo tinto (15% opacità) + bordo brand.
  * Unselected: sfondo trasparente + bordo default.
  */
-export function FilterChip({ label, isSelected, onPress, isDisabled = false }: FilterChipProps) {
+export function FilterChip({ label, isSelected, onPress, isDisabled = false, icon }: FilterChipProps) {
  const selectedColor = colors.primary.DEFAULT;
  const selectedGlow = colors.primary.glow;
  const containerStyle = ({ pressed }: { pressed: boolean }) => ({
@@ -43,15 +66,6 @@ export function FilterChip({ label, isSelected, onPress, isDisabled = false }: F
   transform: [{ scale: pressed ? 0.98 : 1 }],
  });
 
- const contentStyle = {
-  minHeight: 39,
-  borderRadius: borderRadius.full,
-  paddingHorizontal: spacing.md + 2,
-  paddingVertical: spacing.sm + 1,
-  alignItems: 'center' as const,
-  justifyContent: 'center' as const,
- };
-
  return (
   <Pressable
    onPress={() => {
@@ -67,36 +81,15 @@ export function FilterChip({ label, isSelected, onPress, isDisabled = false }: F
      colors={['#7B73FF', '#6C63FF', '#5A52E0']}
      start={{ x: 0, y: 0 }}
      end={{ x: 1, y: 0 }}
-     style={contentStyle}
+     style={CHIP_CONTENT_STYLE_SELECTED}
     >
-     <Text
-      style={{
-       color: '#FFFFFF',
-       fontSize: typography.size.sm,
-       fontFamily: typography.font.semibold,
-      }}
-     >
-      {label}
-     </Text>
+     {icon ? <FontAwesome5 name={icon} size={11} color="#FFFFFF" solid /> : null}
+     <Text style={CHIP_LABEL_STYLE}>{label}</Text>
     </LinearGradient>
    ) : (
-    <View
-     style={[
-      contentStyle,
-      {
-       backgroundColor: colors.background.elevated,
-      },
-     ]}
-    >
-     <Text
-      style={{
-       color: '#FFFFFF',
-       fontSize: typography.size.sm,
-       fontFamily: typography.font.semibold,
-      }}
-     >
-      {label}
-     </Text>
+    <View style={CHIP_CONTENT_STYLE_UNSELECTED}>
+     {icon ? <FontAwesome5 name={icon} size={11} color="#FFFFFF" solid /> : null}
+     <Text style={CHIP_LABEL_STYLE}>{label}</Text>
     </View>
    )}
   </Pressable>

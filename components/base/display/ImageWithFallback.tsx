@@ -53,6 +53,8 @@ export function ImageWithFallback({
    style={{ width, height, borderRadius: radius }}
    onError={() => setFailed(true)}
    contentFit="cover"
+   cachePolicy="memory-disk"
+   recyclingKey={uri}
   />
  );
 }

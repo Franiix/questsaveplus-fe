@@ -1,3 +1,4 @@
+import { FontAwesome5 } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 import { PlatformIconRow } from '@/components/base/display/PlatformIconRow';
 import type { CatalogPlatform } from '@/shared/models/Catalog.model';
@@ -11,6 +12,7 @@ type GameSummaryHeaderProps = {
  releaseStatusLabel?: string | null;
  statusLabel?: string | null;
  statusColor?: string | null;
+ statusIcon?: string | null;
  releaseYear?: string | null;
  platforms?: CatalogPlatform[] | null;
  onSecondaryActionPress?: (() => void) | null;
@@ -23,6 +25,7 @@ type SummaryChipProps = {
  backgroundColor: string;
  borderColor: string;
  alignSelf?: 'flex-start' | 'auto';
+ icon?: string | null;
 };
 
 function SummaryDot() {
@@ -44,6 +47,7 @@ function SummaryChip({
  backgroundColor,
  borderColor,
  alignSelf = 'auto',
+ icon,
 }: SummaryChipProps) {
  return (
   <View
@@ -55,8 +59,12 @@ function SummaryChip({
     borderColor,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
    }}
   >
+   {icon ? <FontAwesome5 name={icon as React.ComponentProps<typeof FontAwesome5>['name']} size={9} color={textColor} solid /> : null}
    <Text
     style={{
      color: textColor,
@@ -75,7 +83,8 @@ function ReleaseMetaRow({
  releaseYear,
  statusLabel,
  statusColor,
-}: Pick<GameSummaryHeaderProps, 'genreText' | 'releaseYear' | 'statusLabel' | 'statusColor'>) {
+ statusIcon,
+}: Pick<GameSummaryHeaderProps, 'genreText' | 'releaseYear' | 'statusLabel' | 'statusColor' | 'statusIcon'>) {
  if (!genreText && !releaseYear && !statusLabel) {
   return null;
  }
@@ -131,6 +140,7 @@ function ReleaseMetaRow({
      textColor={statusColor ?? colors.primary.DEFAULT}
      backgroundColor={statusColor ? `${statusColor}22` : colors.primary.glowSoft}
      borderColor={statusColor ?? colors.primary.DEFAULT}
+     icon={statusIcon}
     />
    ) : null}
   </View>
@@ -186,10 +196,11 @@ function MetaChipGroup({
  releaseStatusLabel,
  statusLabel,
  statusColor,
+ statusIcon,
  compact = false,
 }: Pick<
  GameSummaryHeaderProps,
- 'gameTypeLabel' | 'releaseStatusLabel' | 'statusLabel' | 'statusColor'
+ 'gameTypeLabel' | 'releaseStatusLabel' | 'statusLabel' | 'statusColor' | 'statusIcon'
 > & { compact?: boolean }) {
  if (!gameTypeLabel && !releaseStatusLabel && !statusLabel) {
   return null;
@@ -234,6 +245,7 @@ function MetaChipGroup({
      backgroundColor={statusColor ? `${statusColor}22` : colors.primary.glowSoft}
      borderColor={statusColor ?? colors.primary.DEFAULT}
      alignSelf={alignSelf}
+     icon={statusIcon}
     />
    ) : null}
   </View>
@@ -248,6 +260,7 @@ export function GameSummaryHeader({
  releaseStatusLabel,
  statusLabel,
  statusColor,
+ statusIcon,
  releaseYear,
  platforms,
  onSecondaryActionPress,
@@ -291,6 +304,7 @@ export function GameSummaryHeader({
      releaseYear={releaseYear}
      statusLabel={statusLabel}
      statusColor={statusColor}
+     statusIcon={statusIcon}
     />
    ) : (
     <CompactMetaRow genreText={genreText} releaseYear={releaseYear} />
@@ -318,6 +332,7 @@ export function GameSummaryHeader({
       releaseStatusLabel={releaseStatusLabel}
       statusLabel={null}
       statusColor={null}
+      statusIcon={null}
      />
     </View>
    ) : gameTypeLabel || releaseStatusLabel || statusLabel ? (
@@ -327,6 +342,7 @@ export function GameSummaryHeader({
       releaseStatusLabel={releaseStatusLabel}
       statusLabel={statusLabel}
       statusColor={statusColor}
+      statusIcon={statusIcon}
       compact
      />
     </View>
