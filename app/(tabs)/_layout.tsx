@@ -24,15 +24,15 @@ export default function TabsLayout() {
     }}
    />
    <Tabs.Screen
-    name="profile"
+    name="play-next"
     options={{
-     title: t('tabs.profile'),
+     title: t('tabs.playNext'),
     }}
    />
    <Tabs.Screen
-    name="credits"
+    name="profile"
     options={{
-     title: t('tabs.credits'),
+     title: t('tabs.profile'),
     }}
    />
   </Tabs>

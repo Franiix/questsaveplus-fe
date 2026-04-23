@@ -34,6 +34,9 @@ export function toBacklogItemModel(entity: BacklogItemEntity): BacklogItemModel 
   ...entity,
   status: normalizeStatus(entity.status),
   personal_rating: normalizePersonalRating(entity.personal_rating),
+  is_play_next: entity.is_play_next === true,
+  play_next_priority:
+   typeof entity.play_next_priority === 'number' ? Math.max(1, entity.play_next_priority) : null,
   is_rated: entity.personal_rating !== null,
  };
 }

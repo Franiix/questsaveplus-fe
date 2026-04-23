@@ -12,12 +12,12 @@ export const BACKLOG_QUICK_STATUS_ACTIONS: Record<
   { status: BacklogStatusEnum.ONGOING },
   { status: BacklogStatusEnum.ABANDONED },
  ],
- [BacklogStatusEnum.WANT_TO_PLAY]: [
+[BacklogStatusEnum.WANT_TO_PLAY]: [
   { status: BacklogStatusEnum.PLAYING, isPrimary: true },
-   { status: BacklogStatusEnum.COMPLETED },
-  { status: BacklogStatusEnum.ABANDONED },
-  { status: BacklogStatusEnum.WISHLIST },
+  { status: BacklogStatusEnum.COMPLETED },
   { status: BacklogStatusEnum.ONGOING },
+  { status: BacklogStatusEnum.WISHLIST },
+  { status: BacklogStatusEnum.ABANDONED },
  ],
  [BacklogStatusEnum.PLAYING]: [
   { status: BacklogStatusEnum.COMPLETED, isPrimary: true },
@@ -49,11 +49,14 @@ export const BACKLOG_QUICK_STATUS_ACTIONS: Record<
  ],
 } as const;
 
-export function getBacklogQuickStatusGroups(currentStatus: BacklogStatusEnum) {
+export function getBacklogQuickStatusGroups(
+ currentStatus: BacklogStatusEnum,
+ primaryCount = 3,
+) {
  const actions = BACKLOG_QUICK_STATUS_ACTIONS[currentStatus];
 
  return {
-  primaryActions: actions.slice(0, 3),
-  secondaryActions: actions.slice(3),
+  primaryActions: actions.slice(0, primaryCount),
+  secondaryActions: actions.slice(primaryCount),
  } as const;
 }

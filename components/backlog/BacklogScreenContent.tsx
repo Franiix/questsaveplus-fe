@@ -3,6 +3,7 @@ import { memo, useCallback, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { BacklogListItem } from '@/components/backlog/BacklogListItem';
+import { BacklogPlayNextCallout } from '@/components/backlog/BacklogPlayNextCallout';
 import { HintBox } from '@/components/base/display/HintBox';
 import { EmptyState } from '@/components/base/feedback/EmptyState';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
@@ -26,9 +27,12 @@ type BacklogScreenContentProps = {
  onItemPress: (item: BacklogItemEntity) => void;
  onItemPressIn?: (item: BacklogItemEntity) => void;
  onQuickStatusChange: (item: BacklogItemEntity, status: BacklogStatusEnum) => void;
+ onOpenPlayNext: () => void;
+ onTogglePlayNext: (item: BacklogItemEntity) => void;
  onRefetch: () => void;
  onRequestRemove: (item: BacklogItemEntity) => void;
  isUpdatingStatus?: boolean;
+ isUpdatingPlayNext?: boolean;
  removeLabel: string;
  retryLabel: string;
 };
@@ -53,14 +57,17 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
  onItemPress,
  onItemPressIn,
  onQuickStatusChange,
+ onOpenPlayNext,
+ onTogglePlayNext,
  onRefetch,
  onRequestRemove,
  isUpdatingStatus = false,
+ isUpdatingPlayNext = false,
  removeLabel,
  retryLabel,
 }: BacklogScreenContentProps) {
  const { t } = useTranslation();
- const [isHintExpanded, setIsHintExpanded] = useState(true);
+ const [isHintExpanded, setIsHintExpanded] = useState(false);
 
  const renderItem = useCallback(
   ({ item }: { item: BacklogItemEntity }) => (
@@ -69,15 +76,33 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
     onPress={onItemPress}
     onPressIn={onItemPressIn}
     onQuickStatusChange={onQuickStatusChange}
+    onTogglePlayNext={onTogglePlayNext}
     onRequestRemove={onRequestRemove}
     isUpdatingStatus={isUpdatingStatus}
+    isUpdatingPlayNext={isUpdatingPlayNext}
+    playNextPinLabel={t('backlog.playNext.pinAction')}
+    playNextUnpinLabel={t('backlog.playNext.unpinAction')}
+    showPlayNextRank
     removeLabel={removeLabel}
     labelMap={labelMap}
     colorMap={colorMap}
     iconMap={iconMap}
    />
   ),
-  [onItemPress, onItemPressIn, onQuickStatusChange, onRequestRemove, isUpdatingStatus, removeLabel, labelMap, colorMap, iconMap],
+  [
+   onItemPress,
+   onItemPressIn,
+   onQuickStatusChange,
+   onTogglePlayNext,
+   onRequestRemove,
+   isUpdatingStatus,
+   isUpdatingPlayNext,
+   removeLabel,
+   labelMap,
+   colorMap,
+   iconMap,
+   t,
+  ],
  );
 
  if (state.isReadingList) {
@@ -151,6 +176,7 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
      </Text>
     ) : null}
    </HintBox>
+   <BacklogPlayNextCallout playNextCount={state.playNextCount} onPress={onOpenPlayNext} />
 
    {state.filteredItems.length === 0 ? (
     <View style={{ paddingTop: spacing.md }}>

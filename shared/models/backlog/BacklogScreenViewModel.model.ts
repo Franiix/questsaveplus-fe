@@ -4,4 +4,5 @@ export type BacklogScreenViewModel = {
  activeFilterCount: number;
  filteredItems: BacklogItemEntity[];
  hasAppliedFilters: boolean;
+ playNextItems: BacklogItemEntity[];
 };

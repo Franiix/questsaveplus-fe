@@ -10,18 +10,20 @@ import Animated, {
  withSequence,
  withTiming,
 } from 'react-native-reanimated';
-import { BacklogStatusQuickActions } from '@/components/backlog/BacklogStatusQuickActions';
+import { BacklogQuickActions } from '@/components/backlog/BacklogQuickActions';
 import { ImageWithFallback } from '@/components/base/display/ImageWithFallback';
 import { StatusBadge } from '@/components/base/display/StatusBadge';
 import { StarRatingInput } from '@/components/base/inputs/StarRatingInput';
 import { useSingleAction } from '@/hooks/useSingleAction';
 import { getBacklogQuickStatusGroups } from '@/shared/consts/BacklogQuickStatusActions.const';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
-import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
+import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
 
 const SWIPE_ACTION_WIDTH = 104;
 const SWIPE_STATUS_WIDTH = 88;
+const ACTION_BUTTON_SIZE = 40;
+const ACTION_BUTTON_HEIGHT = 50;
 const AnimatedText = Animated.createAnimatedComponent(Text);
 const TITLE_TEXT_STYLE = {
  color: colors.text.primary,
@@ -29,22 +31,106 @@ const TITLE_TEXT_STYLE = {
  fontFamily: typography.font.semibold,
 } as const;
 
+type ActionButtonTone = {
+ backgroundColor: string;
+ borderColor: string;
+ iconColor: string;
+};
+
 type BacklogListItemProps = {
   item: BacklogItemEntity;
   onPress: (item: BacklogItemEntity) => void;
   onPressIn?: (item: BacklogItemEntity) => void;
+  onLongPress?: (item: BacklogItemEntity) => void;
   onRequestRemove: (item: BacklogItemEntity) => void;
   onQuickStatusChange: (item: BacklogItemEntity, status: BacklogStatusEnum) => void;
+  onTogglePlayNext?: (item: BacklogItemEntity) => void;
+  onPrimaryAction?: (item: BacklogItemEntity) => void;
   removeLabel: string;
   labelMap: Record<BacklogItemEntity['status'], string>;
   colorMap: Record<BacklogItemEntity['status'], string>;
   iconMap: Record<BacklogItemEntity['status'], React.ComponentProps<typeof FontAwesome5>['name']>;
   isUpdatingStatus?: boolean;
+  isUpdatingPlayNext?: boolean;
+  playNextPinLabel?: string;
+  playNextUnpinLabel?: string;
+  dragHintLabel?: string;
+  isDragActive?: boolean;
+  primaryActionLabel?: string;
+  playNextOrdinal?: number;
+  quickActionsMode?: 'default' | 'play-only' | 'hidden';
+  showPlayNextRank?: boolean;
 };
 
 type BacklogCardTitleProps = {
  title: string;
 };
+
+function getActionButtonTone(color: string, isActive = false): ActionButtonTone {
+ return {
+  backgroundColor: isActive ? `${color}26` : colors.background.elevated,
+  borderColor: isActive ? `${color}80` : colors.border.subtle,
+  iconColor: isActive ? color : colors.text.secondary,
+ };
+}
+
+function ActionIconButton({
+ accessibilityLabel,
+ color,
+ iconName,
+ isActive = false,
+ isDisabled = false,
+ onPress,
+}: {
+ accessibilityLabel: string;
+ color: string;
+ iconName: React.ComponentProps<typeof FontAwesome5>['name'];
+ isActive?: boolean;
+ isDisabled?: boolean;
+ onPress: (event: Parameters<NonNullable<React.ComponentProps<typeof Pressable>['onPress']>>[0]) => void;
+}) {
+ const tone = getActionButtonTone(color, isActive);
+ const iconWrapperStyle =
+  iconName === 'play'
+   ? { marginLeft: 2, marginTop: 1 }
+   : undefined;
+
+ return (
+  <View
+   style={{
+    width: ACTION_BUTTON_SIZE,
+    minHeight: ACTION_BUTTON_HEIGHT,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: tone.borderColor,
+    backgroundColor: tone.backgroundColor,
+    overflow: 'hidden',
+   }}
+  >
+   <Pressable
+    accessibilityRole="button"
+    accessibilityLabel={accessibilityLabel}
+    disabled={isDisabled}
+    onPress={onPress}
+   style={({ pressed }) => ({
+     flex: 1,
+     alignItems: 'center',
+     justifyContent: 'center',
+     opacity: isDisabled ? 0.56 : pressed ? 0.78 : 1,
+    })}
+   >
+    <View style={iconWrapperStyle}>
+     <FontAwesome5
+      name={iconName}
+      size={14}
+      color={tone.iconColor}
+      solid={isActive}
+     />
+    </View>
+   </Pressable>
+  </View>
+ );
+}
 
 const BacklogCardTitle = memo(function BacklogCardTitle({ title }: BacklogCardTitleProps) {
  const translateX = useSharedValue(0);
@@ -116,17 +202,45 @@ export const BacklogListItem = memo(function BacklogListItem({
   item,
   onPress,
   onPressIn,
+  onLongPress,
   onRequestRemove,
   onQuickStatusChange,
+  onTogglePlayNext,
+  onPrimaryAction,
   removeLabel,
   labelMap,
   colorMap,
   iconMap,
   isUpdatingStatus = false,
+  isUpdatingPlayNext = false,
+  playNextPinLabel = 'Add to Play Next',
+  playNextUnpinLabel = 'Remove from Play Next',
+  dragHintLabel,
+  isDragActive = false,
+  primaryActionLabel,
+  playNextOrdinal,
+  quickActionsMode = 'default',
 }: BacklogListItemProps) {
   const { isLocked, run } = useSingleAction(() => onPress(item));
-  const { secondaryActions } = getBacklogQuickStatusGroups(item.status);
   const swipeableRef = useRef<Swipeable | null>(null);
+  const isPlayNext = item.is_play_next === true;
+  const canTogglePlayNext =
+    Boolean(onTogglePlayNext) &&
+    (item.status === BacklogStatusEnum.WANT_TO_PLAY || isPlayNext);
+  const quickPrimaryCount =
+    quickActionsMode === 'default' && item.status === BacklogStatusEnum.WANT_TO_PLAY ? 2 : 3;
+  const { secondaryActions } = getBacklogQuickStatusGroups(item.status, quickPrimaryCount);
+  const isSwipeEnabled = quickActionsMode === 'default';
+  const playActionColor = colorMap[BacklogStatusEnum.PLAYING];
+  const playNextColor = colors.primary['200'];
+  const shouldRenderLeadingPlayNextControl =
+    quickActionsMode === 'play-only' && typeof playNextOrdinal === 'number';
+  const shouldRenderTrailingPlayNextControl =
+    quickActionsMode === 'hidden' && canTogglePlayNext;
+  const shouldRenderBacklogPinAction =
+    quickActionsMode === 'default' &&
+    Boolean(onTogglePlayNext) &&
+    item.status === BacklogStatusEnum.WANT_TO_PLAY;
 
   function renderRightActions() {
     return (
@@ -206,31 +320,43 @@ export const BacklogListItem = memo(function BacklogListItem({
     );
   }
 
-  return (
-    <Swipeable
-      ref={swipeableRef}
-      overshootLeft={false}
-      overshootRight={false}
-      leftThreshold={40}
-      rightThreshold={40}
-      friction={2}
-      renderLeftActions={renderLeftActions}
-      renderRightActions={renderRightActions}
-    >
+  const cardContent = (
       <Pressable
         onPress={run}
         onPressIn={() => onPressIn?.(item)}
+        onLongPress={() => onLongPress?.(item)}
+        delayLongPress={260}
         disabled={isLocked}
         style={{
           backgroundColor: colors.background.surface,
           borderRadius: borderRadius.lg,
           borderWidth: 1,
-          borderColor: colors.border.DEFAULT,
+          borderColor: isDragActive ? colors.primary.DEFAULT : colors.border.DEFAULT,
           overflow: 'hidden',
-          opacity: isLocked ? 0.72 : 1,
+          opacity: isLocked ? 0.72 : isDragActive ? 0.92 : 1,
+          transform: [{ scale: isDragActive ? 1.015 : 1 }],
         }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'stretch' }}>
+          {typeof playNextOrdinal === 'number' ? (
+            <View
+              style={{
+                width: 58,
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: spacing.xs,
+                paddingLeft: spacing.sm,
+                paddingRight: spacing.xs,
+              }}
+            >
+              {dragHintLabel ? (
+                <FontAwesome5 name="grip-lines" size={12} color={colors.text.tertiary} solid />
+              ) : null}
+              {shouldRenderLeadingPlayNextControl ? (
+               <FontAwesome5 name="thumbtack" size={13} color={colors.primary['200']} solid />
+              ) : null}
+            </View>
+          ) : null}
           <ImageWithFallback uri={item.game_cover_url} width={60} height={96} radius={0} />
           <View
             style={{
@@ -250,27 +376,157 @@ export const BacklogListItem = memo(function BacklogListItem({
                 gap: spacing.sm,
               }}
             >
-              <StatusBadge
-                value={item.status}
-                colorMap={colorMap}
-                labelMap={labelMap}
-                iconMap={iconMap}
-              />
-              {item.personal_rating !== null ? (
-                <StarRatingInput value={item.personal_rating} onChange={() => {}} readOnly size="sm" />
-              ) : null}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+               <StatusBadge
+                 value={item.status}
+                 colorMap={colorMap}
+                 labelMap={labelMap}
+                 iconMap={iconMap}
+               />
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+                {shouldRenderTrailingPlayNextControl ? (
+                  <ActionIconButton
+                    accessibilityLabel={isPlayNext ? playNextUnpinLabel : playNextPinLabel}
+                    color={colors.primary['200']}
+                    iconName="thumbtack"
+                    isActive={isPlayNext}
+                    isDisabled={isUpdatingPlayNext}
+                    onPress={(event) => {
+                      event.stopPropagation();
+                      onTogglePlayNext(item);
+                    }}
+                  />
+                ) : null}
+                {item.personal_rating !== null ? (
+                  <StarRatingInput value={item.personal_rating} onChange={() => {}} readOnly size="sm" />
+                ) : null}
+              </View>
             </View>
           </View>
-          <BacklogStatusQuickActions
-            currentStatus={item.status}
-            colorMap={colorMap}
-            iconMap={iconMap}
-            labelMap={labelMap}
-            isDisabled={isUpdatingStatus}
-            onStatusChange={(status) => onQuickStatusChange(item, status)}
-          />
+          {quickActionsMode === 'default' ? (
+            <View
+              style={{
+                paddingRight: spacing.sm,
+                paddingVertical: spacing.xs,
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  gap: spacing.xs,
+                }}
+              >
+                <BacklogQuickActions
+                  currentStatus={item.status}
+                  colorMap={colorMap}
+                  iconMap={iconMap}
+                  labelMap={labelMap}
+                  primaryCount={quickPrimaryCount}
+                  isDisabled={isUpdatingStatus}
+                  auxiliaryAction={
+                    shouldRenderBacklogPinAction
+                      ? {
+                          accessibilityLabel: isPlayNext ? playNextUnpinLabel : playNextPinLabel,
+                          color: playNextColor,
+                          iconName: 'thumbtack',
+                          isActive: isPlayNext,
+                          isDisabled: isUpdatingPlayNext,
+                          rank: isPlayNext ? (playNextOrdinal ?? item.play_next_priority ?? undefined) : undefined,
+                          onPress: () => onTogglePlayNext?.(item),
+                        }
+                      : undefined
+                  }
+                  onStatusChange={(status) => onQuickStatusChange(item, status)}
+                />
+              </View>
+            </View>
+          ) : null}
+          {quickActionsMode === 'play-only' && onPrimaryAction && primaryActionLabel ? (
+            <View
+              style={{
+                paddingRight: spacing.sm,
+                paddingVertical: spacing.xs,
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+              }}
+            >
+              <View
+               style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: spacing.xs,
+               }}
+              >
+               {typeof playNextOrdinal === 'number' ? (
+                <View
+                 style={{
+                  minWidth: 24,
+                  height: 24,
+                  paddingHorizontal: spacing.xs,
+                  borderRadius: borderRadius.full,
+                  borderWidth: 1,
+                  borderColor: `${colors.primary['200']}80`,
+                  backgroundColor: `${colors.primary['200']}26`,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                 }}
+                >
+                 <Text
+                  style={{
+                   color: colors.primary['200'],
+                   fontSize: 10,
+                   fontFamily: typography.font.semibold,
+                  }}
+                 >
+                  #{playNextOrdinal}
+                 </Text>
+                </View>
+               ) : null}
+               <BacklogQuickActions
+                currentStatus={item.status}
+                colorMap={colorMap}
+                iconMap={iconMap}
+                labelMap={labelMap}
+                isDisabled={isUpdatingStatus}
+                customActions={[
+                 {
+                  accessibilityLabel: primaryActionLabel,
+                  color: playActionColor,
+                  iconName: 'play',
+                  isActive: true,
+                  onPress: () => onPrimaryAction(item),
+                 },
+                ]}
+                onStatusChange={(status) => onQuickStatusChange(item, status)}
+               />
+              </View>
+            </View>
+          ) : null}
         </View>
       </Pressable>
+  );
+
+  if (!isSwipeEnabled) {
+    return cardContent;
+  }
+
+  return (
+    <Swipeable
+      ref={swipeableRef}
+      overshootLeft={false}
+      overshootRight={false}
+      leftThreshold={40}
+      rightThreshold={40}
+      friction={2}
+      renderLeftActions={renderLeftActions}
+      renderRightActions={renderRightActions}
+    >
+      {cardContent}
     </Swipeable>
   );
 });

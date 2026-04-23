@@ -8,24 +8,31 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { colors, typography } from '@/shared/theme/tokens';
 
-type TabKey = 'index' | 'backlog' | 'profile' | 'credits';
+type TabKey = 'index' | 'backlog' | 'play-next' | 'profile';
 type IconName = React.ComponentProps<typeof FontAwesome5>['name'];
 
 const TAB_ICONS: Record<TabKey, IconName> = {
  index: 'home',
  backlog: 'bookmark',
+ 'play-next': 'bolt',
  profile: 'user',
- credits: 'info-circle',
 };
 
-const TAB_ROUTES: Record<TabKey, '/(tabs)' | '/(tabs)/backlog' | '/(tabs)/profile' | '/(tabs)/credits'> = {
+const TAB_LABEL_KEYS: Record<TabKey, 'tabs.home' | 'tabs.backlog' | 'tabs.playNext' | 'tabs.profile'> = {
+ index: 'tabs.home',
+ backlog: 'tabs.backlog',
+ 'play-next': 'tabs.playNext',
+ profile: 'tabs.profile',
+};
+
+const TAB_ROUTES: Record<TabKey, '/(tabs)' | '/(tabs)/backlog' | '/(tabs)/play-next' | '/(tabs)/profile'> = {
  index: '/(tabs)',
  backlog: '/(tabs)/backlog',
+ 'play-next': '/(tabs)/play-next',
  profile: '/(tabs)/profile',
- credits: '/(tabs)/credits',
 };
 
-const TAB_ORDER: TabKey[] = ['index', 'backlog', 'profile', 'credits'];
+const TAB_ORDER: TabKey[] = ['index', 'backlog', 'play-next', 'profile'];
 const TAB_HEIGHT = 46;
 const HORIZONTAL_INSET = 28;
 const CONTAINER_PADDING = 5;
@@ -35,13 +42,13 @@ function resolveActiveTab(segments: string[]): TabKey {
 
  if (first === '(tabs)') {
   if (second === 'backlog') return 'backlog';
+  if (second === 'play-next') return 'play-next';
   if (second === 'profile') return 'profile';
-  if (second === 'credits') return 'credits';
+  if (second === 'credits') return 'profile';
   return 'index';
  }
 
  if (first === 'profile') return 'profile';
- if (first === 'legal') return 'credits';
  if (first === 'game') return 'index';
  return 'index';
 }
@@ -151,14 +158,7 @@ const activeTab = resolveActiveTab(segments);
      {TAB_ORDER.map((tab) => {
       const isFocused = tab === activeTab;
       const iconColor = isFocused ? colors.primary['200'] : colors.text.disabled;
-      const label =
-       tab === 'index'
-        ? t('tabs.home')
-        : tab === 'backlog'
-         ? t('tabs.backlog')
-         : tab === 'profile'
-          ? t('tabs.profile')
-          : t('tabs.credits');
+      const label = t(TAB_LABEL_KEYS[tab]);
 
      return (
        <Pressable

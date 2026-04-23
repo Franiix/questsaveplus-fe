@@ -14,4 +14,5 @@ export type BacklogScreenContentState = {
  filteredItems: BacklogItemEntity[];
  hasAppliedFilters: boolean;
  isReadingList: boolean;
+ playNextCount: number;
 };

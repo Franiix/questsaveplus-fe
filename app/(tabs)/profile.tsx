@@ -1,3 +1,4 @@
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -207,20 +208,58 @@ export default function ProfileScreen() {
         <View
           style={{
             marginHorizontal: spacing.md,
-            marginTop: spacing.xl,
+            marginTop: spacing.lg,
             marginBottom: spacing['3xl'],
             alignItems: 'center',
+            gap: spacing.md,
           }}
         >
           <Pressable
-            onPress={() => setIsDeleteModalVisible(true)}
+            onPress={() => router.push('/(tabs)/credits')}
             style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing.sm,
               paddingVertical: spacing.xs,
               paddingHorizontal: spacing.sm,
               borderRadius: 999,
               backgroundColor: 'rgba(255,255,255,0.02)',
             }}
           >
+            <FontAwesome5 name="info-circle" size={13} color={colors.text.secondary} solid />
+            <Text
+              style={{
+                color: colors.text.secondary,
+                fontSize: 13,
+                fontWeight: '600',
+              }}
+            >
+              {t('profile.infoButton')}
+            </Text>
+          </Pressable>
+          <Text
+            style={{
+              marginTop: -spacing.sm,
+              color: colors.text.disabled,
+              fontSize: 11,
+              textAlign: 'center',
+            }}
+          >
+            {t('profile.infoSubtitle')}
+          </Text>
+          <Pressable
+            onPress={() => setIsDeleteModalVisible(true)}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing.sm,
+              paddingVertical: spacing.xs,
+              paddingHorizontal: spacing.sm,
+              borderRadius: 999,
+              backgroundColor: 'rgba(255,255,255,0.02)',
+            }}
+          >
+            <FontAwesome5 name="trash-alt" size={13} color={colors.error} solid />
             <Text
               style={{
                 color: colors.error,

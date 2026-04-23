@@ -12,6 +12,8 @@ type CreateBacklogScreenViewModelParams = {
  search: string;
 };
 
+const LOWEST_PLAY_NEXT_PRIORITY = Number.MAX_SAFE_INTEGER;
+
 function hasDiscoveryFilters(filters: GameDiscoveryFilters) {
  return (
   Boolean(filters.genre) ||
@@ -39,6 +41,28 @@ function matchesMetadataFilter(
 
 export function shouldLoadBacklogMetadata(filters: GameDiscoveryFilters) {
  return hasDiscoveryFilters(filters);
+}
+
+function getPlayNextPriority(item: BacklogItemEntity) {
+ return typeof item.play_next_priority === 'number'
+  ? item.play_next_priority
+  : LOWEST_PLAY_NEXT_PRIORITY;
+}
+
+function getSortableUpdatedAt(item: BacklogItemEntity) {
+ const timestamp = Date.parse(item.updated_at);
+ return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+export function getPlayNextItems(backlogItems: BacklogItemEntity[]) {
+ return [...backlogItems]
+  .filter((item) => item.is_play_next === true)
+  .sort((firstItem, secondItem) => {
+   const priorityDiff = getPlayNextPriority(firstItem) - getPlayNextPriority(secondItem);
+   if (priorityDiff !== 0) return priorityDiff;
+
+   return getSortableUpdatedAt(secondItem) - getSortableUpdatedAt(firstItem);
+  });
 }
 
 export function createBacklogScreenViewModel({
@@ -78,5 +102,6 @@ export function createBacklogScreenViewModel({
   activeFilterCount: countActiveDiscoveryFilters(appliedFilters),
   filteredItems,
   hasAppliedFilters,
+  playNextItems: getPlayNextItems(backlogItems),
  };
 }

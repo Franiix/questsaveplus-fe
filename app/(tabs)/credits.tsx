@@ -119,7 +119,7 @@ export default function CreditsScreen() {
  const { t } = useTranslation();
  const router = useSafeRouter();
  const handleBackPress = useCallback(() => {
-  router.replace('/(tabs)');
+  router.replace('/(tabs)/profile');
  }, [router]);
 
  const dataSources: CreditLink[] = useMemo(

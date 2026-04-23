@@ -9,6 +9,8 @@ export interface BacklogItemEntity extends BaseEntity {
  status: BacklogStatusEnum;
  personal_rating: number | null; // 0-5, step 0.5
  notes: string | null;
+ is_play_next?: boolean | null;
+ play_next_priority?: number | null;
  added_at: string; // ISO 8601
  updated_at: string; // ISO 8601
 }

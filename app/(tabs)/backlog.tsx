@@ -92,13 +92,14 @@ export default function BacklogScreen() {
     void readAll(userId);
   }, [clearBacklog, readAll, userId]);
 
-  const { activeFilterCount, filteredItems, hasAppliedFilters } = useBacklogScreenViewModel({
-    activeFilter,
-    appliedFilters,
-    backlogItems,
-    backlogMetadata,
-    search,
-  });
+  const { activeFilterCount, filteredItems, hasAppliedFilters, playNextItems } =
+    useBacklogScreenViewModel({
+      activeFilter,
+      appliedFilters,
+      backlogItems,
+      backlogMetadata,
+      search,
+    });
   const deferredPrefetchEnabled = useDeferredInteractionGate({
     enabled: filteredItems.length > 0,
     delayMs: 500,
@@ -154,9 +155,44 @@ export default function BacklogScreen() {
     [prefetchGameById],
   );
 
+  const getNextPlayNextPriority = useCallback(() => {
+    const priorities = backlogItems
+      .filter((item) => item.is_play_next === true)
+      .map((item) => item.play_next_priority ?? 0);
+
+    return priorities.length === 0 ? 1 : Math.max(...priorities) + 1;
+  }, [backlogItems]);
+
+  const handleOpenPlayNext = useCallback(() => {
+    router.push('/(tabs)/play-next');
+  }, [router]);
+
   const handleRequestRemove = useCallback((item: BacklogItemEntity) => {
     setPendingDeleteItem(item);
   }, []);
+
+  const handleTogglePlayNext = useCallback(
+    async (item: BacklogItemEntity) => {
+      const shouldPin = item.is_play_next !== true;
+
+      clearError();
+      await update(item.id, {
+        is_play_next: shouldPin,
+        play_next_priority: shouldPin ? getNextPlayNextPriority() : null,
+      });
+      const updateError = useBacklogStore.getState().error;
+
+      if (!updateError) {
+        showToast(
+          shouldPin ? t('backlog.playNext.pinSuccess') : t('backlog.playNext.unpinSuccess'),
+          'success',
+        );
+      } else {
+        showToast(updateError, 'error');
+      }
+    },
+    [clearError, getNextPlayNextPriority, showToast, t, update],
+  );
 
   const handleQuickStatusChange = useCallback(
     async (item: BacklogItemEntity, status: BacklogStatusEnum) => {
@@ -196,8 +232,9 @@ export default function BacklogScreen() {
       filteredItems,
       hasAppliedFilters,
       isReadingList,
+      playNextCount: playNextItems.length,
     }),
-    [activeFilter, error, filteredItems, hasAppliedFilters, isReadingList],
+    [activeFilter, error, filteredItems, hasAppliedFilters, isReadingList, playNextItems.length],
   );
 
   return (
@@ -243,10 +280,13 @@ export default function BacklogScreen() {
         onFilterChange={setActiveFilter}
         onItemPress={handleItemPress}
         onItemPressIn={handleItemPressIn}
+        onOpenPlayNext={handleOpenPlayNext}
+        onTogglePlayNext={handleTogglePlayNext}
         onQuickStatusChange={handleQuickStatusChange}
         onRefetch={handleRefetch}
         onRequestRemove={handleRequestRemove}
         isUpdatingStatus={isMutating && activeMutation === 'update'}
+        isUpdatingPlayNext={isMutating && activeMutation === 'update'}
         removeLabel={t('gameDetail.confirmRemove.confirm')}
         retryLabel={t('home.errorRetry')}
       />

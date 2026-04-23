@@ -24,6 +24,7 @@
  tabs: {
   home: 'Homepage',
   backlog: 'Il mio Backlog',
+  playNext: 'Play Next',
   profile: 'Profilo',
   credits: 'Info',
  },
@@ -136,8 +137,10 @@
  },
  profile: {
   editButton: 'Modifica profilo',
-  changeEmailButton: 'Cambia email',
-  changePasswordButton: 'Cambia password',
+ changeEmailButton: 'Cambia email',
+ changePasswordButton: 'Cambia password',
+  infoButton: 'Info e crediti',
+  infoSubtitle: 'Fonti dati, documenti legali e riferimenti del progetto.',
   logoutButton: 'Esci',
   heroTagline: 'Profilo giocatore',
   fields: {
@@ -201,9 +204,39 @@
   },
   interactionHintTitle: 'Azioni rapide del backlog',
   interactionHint:
-   'Usa la barra a destra della card per i 3 stati principali. Fai swipe sulla card per rimuovere il gioco o raggiungere gli altri 2 stati.',
+   'Usa la barra a destra della card per i cambi stato principali. Il pin Play Next è un’azione separata. Fai swipe sulla card per rimuovere il gioco o raggiungere le azioni secondarie.',
   interactionHintShow: 'Mostra suggerimenti backlog',
   interactionHintHide: 'Nascondi suggerimenti backlog',
+  playNextCta: {
+   title: 'Vedi i tuoi Play Next',
+   subtitle_one: '{{count}} gioco prioritario fissato per la prossima sessione.',
+   subtitle_other: '{{count}} giochi prioritari fissati per la prossima sessione.',
+   accessibilityLabel: 'Apri la lista Play Next',
+   action: 'Apri',
+  },
+  playNext: {
+   pinAction: 'Aggiungi a Play Next',
+   unpinAction: 'Rimuovi da Play Next',
+   pinSuccess: 'Gioco aggiunto a Play Next',
+   unpinSuccess: 'Gioco rimosso da Play Next',
+  },
+ },
+ playNext: {
+ title: 'Play Next',
+  subtitle: 'La mini-lista dei giochi che vuoi davvero iniziare o riprendere subito, ordinata per priorità.',
+ searchPlaceholder: 'Cerca in Play Next...',
+  reorderHint: 'Tieni premuta una card e trascinala per cambiare priorità.',
+  dragHint: 'Tieni premuto per ordinare',
+  reorderSuccess: 'Priorità Play Next aggiornata',
+  playAction: 'PLAY',
+  playConfirmTitle: 'Avvia questo gioco?',
+  playConfirmMessage:
+   'Se premi PLAY, questo gioco uscirà da Play Next e lo ritroverai solo nel tuo backlog come In corso.',
+  playConfirmAction: 'Sì, gioca ora',
+  playSuccess: 'Gioco spostato in In corso',
+  emptyTitle: 'Nessun gioco in Play Next',
+  emptySubtitle: 'Apri il backlog e usa il pin sulle card per costruire la tua prossima coda di gioco.',
+  emptyAction: 'Vai al backlog',
  },
  gameDetail: {
   yourStatus: 'Il tuo stato',
