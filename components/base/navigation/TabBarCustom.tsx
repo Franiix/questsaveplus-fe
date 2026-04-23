@@ -1,10 +1,11 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import { useRouter, useSegments } from 'expo-router';
+import { useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { colors, typography } from '@/shared/theme/tokens';
 
 type TabKey = 'index' | 'backlog' | 'profile' | 'credits';
@@ -47,7 +48,7 @@ function resolveActiveTab(segments: string[]): TabKey {
 
 export function TabBarCustom() {
  const { t } = useTranslation();
- const router = useRouter();
+ const router = useSafeRouter();
  const segments = useSegments();
  const { width: screenWidth } = useWindowDimensions();
  const insets = useSafeAreaInsets();
@@ -164,7 +165,10 @@ const activeTab = resolveActiveTab(segments);
         key={tab}
         accessibilityRole="button"
         accessibilityState={isFocused ? { selected: true } : {}}
-        onPress={() => router.replace(TAB_ROUTES[tab])}
+        onPress={() => {
+         if (isFocused) return;
+         router.navigate(TAB_ROUTES[tab]);
+        }}
         style={{
          width: tabWidth,
          alignItems: 'center',

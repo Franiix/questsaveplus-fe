@@ -1,14 +1,16 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { SearchFilterToolbar } from '@/components/base/layout/SearchFilterToolbar';
 import { ScreenHeader } from '@/components/base/layout/ScreenHeader';
 import { BacklogScreenContent } from '@/components/backlog/BacklogScreenContent';
 import { GameFilterSheet } from '@/components/game/GameFilterSheet';
+import { useDeferredInteractionGate } from '@/hooks/useDeferredInteractionGate';
+import { usePrefetchGameResources } from '@/hooks/usePrefetchGameResources';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { useBacklogGameMetadata } from '@/hooks/useBacklogGameMetadata';
 import { useBacklogScreenViewModel } from '@/hooks/useBacklogScreenViewModel';
 import { useBacklogStatusPresentation } from '@/hooks/useBacklogStatusPresentation';
@@ -33,36 +35,47 @@ const HORIZONTAL_PADDING = spacing.md;
 export default function BacklogScreen() {
   const { t } = useTranslation();
   const { labelMap, colorMap, iconMap } = useBacklogStatusPresentation();
-  const router = useRouter();
-  const { showToast } = useToastStore();
+  const router = useSafeRouter();
+  const { prefetchGameById } = usePrefetchGameResources();
+  const showToast = useToastStore((state) => state.showToast);
   const handleBackPress = useCallback(() => {
     router.replace('/(tabs)');
   }, [router]);
-  const { session } = useAuthStore();
-  const { backlogItems, isReadingList, error, readAll, clearBacklog, clearError, delete: deleteBacklogItem } =
-    useBacklogStore();
+  const session = useAuthStore((state) => state.session);
+  const backlogItems = useBacklogStore((state) => state.backlogItems);
+  const isReadingList = useBacklogStore((state) => state.isReadingList);
+  const isMutating = useBacklogStore((state) => state.isMutating);
+  const activeMutation = useBacklogStore((state) => state.activeMutation);
+  const error = useBacklogStore((state) => state.error);
+  const readAll = useBacklogStore((state) => state.readAll);
+  const update = useBacklogStore((state) => state.update);
+  const clearBacklog = useBacklogStore((state) => state.clearBacklog);
+  const clearError = useBacklogStore((state) => state.clearError);
+  const deleteBacklogItem = useBacklogStore((state) => state.delete);
   const [activeFilter, setActiveFilter] = useState<BacklogStatusEnum | null>(null);
   const [search, setSearch] = useState('');
-  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-  const [pendingDeleteItem, setPendingDeleteItem] = useState<BacklogItemEntity | null>(null);
+ const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+ const [pendingDeleteItem, setPendingDeleteItem] = useState<BacklogItemEntity | null>(null);
   const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
   const [draftFilters, setDraftFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
- const { data: genres = [], isLoading: isGenresLoading, isError: isGenresError } = useCatalogGenres();
+ const catalogFiltersEnabled = isFilterSheetOpen || shouldLoadBacklogMetadata(appliedFilters);
+ const { data: genres = [], isLoading: isGenresLoading, isError: isGenresError } =
+  useCatalogGenres(catalogFiltersEnabled);
  const {
   data: parentPlatforms = [],
   isLoading: isParentPlatformsLoading,
   isError: isParentPlatformsError,
- } = useCatalogParentPlatforms();
+ } = useCatalogParentPlatforms(catalogFiltersEnabled);
  const {
   data: developers = [],
   isLoading: isDevelopersLoading,
   isError: isDevelopersError,
- } = useCatalogDevelopers();
+ } = useCatalogDevelopers(catalogFiltersEnabled);
  const {
   data: publishers = [],
   isLoading: isPublishersLoading,
   isError: isPublishersError,
- } = useCatalogPublishers();
+ } = useCatalogPublishers(catalogFiltersEnabled);
   const { data: backlogMetadata } = useBacklogGameMetadata(
     backlogItems.map((item) => item.game_id),
     shouldLoadBacklogMetadata(appliedFilters),
@@ -86,6 +99,22 @@ export default function BacklogScreen() {
     backlogMetadata,
     search,
   });
+  const deferredPrefetchEnabled = useDeferredInteractionGate({
+    enabled: filteredItems.length > 0,
+    delayMs: 500,
+  });
+
+  useEffect(() => {
+    if (!deferredPrefetchEnabled) {
+      return;
+    }
+
+    void Promise.all(
+      filteredItems.slice(0, 3).map((item) =>
+        prefetchGameById(item.game_id, item.game_cover_url ? [item.game_cover_url] : []),
+      ),
+    );
+  }, [deferredPrefetchEnabled, filteredItems, prefetchGameById]);
 
   function handleOpenFilters() {
     setDraftFilters(appliedFilters);
@@ -106,17 +135,45 @@ export default function BacklogScreen() {
     if (!userId) return Promise.resolve([]);
     return readAll(userId);
   }, [readAll, userId]);
+  const handleRefetch = useCallback(() => {
+    void refetch();
+  }, [refetch]);
 
   const handleItemPress = useCallback(
     (item: BacklogItemEntity) => {
+      void prefetchGameById(item.game_id, item.game_cover_url ? [item.game_cover_url] : []);
       router.push({ pathname: '/game/[id]', params: { id: item.game_id } });
     },
-    [router],
+    [prefetchGameById, router],
+  );
+
+  const handleItemPressIn = useCallback(
+    (item: BacklogItemEntity) => {
+      void prefetchGameById(item.game_id, item.game_cover_url ? [item.game_cover_url] : []);
+    },
+    [prefetchGameById],
   );
 
   const handleRequestRemove = useCallback((item: BacklogItemEntity) => {
     setPendingDeleteItem(item);
   }, []);
+
+  const handleQuickStatusChange = useCallback(
+    async (item: BacklogItemEntity, status: BacklogStatusEnum) => {
+      if (item.status === status) return;
+
+      clearError();
+      await update(item.id, { status });
+      const updateError = useBacklogStore.getState().error;
+
+      if (!updateError) {
+        showToast(t('gameDetail.updateSuccess'), 'success');
+      } else {
+        showToast(updateError, 'error');
+      }
+    },
+    [clearError, showToast, t, update],
+  );
 
   const handleConfirmRemove = useCallback(async () => {
     if (!pendingDeleteItem) return;
@@ -131,6 +188,17 @@ export default function BacklogScreen() {
     }
     setPendingDeleteItem(null);
   }, [clearError, deleteBacklogItem, pendingDeleteItem, showToast, t]);
+
+  const contentState = useMemo(
+    () => ({
+      activeFilter,
+      error,
+      filteredItems,
+      hasAppliedFilters,
+      isReadingList,
+    }),
+    [activeFilter, error, filteredItems, hasAppliedFilters, isReadingList],
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
@@ -171,17 +239,14 @@ export default function BacklogScreen() {
         colorMap={colorMap}
         iconMap={iconMap}
         labelMap={labelMap}
-        state={{
-          activeFilter,
-          error,
-          filteredItems,
-          hasAppliedFilters,
-          isReadingList,
-        }}
+        state={contentState}
         onFilterChange={setActiveFilter}
         onItemPress={handleItemPress}
-        onRefetch={() => void refetch()}
+        onItemPressIn={handleItemPressIn}
+        onQuickStatusChange={handleQuickStatusChange}
+        onRefetch={handleRefetch}
         onRequestRemove={handleRequestRemove}
+        isUpdatingStatus={isMutating && activeMutation === 'update'}
         removeLabel={t('gameDetail.confirmRemove.confirm')}
         retryLabel={t('home.errorRetry')}
       />

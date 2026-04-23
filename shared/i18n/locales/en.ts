@@ -112,6 +112,7 @@
   sortTopRated: 'Top rated',
   sortNewest: 'Newest',
   sortPopular: 'Most popular',
+  updateAvailable: 'Update {{version}}',
  },
  editProfile: {
   title: 'Edit profile',
@@ -198,6 +199,11 @@
    title: 'No games with this status',
    subtitle: 'Try a different filter',
   },
+  interactionHintTitle: 'Backlog quick actions',
+  interactionHint:
+   'Use the bar on the right side of the card for the 3 main states. Swipe the card to remove the game or reach the other 2 states.',
+  interactionHintShow: 'Show backlog tips',
+  interactionHintHide: 'Hide backlog tips',
  },
  gameDetail: {
   yourStatus: 'Your status',

@@ -29,6 +29,7 @@ type StatusOption = {
  label: string;
  value: string;
  icon?: string;
+ color?: string;
 };
 
 type UseGameDetailViewModelParams = {

@@ -20,6 +20,7 @@ import { useGameDetail } from '@/hooks/useGameDetail';
 import { useGameDetailNavigation } from '@/hooks/useGameDetailNavigation';
 import { useGameDetailScreenState } from '@/hooks/useGameDetailScreenState';
 import { useGameDetailViewModel } from '@/hooks/useGameDetailViewModel';
+import { useDeferredGameDetailSectionsGate } from '@/hooks/useDeferredGameDetailSectionsGate';
 import { useGameSeries } from '@/hooks/useGameSeries';
 import { useGameSimilar } from '@/hooks/useGameSimilar';
 import { useRelatedCompanyGames } from '@/hooks/useRelatedCompanyGames';
@@ -48,23 +49,24 @@ export default function GameDetailScreen() {
   setDescriptionExpanded,
   setStorylineExpanded,
   stickyHeaderOpacity,
-  stickyHeaderTranslateY,
-  storylineExpanded,
+ stickyHeaderTranslateY,
+ storylineExpanded,
  } = useGameDetailScreenState({ stickyThreshold });
  const { data: game, isLoading, isError } = useGameDetail(gameId);
+ const secondarySectionsEnabled = useDeferredGameDetailSectionsGate(Boolean(game));
  const { data: communityRating, isLoading: isCommunityRatingLoading } =
   useGameCommunityRating(gameId);
  const { data: additions = [], isLoading: isAdditionsLoading } = useGameAdditions({
   gameId,
-  enabled: Number.isFinite(gameId),
+  enabled: Number.isFinite(gameId) && secondarySectionsEnabled,
  });
  const { data: gameSeries = [], isLoading: isSeriesLoading } = useGameSeries({
   gameId,
-  enabled: Number.isFinite(gameId),
+  enabled: Number.isFinite(gameId) && secondarySectionsEnabled,
  });
  const { data: similarGamesRaw = [], isLoading: isSimilarGamesLoading } = useGameSimilar({
   gameId,
-  enabled: Number.isFinite(gameId),
+  enabled: Number.isFinite(gameId) && secondarySectionsEnabled,
  });
  const primaryDeveloper = game?.developers[0] ?? null;
  const primaryPublisher = game?.publishers[0] ?? null;
@@ -76,7 +78,10 @@ export default function GameDetailScreen() {
   companyExternalId: primaryDeveloperCatalogId,
   companyName: primaryDeveloper?.name ?? null,
   companyType: 'developers',
-  enabled: Number.isFinite(gameId) && Boolean(primaryDeveloperCatalogId),
+  enabled:
+   Number.isFinite(gameId) &&
+   secondarySectionsEnabled &&
+   Boolean(primaryDeveloperCatalogId),
  });
  const { data: publisherGames = [], isLoading: isPublisherGamesLoading } = useRelatedCompanyGames({
   currentGameId: gameId,
@@ -85,6 +90,7 @@ export default function GameDetailScreen() {
   companyType: 'publishers',
   enabled:
     Number.isFinite(gameId) &&
+    secondarySectionsEnabled &&
     Boolean(primaryPublisherCatalogId) &&
     primaryPublisher?.name !== primaryDeveloper?.name,
   });
@@ -289,30 +295,32 @@ export default function GameDetailScreen() {
       whereItFits={whereItFits}
      />
 
-      <GameDetailRelatedSections
-       sameSeriesGames={viewModel.sameSeriesGames}
-       isSeriesLoading={isSeriesLoading}
-       seriesTitle={viewModel.seriesTitle}
-       dlcGames={viewModel.dlcGames}
-       isAdditionsLoading={isAdditionsLoading}
-       dlcTitle={t('gameDetail.dlc')}
-       editionGames={viewModel.editionGames}
-       editionsTitle={t('gameDetail.editions')}
-       expansionGames={viewModel.expansionGames}
-       expansionsTitle={t('gameDetail.expansions')}
-       moreFromDeveloper={viewModel.moreFromDeveloper}
-       isDeveloperGamesLoading={isDeveloperGamesLoading}
-       moreFromDeveloperTitle={viewModel.moreFromDeveloperTitle}
-       moreFromPublisher={viewModel.moreFromPublisher}
-       isPublisherGamesLoading={isPublisherGamesLoading}
-       moreFromPublisherTitle={viewModel.moreFromPublisherTitle}
-       similarGames={viewModel.similarGames}
-       isSimilarGamesLoading={isSimilarGamesLoading}
-       similarGamesTitle={t('gameDetail.similarGames')}
-       relatedCardWidth={relatedCardWidth}
-       onRelatedGamePress={handleRelatedGamePress}
-       registerSectionOffset={registerSectionOffset}
-      />
+      {secondarySectionsEnabled ? (
+       <GameDetailRelatedSections
+        sameSeriesGames={viewModel.sameSeriesGames}
+        isSeriesLoading={isSeriesLoading}
+        seriesTitle={viewModel.seriesTitle}
+        dlcGames={viewModel.dlcGames}
+        isAdditionsLoading={isAdditionsLoading}
+        dlcTitle={t('gameDetail.dlc')}
+        editionGames={viewModel.editionGames}
+        editionsTitle={t('gameDetail.editions')}
+        expansionGames={viewModel.expansionGames}
+        expansionsTitle={t('gameDetail.expansions')}
+        moreFromDeveloper={viewModel.moreFromDeveloper}
+        isDeveloperGamesLoading={isDeveloperGamesLoading}
+        moreFromDeveloperTitle={viewModel.moreFromDeveloperTitle}
+        moreFromPublisher={viewModel.moreFromPublisher}
+        isPublisherGamesLoading={isPublisherGamesLoading}
+        moreFromPublisherTitle={viewModel.moreFromPublisherTitle}
+        similarGames={viewModel.similarGames}
+        isSimilarGamesLoading={isSimilarGamesLoading}
+        similarGamesTitle={t('gameDetail.similarGames')}
+        relatedCardWidth={relatedCardWidth}
+        onRelatedGamePress={handleRelatedGamePress}
+        registerSectionOffset={registerSectionOffset}
+       />
+      ) : null}
 
     </View>
    </Animated.ScrollView>

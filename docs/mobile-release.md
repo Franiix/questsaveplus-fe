@@ -27,8 +27,39 @@ Devi verificare:
 4. URL pubblici online:
    - privacy: `https://www.franiix.cloud/questsaveplus/privacy/`
    - support: `https://www.franiix.cloud/questsaveplus/support/`
+   - update manifest: `https://www.franiix.cloud/questsaveplus/update-manifest.json`
 5. store listing compilato
 6. screenshot pronti
+
+## Update manifest remoto
+
+Per mostrare in app il badge di aggiornamento disponibile, pubblica questo file JSON:
+
+```text
+/Users/franiix/Projects/Personale/QuestSave+/questsave-fe/docs/site/questsaveplus/update-manifest.json
+```
+
+sotto questo URL:
+
+```text
+https://www.franiix.cloud/questsaveplus/update-manifest.json
+```
+
+Formato:
+
+```json
+{
+  "latestVersion": "0.0.5",
+  "iosUrl": "https://apps.apple.com/it/app/questsave/id6762209970",
+  "androidUrl": "https://play.google.com/store/apps/details?id=com.franiix.questsaveplus"
+}
+```
+
+Regola pratica:
+
+- aggiorna `latestVersion` ogni volta che una nuova release e davvero online
+- lascia gli URL store stabili
+- se `latestVersion` e maggiore della versione locale, l'app mostra il badge update nella home
 
 ## Prima del rilascio: test release locale obbligatorio
 

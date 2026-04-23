@@ -19,6 +19,7 @@ type GameCarouselSectionProps = {
  onEndReached?: () => void;
  onRetry?: () => void;
  onPress: (game: GameCardItem) => void;
+ onPressIn?: (game: GameCardItem) => void;
  onLongPress?: (game: GameCardItem) => void;
 };
 
@@ -36,13 +37,20 @@ export function GameCarouselSection({
  onEndReached,
  onRetry,
  onPress,
+ onPressIn,
  onLongPress,
 }: GameCarouselSectionProps) {
  const renderItem = useCallback(
   ({ item }: { item: GameCardItem }) => (
-   <GameCard game={item} width={cardWidth} onPress={onPress} onLongPress={onLongPress} />
+   <GameCard
+    game={item}
+    width={cardWidth}
+    onPress={onPress}
+    onPressIn={onPressIn}
+    onLongPress={onLongPress}
+   />
   ),
-  [cardWidth, onLongPress, onPress],
+  [cardWidth, onLongPress, onPress, onPressIn],
  );
 
  const keyExtractor = useCallback((item: GameCardItem, index: number) => `${item.id}-${index}`, []);

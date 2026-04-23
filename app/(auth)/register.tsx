@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'expo-router';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
@@ -10,6 +9,7 @@ import { ErrorBox } from '@/components/base/feedback/ErrorBox';
 import { ScreenContainer } from '@/components/base/layout/ScreenContainer';
 import { RhfPasswordInput } from '@/components/form/RhfPasswordInput';
 import { CredentialFields } from '@/components/form/subforms/CredentialFields';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { spacing } from '@/shared/theme/tokens';
 import { createRegisterSchema, type RegisterForm } from '@/shared/validation/auth.schemas';
 import { useAuthStore } from '@/stores/auth.store';
@@ -31,7 +31,7 @@ function mapAuthError(message: string): string {
 
 export default function RegisterScreen() {
  const { t } = useTranslation();
- const router = useRouter();
+ const router = useSafeRouter();
  const { signUp, isLoading, error, clearError } = useAuthStore();
 
  const { control, handleSubmit } = useForm<RegisterForm>({

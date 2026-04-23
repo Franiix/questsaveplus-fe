@@ -1,6 +1,5 @@
-import Constants from 'expo-constants';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useMemo } from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import { useCallback, useEffect, useMemo } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useWindowDimensions } from 'react-native';
 import { AppBackground } from '@/components/base/layout/AppBackground';
@@ -8,8 +7,12 @@ import { GameDetailSheet } from '@/components/game/GameDetailSheet';
 import { GameFilterSheet } from '@/components/game/GameFilterSheet';
 import { HomeScreenContent } from '@/components/game/HomeScreenContent';
 import { HomeScreenHeader } from '@/components/game/HomeScreenHeader';
+import { useAppUpdateAvailabilityWithOptions } from '@/hooks/useAppUpdateAvailability';
+import { useDeferredInteractionGate } from '@/hooks/useDeferredInteractionGate';
 import { useHomeScreenState } from '@/hooks/useHomeScreenState';
 import { useHomeScreenViewModel } from '@/hooks/useHomeScreenViewModel';
+import { usePrefetchGameResources } from '@/hooks/usePrefetchGameResources';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import type { CatalogGame } from '@/shared/models/Catalog.model';
 import type { HomeScreenRouteParams } from '@/shared/models/home/HomeScreenRouteParams.model';
 import { colors, spacing } from '@/shared/theme/tokens';
@@ -21,9 +24,16 @@ const HORIZONTAL_PADDING = spacing.md;
 
 export default function HomeScreen() {
  const params = useLocalSearchParams<HomeScreenRouteParams>();
- const router = useRouter();
+ const router = useSafeRouter();
  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
- const appVersion = Constants.expoConfig?.version ?? '1.0.0';
+ const deferredHomeSideEffectsEnabled = useDeferredInteractionGate({ delayMs: 500 });
+ const {
+  currentVersion,
+  isUpdateAvailable,
+  latestVersion,
+  canOpenStore,
+  openStore,
+ } = useAppUpdateAvailabilityWithOptions(deferredHomeSideEffectsEnabled);
 
  const {
   activeFilterCount,
@@ -88,14 +98,35 @@ export default function HomeScreen() {
   () => Math.min(170, Math.floor(screenWidth * 0.42)),
   [screenWidth],
  );
+ const { prefetchGame, prefetchGames } = usePrefetchGameResources();
+
+ useEffect(() => {
+  if (!deferredHomeSideEffectsEnabled) {
+   return;
+  }
+
+  const primaryCandidates = isDiscoveryMode
+   ? games.slice(0, 6)
+   : homeSections.flatMap((section) => section.games.slice(0, 2)).slice(0, 8);
+
+  void prefetchGames(primaryCandidates, primaryCandidates.length);
+ }, [deferredHomeSideEffectsEnabled, games, homeSections, isDiscoveryMode, prefetchGames]);
 
  const handleGamePress = useCallback(
   (game: CatalogGame) => {
    const nextId = Number(game.gameId ?? game.externalId);
    if (!Number.isFinite(nextId)) return;
+   void prefetchGame(game);
    router.push({ pathname: '/game/[id]', params: { id: nextId } });
   },
-  [router],
+  [prefetchGame, router],
+ );
+
+ const handleGamePressIn = useCallback(
+  (game: CatalogGame) => {
+   void prefetchGame(game);
+  },
+  [prefetchGame],
  );
 
  const headerFilters = useMemo(
@@ -114,7 +145,9 @@ export default function HomeScreen() {
    <HomeScreenHeader
     activeFilterCount={activeFilterCount}
     activeFilters={headerFilters}
-    appVersion={appVersion}
+    appVersion={currentVersion}
+    isUpdateAvailable={isUpdateAvailable}
+    latestVersion={latestVersion}
     discoveryContextLabel={discoveryContextLabel}
     gamesCount={games.length}
     isDiscoveryMode={isDiscoveryMode}
@@ -122,6 +155,7 @@ export default function HomeScreen() {
     isSearchLoading={uiState.isFetching && !uiState.isFetchingNextPage && (search.length > 0 || hasActiveFilters)}
     onClearSearch={() => setSearch('')}
     onFilterPress={openFilters}
+    onPressUpdate={isUpdateAvailable && canOpenStore ? () => void openStore() : undefined}
     onSearchChange={setSearch}
     quickDiscoveryPresets={headerQuickPresets}
     search={search}
@@ -144,6 +178,7 @@ export default function HomeScreen() {
     isSectionsLoading={isSectionsLoading}
     onGameLongPress={openGameSheet}
     onGamePress={handleGamePress}
+    onGamePressIn={handleGamePressIn}
     onResetFilters={resetFilters}
     onRetryDiscovery={() => void refetchDiscovery()}
     onRetrySections={() => {

@@ -1,7 +1,9 @@
-import { FlatList, StyleSheet, View } from 'react-native';
-import { useCallback } from 'react';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { memo, useCallback, useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { BacklogListItem } from '@/components/backlog/BacklogListItem';
+import { HintBox } from '@/components/base/display/HintBox';
 import { EmptyState } from '@/components/base/feedback/EmptyState';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { FilterChipRow } from '@/components/game/FilterChipRow';
@@ -22,8 +24,11 @@ type BacklogScreenContentProps = {
  state: BacklogScreenContentState;
  onFilterChange: (value: BacklogStatusEnum | null) => void;
  onItemPress: (item: BacklogItemEntity) => void;
+ onItemPressIn?: (item: BacklogItemEntity) => void;
+ onQuickStatusChange: (item: BacklogItemEntity, status: BacklogStatusEnum) => void;
  onRefetch: () => void;
  onRequestRemove: (item: BacklogItemEntity) => void;
+ isUpdatingStatus?: boolean;
  removeLabel: string;
  retryLabel: string;
 };
@@ -39,33 +44,40 @@ const listContentStyle = StyleSheet.create({
  },
 });
 
-export function BacklogScreenContent({
+export const BacklogScreenContent = memo(function BacklogScreenContent({
  colorMap,
  iconMap,
  labelMap,
  state,
  onFilterChange,
  onItemPress,
+ onItemPressIn,
+ onQuickStatusChange,
  onRefetch,
  onRequestRemove,
+ isUpdatingStatus = false,
  removeLabel,
  retryLabel,
 }: BacklogScreenContentProps) {
  const { t } = useTranslation();
+ const [isHintExpanded, setIsHintExpanded] = useState(true);
 
  const renderItem = useCallback(
   ({ item }: { item: BacklogItemEntity }) => (
    <BacklogListItem
     item={item}
     onPress={onItemPress}
+    onPressIn={onItemPressIn}
+    onQuickStatusChange={onQuickStatusChange}
     onRequestRemove={onRequestRemove}
+    isUpdatingStatus={isUpdatingStatus}
     removeLabel={removeLabel}
     labelMap={labelMap}
     colorMap={colorMap}
     iconMap={iconMap}
    />
   ),
-  [onItemPress, onRequestRemove, removeLabel, labelMap, colorMap, iconMap],
+  [onItemPress, onItemPressIn, onQuickStatusChange, onRequestRemove, isUpdatingStatus, removeLabel, labelMap, colorMap, iconMap],
  );
 
  if (state.isReadingList) {
@@ -89,6 +101,56 @@ export function BacklogScreenContent({
    <View style={{ marginBottom: spacing.xs }}>
     <FilterChipRow activeFilter={state.activeFilter} onFilterChange={onFilterChange} />
    </View>
+   <HintBox
+    style={{
+     marginHorizontal: HORIZONTAL_PADDING,
+     marginBottom: spacing.sm,
+     gap: spacing.sm,
+    }}
+   >
+    <Pressable
+     accessibilityRole="button"
+     accessibilityLabel={
+      isHintExpanded ? t('backlog.interactionHintHide') : t('backlog.interactionHintShow')
+     }
+     onPress={() => setIsHintExpanded((current) => !current)}
+     style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    }}
+    >
+     <FontAwesome5 name="info-circle" size={14} color={colorMap.PLAYING} solid />
+     <Text
+      style={{
+       flex: 1,
+       color: '#FFFFFF',
+       fontSize: 12,
+       lineHeight: 18,
+       fontWeight: '600',
+      }}
+     >
+      {t('backlog.interactionHintTitle')}
+     </Text>
+     <FontAwesome5
+      name={isHintExpanded ? 'chevron-up' : 'chevron-down'}
+      size={12}
+      color="#FFFFFF"
+      solid
+     />
+    </Pressable>
+    {isHintExpanded ? (
+     <Text
+      style={{
+       color: '#FFFFFF',
+       fontSize: 12,
+       lineHeight: 18,
+      }}
+     >
+      {t('backlog.interactionHint')}
+     </Text>
+    ) : null}
+   </HintBox>
 
    {state.filteredItems.length === 0 ? (
     <View style={{ paddingTop: spacing.md }}>
@@ -114,4 +176,4 @@ export function BacklogScreenContent({
    )}
   </>
  );
-}
+});

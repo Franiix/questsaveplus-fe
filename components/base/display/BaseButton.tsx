@@ -15,6 +15,7 @@ import Animated, {
  withSequence,
  withTiming,
 } from 'react-native-reanimated';
+import { useSingleAction } from '@/hooks/useSingleAction';
 import { borderRadius, colors, opacity, spacing, typography } from '@/shared/theme/tokens';
 
 type ButtonVariant = 'filled' | 'outlined' | 'ghost';
@@ -297,7 +298,8 @@ export function BaseButton({
  onPress,
  ...props
 }: BaseButtonProps) {
- const isInactive = isLoading || isDisabled;
+ const { isLocked, run } = useSingleAction(onPress);
+ const isInactive = isLoading || isDisabled || isLocked;
  const resolvedColor = color ?? colors.primary.DEFAULT;
  const indicatorColor = variant === 'filled' ? colors.text.primary : resolvedColor;
  const inferred = inferButtonIcon(label, variant, color);
@@ -360,7 +362,7 @@ export function BaseButton({
     gradientColors={gradientColors}
     isInactive={isInactive}
     fullWidth={fullWidth}
-    onPress={onPress}
+    onPress={run}
    >
     {content}
    </FilledButton>
@@ -385,7 +387,7 @@ export function BaseButton({
  return (
   <TouchableOpacity
    {...props}
-   onPress={onPress}
+   onPress={run}
    disabled={isInactive}
    activeOpacity={0.75}
    style={nonFilledContainer}

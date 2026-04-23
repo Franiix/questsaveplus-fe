@@ -1,6 +1,6 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, type ViewStyle, View } from 'react-native';
 import {
  borderRadius,
  colors,
@@ -9,21 +9,21 @@ import {
  typography,
 } from '@/shared/theme/tokens';
 
-const CHIP_CONTENT_STYLE = {
+const CHIP_CONTENT_STYLE: ViewStyle = {
  minHeight: 39,
  borderRadius: borderRadius.full,
  paddingHorizontal: spacing.md + 2,
  paddingVertical: spacing.sm + 1,
- alignItems: 'center' as const,
- justifyContent: 'center' as const,
-} as const;
+ alignItems: 'center',
+ justifyContent: 'center',
+};
 
-const CHIP_CONTENT_STYLE_SELECTED = [CHIP_CONTENT_STYLE, { flexDirection: 'row', gap: 5 }] as const;
+const CHIP_CONTENT_STYLE_SELECTED: ViewStyle[] = [CHIP_CONTENT_STYLE, { flexDirection: 'row', gap: 5 }];
 
-const CHIP_CONTENT_STYLE_UNSELECTED = [
+const CHIP_CONTENT_STYLE_UNSELECTED: ViewStyle[] = [
  CHIP_CONTENT_STYLE,
  { backgroundColor: colors.background.elevated, flexDirection: 'row', gap: 5 },
-] as const;
+];
 
 const CHIP_LABEL_STYLE = {
  color: '#FFFFFF',
@@ -46,9 +46,10 @@ type FilterChipProps = {
  * Selected: sfondo tinto (15% opacità) + bordo brand.
  * Unselected: sfondo trasparente + bordo default.
  */
-export function FilterChip({ label, isSelected, onPress, isDisabled = false, icon }: FilterChipProps) {
+export function FilterChip({ label, isSelected, onPress, isDisabled = false, color, icon }: FilterChipProps) {
  const selectedColor = colors.primary.DEFAULT;
  const selectedGlow = colors.primary.glow;
+ const iconColor = color ?? '#FFFFFF';
  const containerStyle = ({ pressed }: { pressed: boolean }) => ({
   minHeight: 42,
   borderRadius: borderRadius.full,
@@ -82,13 +83,13 @@ export function FilterChip({ label, isSelected, onPress, isDisabled = false, ico
      start={{ x: 0, y: 0 }}
      end={{ x: 1, y: 0 }}
      style={CHIP_CONTENT_STYLE_SELECTED}
-    >
-     {icon ? <FontAwesome5 name={icon} size={11} color="#FFFFFF" solid /> : null}
+   >
+     {icon ? <FontAwesome5 name={icon} size={11} color={iconColor} solid /> : null}
      <Text style={CHIP_LABEL_STYLE}>{label}</Text>
     </LinearGradient>
    ) : (
     <View style={CHIP_CONTENT_STYLE_UNSELECTED}>
-     {icon ? <FontAwesome5 name={icon} size={11} color="#FFFFFF" solid /> : null}
+     {icon ? <FontAwesome5 name={icon} size={11} color={iconColor} solid /> : null}
      <Text style={CHIP_LABEL_STYLE}>{label}</Text>
     </View>
    )}

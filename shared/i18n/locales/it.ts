@@ -112,6 +112,7 @@
   sortTopRated: 'Più votati',
   sortNewest: 'Più recenti',
   sortPopular: 'Più popolari',
+  updateAvailable: 'Update {{version}}',
  },
  editProfile: {
   title: 'Modifica profilo',
@@ -198,6 +199,11 @@
    title: 'Nessun gioco con questo stato',
    subtitle: 'Prova un filtro diverso',
   },
+  interactionHintTitle: 'Azioni rapide del backlog',
+  interactionHint:
+   'Usa la barra a destra della card per i 3 stati principali. Fai swipe sulla card per rimuovere il gioco o raggiungere gli altri 2 stati.',
+  interactionHintShow: 'Mostra suggerimenti backlog',
+  interactionHintHide: 'Nascondi suggerimenti backlog',
  },
  gameDetail: {
   yourStatus: 'Il tuo stato',

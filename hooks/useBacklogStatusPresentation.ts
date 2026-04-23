@@ -36,12 +36,42 @@ export function useBacklogStatusPresentation() {
   };
 
   const statusOptions = [
-   { label: labelMap[BacklogStatusEnum.WISHLIST], value: BacklogStatusEnum.WISHLIST, icon: iconMap[BacklogStatusEnum.WISHLIST] },
-   { label: labelMap[BacklogStatusEnum.WANT_TO_PLAY], value: BacklogStatusEnum.WANT_TO_PLAY, icon: iconMap[BacklogStatusEnum.WANT_TO_PLAY] },
-   { label: labelMap[BacklogStatusEnum.PLAYING], value: BacklogStatusEnum.PLAYING, icon: iconMap[BacklogStatusEnum.PLAYING] },
-   { label: labelMap[BacklogStatusEnum.ONGOING], value: BacklogStatusEnum.ONGOING, icon: iconMap[BacklogStatusEnum.ONGOING] },
-   { label: labelMap[BacklogStatusEnum.COMPLETED], value: BacklogStatusEnum.COMPLETED, icon: iconMap[BacklogStatusEnum.COMPLETED] },
-   { label: labelMap[BacklogStatusEnum.ABANDONED], value: BacklogStatusEnum.ABANDONED, icon: iconMap[BacklogStatusEnum.ABANDONED] },
+   {
+    label: labelMap[BacklogStatusEnum.WISHLIST],
+    value: BacklogStatusEnum.WISHLIST,
+    icon: iconMap[BacklogStatusEnum.WISHLIST],
+    color: colorMap[BacklogStatusEnum.WISHLIST],
+   },
+   {
+    label: labelMap[BacklogStatusEnum.WANT_TO_PLAY],
+    value: BacklogStatusEnum.WANT_TO_PLAY,
+    icon: iconMap[BacklogStatusEnum.WANT_TO_PLAY],
+    color: colorMap[BacklogStatusEnum.WANT_TO_PLAY],
+   },
+   {
+    label: labelMap[BacklogStatusEnum.PLAYING],
+    value: BacklogStatusEnum.PLAYING,
+    icon: iconMap[BacklogStatusEnum.PLAYING],
+    color: colorMap[BacklogStatusEnum.PLAYING],
+   },
+   {
+    label: labelMap[BacklogStatusEnum.ONGOING],
+    value: BacklogStatusEnum.ONGOING,
+    icon: iconMap[BacklogStatusEnum.ONGOING],
+    color: colorMap[BacklogStatusEnum.ONGOING],
+   },
+   {
+    label: labelMap[BacklogStatusEnum.COMPLETED],
+    value: BacklogStatusEnum.COMPLETED,
+    icon: iconMap[BacklogStatusEnum.COMPLETED],
+    color: colorMap[BacklogStatusEnum.COMPLETED],
+   },
+   {
+    label: labelMap[BacklogStatusEnum.ABANDONED],
+    value: BacklogStatusEnum.ABANDONED,
+    icon: iconMap[BacklogStatusEnum.ABANDONED],
+    color: colorMap[BacklogStatusEnum.ABANDONED],
+   },
   ] as const;
 
   return {

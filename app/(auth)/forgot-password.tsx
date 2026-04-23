@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +10,7 @@ import { TextLink } from '@/components/base/display/TextLink';
 import { ErrorBox } from '@/components/base/feedback/ErrorBox';
 import { ScreenContainer } from '@/components/base/layout/ScreenContainer';
 import { RhfEmailInput } from '@/components/form/RhfEmailInput';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 import {
  createForgotPasswordSchema,
@@ -20,7 +20,7 @@ import { useAuthStore } from '@/stores/auth.store';
 
 export default function ForgotPasswordScreen() {
  const { t } = useTranslation();
- const router = useRouter();
+ const router = useSafeRouter();
  const { resetPassword, isLoading, error, clearError } = useAuthStore();
  const [sent, setSent] = useState(false);
 

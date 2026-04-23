@@ -7,6 +7,7 @@ type HomeSectionParams = {
  queryKey: string;
  dates: string;
  ordering: string;
+ enabled?: boolean;
  genres?: string;
  tags?: string;
  categories?: string;
@@ -21,6 +22,7 @@ export function useHomeSectionGames({
  queryKey,
  dates,
  ordering,
+ enabled = true,
  genres,
  tags,
  categories,
@@ -67,5 +69,6 @@ export function useHomeSectionGames({
   },
   initialPageParam: 1,
   staleTime: 5 * 60 * 1000,
+  enabled,
  });
 }

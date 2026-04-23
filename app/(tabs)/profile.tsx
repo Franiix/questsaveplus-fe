@@ -1,5 +1,4 @@
-import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,6 +11,8 @@ import { ScreenHeader } from '@/components/base/layout/ScreenHeader';
 import { DeleteAccountModal } from '@/components/profile/DeleteAccountModal';
 import { ProfileHero } from '@/components/profile/ProfileHero';
 import { ProfileStatsCard } from '@/components/profile/ProfileStatsCard';
+import { useDeferredInteractionGate } from '@/hooks/useDeferredInteractionGate';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { colors, spacing } from '@/shared/theme/tokens';
 import { formatDate } from '@/shared/utils/date';
@@ -21,24 +22,30 @@ import { useProfileStore } from '@/stores/profile.store';
 
 export default function ProfileScreen() {
   const { t, i18n } = useTranslation();
-  const router = useRouter();
+  const router = useSafeRouter();
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const handleBackPress = () => {
+  const handleBackPress = useCallback(() => {
     router.replace('/(tabs)');
-  };
+  }, [router]);
   const insets = useSafeAreaInsets();
-  const {
-    signOut,
-    deleteAccount,
-    clearError: clearAuthError,
-    error: authError,
-    isLoading: isAuthMutating,
-    session,
-  } = useAuthStore();
-  const { profile, isLoading } = useProfileStore();
-  const { backlogItems, readAll, clearBacklog } = useBacklogStore();
+  const signOut = useAuthStore((state) => state.signOut);
+  const deleteAccount = useAuthStore((state) => state.deleteAccount);
+  const clearAuthError = useAuthStore((state) => state.clearError);
+  const authError = useAuthStore((state) => state.error);
+  const isAuthMutating = useAuthStore((state) => state.isLoading);
+  const session = useAuthStore((state) => state.session);
+  const profile = useProfileStore((state) => state.profile);
+  const isLoading = useProfileStore((state) => state.isLoading);
+  const backlogItems = useBacklogStore((state) => state.backlogItems);
+  const readAll = useBacklogStore((state) => state.readAll);
+  const clearBacklog = useBacklogStore((state) => state.clearBacklog);
 
   const userId = session?.user?.id;
+  const shouldHydrateProfileStats = Boolean(userId) && backlogItems.length === 0;
+  const deferredStatsLoadEnabled = useDeferredInteractionGate({
+    enabled: shouldHydrateProfileStats,
+    delayMs: 450,
+  });
 
   async function handleDeleteAccount(confirmation: string) {
     const deleted = await deleteAccount(confirmation);
@@ -53,8 +60,12 @@ export default function ProfileScreen() {
       return;
     }
 
+    if (!deferredStatsLoadEnabled) {
+      return;
+    }
+
     void readAll(userId);
-  }, [clearBacklog, readAll, userId]);
+  }, [clearBacklog, deferredStatsLoadEnabled, readAll, userId]);
 
   const stats = useMemo(
     () => ({

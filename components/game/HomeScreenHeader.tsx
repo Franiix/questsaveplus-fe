@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { SearchFilterToolbar } from '@/components/base/layout/SearchFilterToolbar';
 import { AppliedGameFiltersRow } from '@/components/game/AppliedGameFiltersRow';
 import { QuickDiscoveryPresetsRow } from '@/components/game/QuickDiscoveryPresetsRow';
@@ -11,6 +12,8 @@ type HomeScreenHeaderProps = {
  activeFilterCount: number;
  activeFilters: HomeAppliedFilterChip[];
  appVersion: string;
+ isUpdateAvailable?: boolean;
+ latestVersion?: string | null;
  discoveryContextLabel: string | null;
  gamesCount: number;
  isDiscoveryMode: boolean;
@@ -18,6 +21,7 @@ type HomeScreenHeaderProps = {
  isSearchLoading: boolean;
  onClearSearch: () => void;
  onFilterPress: () => void;
+ onPressUpdate?: () => void;
  onSearchChange: (value: string) => void;
  quickDiscoveryPresets: HomeQuickPresetAction[];
  search: string;
@@ -27,6 +31,8 @@ export function HomeScreenHeader({
  activeFilterCount,
  activeFilters,
  appVersion,
+ isUpdateAvailable = false,
+ latestVersion = null,
  discoveryContextLabel,
  gamesCount,
  isDiscoveryMode,
@@ -34,6 +40,7 @@ export function HomeScreenHeader({
  isSearchLoading,
  onClearSearch,
  onFilterPress,
+ onPressUpdate,
  onSearchChange,
  quickDiscoveryPresets,
  search,
@@ -72,6 +79,35 @@ export function HomeScreenHeader({
      >
       v{appVersion}
      </Text>
+     {isUpdateAvailable && onPressUpdate ? (
+      <Pressable
+       onPress={onPressUpdate}
+       style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        paddingHorizontal: spacing.sm,
+        paddingVertical: 4,
+        borderRadius: 999,
+        backgroundColor: `${colors.success}22`,
+        borderWidth: 1,
+        borderColor: `${colors.success}55`,
+       }}
+      >
+       <FontAwesome5 name="download" size={10} color={colors.success} solid />
+       <Text
+        style={{
+         fontFamily: typography.font.semibold,
+         fontSize: typography.size.xs,
+         color: colors.success,
+         letterSpacing: typography.letterSpacing.wide,
+         textTransform: 'uppercase',
+        }}
+       >
+        {t('home.updateAvailable', { version: latestVersion ?? appVersion })}
+       </Text>
+      </Pressable>
+     ) : null}
     </View>
 
     {isDiscoveryMode && gamesCount > 0 ? (

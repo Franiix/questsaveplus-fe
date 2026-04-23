@@ -9,6 +9,8 @@ import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 type StatusOption = {
  label: string;
  value: BacklogStatusEnum;
+ icon?: string;
+ color?: string;
 };
 
 type GameDetailOverviewViewModel = {

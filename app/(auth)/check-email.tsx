@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { AuthMessageAccent } from '@/components/auth/AuthMessageAccent';
@@ -6,11 +5,12 @@ import { AuthStatusIcon } from '@/components/auth/AuthStatusIcon';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { HintBox } from '@/components/base/display/HintBox';
 import { ScreenContainer } from '@/components/base/layout/ScreenContainer';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 
 export default function CheckEmailScreen() {
  const { t } = useTranslation();
- const router = useRouter();
+ const router = useSafeRouter();
 
  return (
   <ScreenContainer

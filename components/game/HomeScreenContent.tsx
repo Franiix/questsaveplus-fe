@@ -57,6 +57,7 @@ type HomeScreenContentProps = {
  isSectionsLoading: boolean;
  onGameLongPress: (game: CatalogGame) => void;
  onGamePress: (game: CatalogGame) => void;
+ onGamePressIn: (game: CatalogGame) => void;
  onResetFilters: () => void;
  onRetryDiscovery: () => void;
  onRetrySections: () => void;
@@ -87,6 +88,7 @@ export function HomeScreenContent({
  isSectionsLoading,
  onGameLongPress,
  onGamePress,
+ onGamePressIn,
  onResetFilters,
  onRetryDiscovery,
  onRetrySections,
@@ -126,9 +128,15 @@ export function HomeScreenContent({
  const renderDiscoveryItem = useMemo(
   () =>
    ({ item }: { item: CatalogGame }) => (
-    <GameCard game={item} width={cardWidth} onPress={onGamePress} onLongPress={onGameLongPress} />
+    <GameCard
+     game={item}
+     width={cardWidth}
+     onPress={onGamePress}
+     onPressIn={onGamePressIn}
+     onLongPress={onGameLongPress}
+    />
    ),
-  [cardWidth, onGameLongPress, onGamePress],
+  [cardWidth, onGameLongPress, onGamePress, onGamePressIn],
  );
 
  const discoveryFooter = useMemo(() => {
@@ -165,7 +173,7 @@ export function HomeScreenContent({
    <View style={{ paddingHorizontal: HORIZONTAL_PADDING, paddingTop: spacing.sm }}>
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: COLUMN_GAP }}>
      {Array.from({ length: 6 }).map((_, index) => (
-      <GameCardSkeleton
+     <GameCardSkeleton
        // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton grid, no reordering
        key={index}
        width={cardWidth}
@@ -293,13 +301,14 @@ export function HomeScreenContent({
     {homeSections.map((section) => (
      <GameCarouselSection
       key={section.key}
-      title={section.title}
-      games={[]}
-      cardWidth={carouselCardWidth}
-      isLoading
-      onPress={onGamePress}
-      onLongPress={onGameLongPress}
-     />
+     title={section.title}
+     games={[]}
+     cardWidth={carouselCardWidth}
+     isLoading
+     onPress={onGamePress}
+     onPressIn={onGamePressIn}
+     onLongPress={onGameLongPress}
+    />
     ))}
    </View>
   );
@@ -332,6 +341,7 @@ export function HomeScreenContent({
      onEndReached={section.onEndReached}
      onRetry={section.onRetry}
      onPress={onGamePress}
+     onPressIn={onGamePressIn}
      onLongPress={onGameLongPress}
     />
    ))}

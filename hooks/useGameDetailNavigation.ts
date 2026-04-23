@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { useRouter } from 'expo-router';
+import { usePrefetchGameResources } from '@/hooks/usePrefetchGameResources';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import type { CatalogGame } from '@/shared/models/Catalog.model';
 import { getCatalogGameNumericId } from '@/shared/utils/catalogGame';
 
@@ -22,15 +23,17 @@ export function useGameDetailNavigation({
  publisherName,
  publisherSlug,
 }: UseGameDetailNavigationParams) {
- const router = useRouter();
+ const router = useSafeRouter();
+ const { prefetchGame } = usePrefetchGameResources();
 
  const handleRelatedGamePress = useCallback(
   (relatedGame: CatalogGame) => {
    const relatedGameId = getCatalogGameNumericId(relatedGame);
    if (relatedGameId === null) return;
+   void prefetchGame(relatedGame);
    router.push({ pathname: '/game/[id]', params: { id: relatedGameId } });
   },
-  [router],
+  [prefetchGame, router],
  );
 
  const handleDeveloperPress = useCallback(() => {

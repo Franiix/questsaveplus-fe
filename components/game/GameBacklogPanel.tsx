@@ -11,6 +11,8 @@ import { colors, spacing, typography } from '@/shared/theme/tokens';
 type StatusOption = {
  label: string;
  value: BacklogStatusEnum;
+ icon?: React.ComponentProps<typeof import('@expo/vector-icons').FontAwesome5>['name'];
+ color?: string;
 };
 
 type GameBacklogPanelProps = {

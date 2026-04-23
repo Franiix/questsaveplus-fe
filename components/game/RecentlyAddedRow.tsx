@@ -1,9 +1,11 @@
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
 import { ImageWithFallback } from '@/components/base/display/ImageWithFallback';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
+import { usePrefetchGameResources } from '@/hooks/usePrefetchGameResources';
+import { useSingleAction } from '@/hooks/useSingleAction';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
 import { useAuthStore } from '@/stores/auth.store';
@@ -14,9 +16,10 @@ const CARD_HEIGHT = 160;
 
 export function RecentlyAddedRow() {
   const { t } = useTranslation();
-  const router = useRouter();
+  const router = useSafeRouter();
   const { session } = useAuthStore();
   const { recentBacklogItems, readAll, clearBacklog } = useBacklogStore();
+  const { prefetchGameById } = usePrefetchGameResources();
 
   const userId = session?.user?.id;
 
@@ -28,6 +31,14 @@ export function RecentlyAddedRow() {
 
     void readAll(userId, { orderBy: 'added_at', limit: 5, target: 'recentBacklogItems' });
   }, [clearBacklog, readAll, userId]);
+
+  useEffect(() => {
+    void Promise.all(
+      recentBacklogItems.slice(0, 4).map((item) =>
+        prefetchGameById(item.game_id, item.game_cover_url ? [item.game_cover_url] : []),
+      ),
+    );
+  }, [prefetchGameById, recentBacklogItems]);
 
   const handlePress = useCallback(
     (item: BacklogItemEntity) => {
@@ -47,39 +58,53 @@ export function RecentlyAddedRow() {
         keyExtractor={(item) => item.id}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: spacing.md, gap: spacing.sm }}
-        renderItem={({ item }) => (
-          <Pressable onPress={() => handlePress(item)}>
-            <View
-              style={{
-                width: CARD_WIDTH,
-                height: CARD_HEIGHT,
-                borderRadius: borderRadius.md,
-                overflow: 'hidden',
-                backgroundColor: colors.background.surface,
-              }}
-            >
-              <ImageWithFallback
-                uri={item.game_cover_url}
-                width={CARD_WIDTH}
-                height={CARD_HEIGHT}
-                radius={borderRadius.md}
-              />
-            </View>
-            <Text
-              numberOfLines={1}
-              style={{
-                color: colors.text.secondary,
-                fontSize: typography.size.xs,
-                fontFamily: typography.font.medium,
-                marginTop: spacing.xs,
-                width: CARD_WIDTH,
-              }}
-            >
-              {item.game_name}
-            </Text>
-          </Pressable>
-        )}
+        renderItem={({ item }) => <RecentlyAddedCard item={item} onPress={handlePress} />}
       />
     </View>
   );
+}
+
+function RecentlyAddedCard({
+ item,
+ onPress,
+}: {
+ item: BacklogItemEntity;
+ onPress: (item: BacklogItemEntity) => void;
+}) {
+ const { isLocked, run } = useSingleAction(() => onPress(item));
+
+ return (
+  <Pressable onPress={run} disabled={isLocked}>
+   <View
+    style={{
+     width: CARD_WIDTH,
+     height: CARD_HEIGHT,
+     borderRadius: borderRadius.md,
+     overflow: 'hidden',
+     backgroundColor: colors.background.surface,
+     opacity: isLocked ? 0.72 : 1,
+    }}
+   >
+    <ImageWithFallback
+     uri={item.game_cover_url}
+     width={CARD_WIDTH}
+     height={CARD_HEIGHT}
+     radius={borderRadius.md}
+    />
+   </View>
+   <Text
+    numberOfLines={1}
+    style={{
+     color: colors.text.secondary,
+     fontSize: typography.size.xs,
+     fontFamily: typography.font.medium,
+     marginTop: spacing.xs,
+     width: CARD_WIDTH,
+     opacity: isLocked ? 0.72 : 1,
+    }}
+   >
+    {item.game_name}
+   </Text>
+  </Pressable>
+ );
 }

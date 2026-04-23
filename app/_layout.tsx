@@ -52,8 +52,8 @@ function AuthGuard() {
   profile,
   currentUserId,
   hasResolvedProfile,
-  isLoading: isProfileLoading,
-  fetchProfile,
+  isBootstrapping,
+  ensureProfile,
   clearProfile,
  } = useProfileStore();
 
@@ -64,11 +64,11 @@ function AuthGuard() {
  // Fetch profilo solo quando cambia lo userId (non a ogni navigazione)
  useEffect(() => {
   if (session?.user?.id) {
-   fetchProfile(session.user.id).then();
+   void ensureProfile(session.user.id);
   } else {
    clearProfile();
   }
- }, [session?.user?.id, clearProfile, fetchProfile]);
+ }, [session?.user?.id, clearProfile, ensureProfile]);
 
  const inAuthGroup = segments[0] === '(auth)';
  const inCheckEmail = inAuthGroup && segments[1] === 'check-email';
@@ -76,7 +76,7 @@ function AuthGuard() {
  const shouldBootstrapProfile =
   !inCheckEmail &&
   Boolean(session?.user?.id) &&
-  (isProfileLoading || currentUserId !== session?.user?.id || !hasResolvedProfile);
+  (isBootstrapping || currentUserId !== session?.user?.id || !hasResolvedProfile);
 
  useEffect(() => {
   if (isAuthLoading || shouldBootstrapProfile) return;

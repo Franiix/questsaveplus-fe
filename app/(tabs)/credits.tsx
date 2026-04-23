@@ -1,7 +1,6 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
-import { useRouter } from 'expo-router';
-import type { ReactNode } from 'react';
+import { useCallback, useMemo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,6 +9,7 @@ import { ExternalLinkCard } from '@/components/base/display/ExternalLinkCard';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { ScreenHeader } from '@/components/base/layout/ScreenHeader';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { getLegalDocumentUrl, type LegalDocumentKey } from '@/shared/config/legal';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 
@@ -117,67 +117,76 @@ function CreditsSection({
 
 export default function CreditsScreen() {
  const { t } = useTranslation();
- const router = useRouter();
- const handleBackPress = () => {
+ const router = useSafeRouter();
+ const handleBackPress = useCallback(() => {
   router.replace('/(tabs)');
- };
+ }, [router]);
 
- const dataSources: CreditLink[] = [
-  {
-   key: 'igdb',
-   title: 'IGDB',
-   subtitle: t('credits.igdbSubtitle'),
-   accentColor: '#8B7BFF',
-   mark: <BrandMark label="IGDB" accentColor="#8B7BFF" />,
-   url: 'https://www.igdb.com',
-  },
- ];
+ const dataSources: CreditLink[] = useMemo(
+  () => [
+   {
+    key: 'igdb',
+    title: 'IGDB',
+    subtitle: t('credits.igdbSubtitle'),
+    accentColor: '#8B7BFF',
+    mark: <BrandMark label="IGDB" accentColor="#8B7BFF" />,
+    url: 'https://www.igdb.com',
+   },
+  ],
+  [t],
+ );
 
- const creatorLinks: CreditLink[] = [
-  {
-   key: 'github',
-   title: 'GitHub',
-   subtitle: t('credits.githubSubtitle'),
-   accentColor: '#F4F4FF',
-   mark: <BrandMark iconName="github" brand accentColor="#F4F4FF" label="GH" />,
-   url: 'https://github.com/Franiix',
-  },
-  {
-   key: 'linkedin',
-   title: 'LinkedIn',
-   subtitle: t('credits.linkedinSubtitle'),
-   accentColor: '#0A66C2',
-   mark: <BrandMark iconName="linkedin-in" brand accentColor="#0A66C2" label="in" />,
-   url: 'https://www.linkedin.com/in/francesco-scamardella/',
-  },
- ];
+ const creatorLinks: CreditLink[] = useMemo(
+  () => [
+   {
+    key: 'github',
+    title: 'GitHub',
+    subtitle: t('credits.githubSubtitle'),
+    accentColor: '#F4F4FF',
+    mark: <BrandMark iconName="github" brand accentColor="#F4F4FF" label="GH" />,
+    url: 'https://github.com/Franiix',
+   },
+   {
+    key: 'linkedin',
+    title: 'LinkedIn',
+    subtitle: t('credits.linkedinSubtitle'),
+    accentColor: '#0A66C2',
+    mark: <BrandMark iconName="linkedin-in" brand accentColor="#0A66C2" label="in" />,
+    url: 'https://www.linkedin.com/in/francesco-scamardella/',
+   },
+  ],
+  [t],
+ );
 
- const legalLinks: CreditLink[] = [
-  {
-   key: 'terms',
-   title: t('credits.termsTitle'),
-   subtitle: t('credits.termsSubtitle'),
-   accentColor: '#7B73FF',
-   mark: <BrandMark iconName="file-contract" accentColor="#7B73FF" label="T" />,
-   legalDocumentKey: 'terms',
-  },
-  {
-   key: 'privacy',
-   title: t('credits.privacyTitle'),
-   subtitle: t('credits.privacySubtitle'),
-   accentColor: '#3AA7FF',
-   mark: <BrandMark iconName="user-shield" accentColor="#3AA7FF" label="P" />,
-   legalDocumentKey: 'privacy',
-  },
-  {
-   key: 'policy',
-   title: t('credits.policyTitle'),
-   subtitle: t('credits.policySubtitle'),
-   accentColor: '#14C38E',
-   mark: <BrandMark iconName="shield-alt" accentColor="#14C38E" label="S" />,
-   legalDocumentKey: 'policy',
-  },
- ];
+ const legalLinks: CreditLink[] = useMemo(
+  () => [
+   {
+    key: 'terms',
+    title: t('credits.termsTitle'),
+    subtitle: t('credits.termsSubtitle'),
+    accentColor: '#7B73FF',
+    mark: <BrandMark iconName="file-contract" accentColor="#7B73FF" label="T" />,
+    legalDocumentKey: 'terms',
+   },
+   {
+    key: 'privacy',
+    title: t('credits.privacyTitle'),
+    subtitle: t('credits.privacySubtitle'),
+    accentColor: '#3AA7FF',
+    mark: <BrandMark iconName="user-shield" accentColor="#3AA7FF" label="P" />,
+    legalDocumentKey: 'privacy',
+   },
+   {
+    key: 'policy',
+    title: t('credits.policyTitle'),
+    subtitle: t('credits.policySubtitle'),
+    accentColor: '#14C38E',
+    mark: <BrandMark iconName="shield-alt" accentColor="#14C38E" label="S" />,
+    legalDocumentKey: 'policy',
+   },
+  ],
+  [t],
+ );
 
  return (
   <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>

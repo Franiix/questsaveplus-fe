@@ -5,7 +5,6 @@ import { useWindowDimensions, View } from 'react-native';
 import Animated, {
  useAnimatedStyle,
  useSharedValue,
- withRepeat,
  withTiming,
 } from 'react-native-reanimated';
 import { borderRadius as borderRadiusTokens, colors } from '@/shared/theme/tokens';
@@ -37,7 +36,8 @@ export function Skeleton({ width, height, borderRadius, style }: SkeletonProps) 
  const translateX = useSharedValue(-screenWidth);
 
  useEffect(() => {
-  translateX.value = withRepeat(withTiming(screenWidth, { duration: 1200 }), -1, false);
+  translateX.value = -screenWidth;
+  translateX.value = withTiming(screenWidth, { duration: 1400 });
  }, [translateX, screenWidth]);
 
  const shimmerStyle = useAnimatedStyle(() => ({

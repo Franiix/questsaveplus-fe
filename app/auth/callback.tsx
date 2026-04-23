@@ -11,13 +11,14 @@
  *   2. L'app deve essere una build nativa (expo run:ios / EAS Build).
  *      Expo Go non registra lo scheme personalizzato e non può aprire questsave://.
  */
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { AuthMessageAccent } from '@/components/auth/AuthMessageAccent';
 import { AuthStatusIcon } from '@/components/auth/AuthStatusIcon';
 import { BaseButton } from '@/components/base/display/BaseButton';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { supabase } from '@/lib/supabase';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 
@@ -34,7 +35,7 @@ type CallbackParams = {
 
 export default function AuthCallbackScreen() {
  const { t } = useTranslation();
- const router = useRouter();
+ const router = useSafeRouter();
  const [status, setStatus] = useState<CallbackStatus>('loading');
  const processed = useRef(false);
 

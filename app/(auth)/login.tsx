@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'expo-router';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
@@ -8,6 +7,7 @@ import { TextLink } from '@/components/base/display/TextLink';
 import { ErrorBox } from '@/components/base/feedback/ErrorBox';
 import { ScreenContainer } from '@/components/base/layout/ScreenContainer';
 import { CredentialFields } from '@/components/form/subforms/CredentialFields';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import {
  type AuthCredentialsModel,
  authCredentialsDefaultValues,
@@ -29,7 +29,7 @@ function mapAuthError(message: string): string {
 
 export default function LoginScreen() {
  const { t } = useTranslation();
- const router = useRouter();
+ const router = useSafeRouter();
  const { signIn, isLoading, error, clearError } = useAuthStore();
 
  const { control, handleSubmit } = useForm<AuthCredentialsModel>({

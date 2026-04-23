@@ -5,7 +5,6 @@ import { Pressable, Text, View } from 'react-native';
 import Animated, {
  useAnimatedStyle,
  useSharedValue,
- withRepeat,
  withSequence,
  withSpring,
  withTiming,
@@ -14,6 +13,7 @@ import { ImageWithFallback } from '@/components/base/display/ImageWithFallback';
 import { MetacriticBadge } from '@/components/base/display/MetacriticBadge';
 import { PlatformIconRow } from '@/components/base/display/PlatformIconRow';
 import { RatingBadge } from '@/components/base/display/RatingBadge';
+import { useSingleAction } from '@/hooks/useSingleAction';
 import type { CatalogGame } from '@/shared/models/Catalog.model';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 
@@ -58,6 +58,7 @@ type GameCardProps = {
  game: GameCardItem;
  width: number;
  onPress?: (game: GameCardItem) => void;
+ onPressIn?: (game: GameCardItem) => void;
  onLongPress?: (game: GameCardItem) => void;
  backlogStatus?: string | null;
 };
@@ -87,7 +88,14 @@ function getGamePrimaryGenre(game: GameCardItem) {
  return game.genres[0] ?? null;
 }
 
-export const GameCard = memo(function GameCard({ game, width, onPress, onLongPress, backlogStatus }: GameCardProps) {
+export const GameCard = memo(function GameCard({
+ game,
+ width,
+ onPress,
+ onPressIn,
+ onLongPress,
+ backlogStatus,
+}: GameCardProps) {
  const { t, i18n } = useTranslation();
  const cardHeight = Math.round(width * 1.42);
  const displayRating = getGameDisplayRating(game);
@@ -110,9 +118,9 @@ export const GameCard = memo(function GameCard({ game, width, onPress, onLongPre
 
  useEffect(() => {
   if (isPlaying) {
-   dotOpacity.value = withRepeat(
-    withSequence(withTiming(0.3, { duration: 900 }), withTiming(1, { duration: 900 })),
-    -1,
+   dotOpacity.value = withSequence(
+    withTiming(0.45, { duration: 700 }),
+    withTiming(1, { duration: 700 }),
    );
   } else {
    dotOpacity.value = 1;
@@ -120,15 +128,21 @@ export const GameCard = memo(function GameCard({ game, width, onPress, onLongPre
  }, [isPlaying, dotOpacity]);
 
  const dotAnimStyle = useAnimatedStyle(() => ({ opacity: dotOpacity.value }));
+ const { isLocked, run } = useSingleAction(onPress ? () => onPress(game) : null);
+ const { run: runLongPress } = useSingleAction(onLongPress ? () => onLongPress(game) : null, {
+  cooldownMs: 1200,
+ });
 
  const dotColor = backlogStatus ? statusDotColor(backlogStatus) : null;
 
  return (
   <Pressable
-   onPress={() => onPress?.(game)}
-   onLongPress={() => onLongPress?.(game)}
+   onPress={run}
+   onLongPress={runLongPress}
+   disabled={isLocked}
    delayLongPress={400}
    onPressIn={() => {
+    onPressIn?.(game);
     scale.value = withSpring(0.96, SPRING_CONFIG);
    }}
    onPressOut={() => {
@@ -139,11 +153,12 @@ export const GameCard = memo(function GameCard({ game, width, onPress, onLongPre
     style={[
      cardStyle,
      {
-      width,
-      height: cardHeight,
-      borderRadius: 18,
-      overflow: 'hidden',
-      backgroundColor: colors.background.surface,
+     width,
+     height: cardHeight,
+     borderRadius: 18,
+     overflow: 'hidden',
+     backgroundColor: colors.background.surface,
+      opacity: isLocked ? 0.78 : 1,
      },
     ]}
    >

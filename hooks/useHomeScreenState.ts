@@ -1,6 +1,6 @@
-import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import type { CatalogGame } from '@/shared/models/Catalog.model';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import type { HomeOrdering } from '@/shared/models/home/HomeOrdering.model';
@@ -13,7 +13,7 @@ type UseHomeScreenStateParams = {
 };
 
 export function useHomeScreenState({ params }: UseHomeScreenStateParams) {
- const router = useRouter();
+ const router = useSafeRouter();
  const [search, setSearch] = useState('');
  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
  const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
