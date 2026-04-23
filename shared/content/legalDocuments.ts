@@ -4,13 +4,12 @@ type LegalDocumentType = 'terms' | 'privacy' | 'policy';
 type SupportedLegalLanguage = 'it' | 'en';
 
 const OWNER_NAME = 'Francesco Scamardella';
-const SUPPORT_EMAIL = 'questsaveplus@franiix.cloud';
+const SUPPORT_EMAIL = 'supportoquestsaveplus@franiix.cloud';
 
 const itDocuments: Record<LegalDocumentType, LegalDocument> = {
  terms: {
   title: 'Termini di utilizzo',
-  subtitle:
-   "Questi termini regolano l'uso dell'app QuestSave+, dei servizi collegati e delle eventuali funzionalita' premium rese disponibili nel tempo.",
+  subtitle: "Questi termini regolano l'uso dell'app QuestSave+ e dei servizi collegati.",
   lastUpdated: 'Ultimo aggiornamento: 10 aprile 2026',
   sections: [
    {
@@ -24,7 +23,7 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
     title: '2. Oggetto del servizio',
     paragraphs: [
      "QuestSave+ e' un'app dedicata alla scoperta, organizzazione e consultazione di videogiochi, del proprio backlog e di contenuti informativi collegati.",
-     "Il servizio puo' essere inizialmente gratuito, includere in futuro pubblicita' e, successivamente, offrire funzionalita' premium tramite abbonamenti mensili o annuali acquistabili su App Store o Google Play.",
+     "Il servizio e' attualmente gratuito e non richiede acquisti interni o piani riservati.",
     ],
    },
    {
@@ -56,23 +55,14 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
     ],
    },
    {
-    title: '6. Funzioni premium, pubblicita e acquisti in-app',
+    title: '6. Stato gratuito del servizio',
     paragraphs: [
-     "QuestSave+ puo' restare gratuita in una prima fase. In una fase successiva potrebbero essere introdotte pubblicita' e, successivamente, funzioni premium.",
-     "Gli eventuali abbonamenti premium potranno essere mensili o annuali, con una prova gratuita iniziale di 48 ore e rinnovo automatico salvo cancellazione nei tempi previsti dallo store.",
-     "Gli acquisti in-app e gli abbonamenti effettuati su iOS o Android sono gestiti rispettivamente da Apple o Google tramite i relativi sistemi di pagamento.",
+     "QuestSave+ e' gratuita. Al momento non sono previsti costi, acquisti interni, piani riservati o annunci integrati.",
+     "QuestSave+ non gestisce addebiti o rinnovi automatici collegati a funzionalita dell'app.",
     ],
    },
    {
-    title: '7. Rinnovo, cancellazione e rimborsi',
-    paragraphs: [
-     "Gli eventuali abbonamenti si rinnoveranno automaticamente salvo cancellazione da parte dell'utente tramite il proprio account App Store o Google Play prima della data di rinnovo.",
-     "Le richieste di rimborso per acquisti effettuati tramite gli store mobili sono soggette alle regole della piattaforma di pagamento utilizzata e alle norme inderogabili a tutela dei consumatori applicabili nel Paese dell'utente.",
-     `Quando possibile, l'utente puo' anche contattarci a ${SUPPORT_EMAIL} per ricevere supporto sulla procedura corretta o per far valere eventuali diritti previsti dalla legge.`,
-    ],
-   },
-   {
-    title: "8. Eliminazione dell'account",
+    title: "7. Eliminazione dell'account",
     paragraphs: [
      "L'utente puo' richiedere l'eliminazione del proprio account direttamente dall'app.",
      `In alternativa, puo' inviare una richiesta a ${SUPPORT_EMAIL}.`,
@@ -80,21 +70,21 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
     ],
    },
    {
-    title: '9. Sospensione o cessazione del servizio',
+    title: '8. Sospensione o cessazione del servizio',
     paragraphs: [
      "Possiamo limitare, sospendere o interrompere l'accesso al servizio in caso di uso illecito, abuso, violazione di questi termini o rischi per la sicurezza dell'app e degli altri utenti.",
      "Possiamo inoltre modificare, aggiornare o interrompere alcune funzionalita dell'app, anche per ragioni tecniche o di business.",
     ],
    },
    {
-    title: '10. Proprieta intellettuale',
+    title: '9. Proprieta intellettuale',
     paragraphs: [
      "Il marchio QuestSave+, l'interfaccia dell'app, il design, i testi originali e i materiali creati per il servizio restano di proprieta del titolare del progetto o dei rispettivi licenzianti.",
      "I marchi, i nomi dei videogiochi e i contenuti di terzi restano di proprieta dei rispettivi titolari.",
     ],
    },
    {
-    title: '11. Legge applicabile e mercato iniziale',
+    title: '10. Legge applicabile e mercato iniziale',
     paragraphs: [
      "Il servizio e' inizialmente rivolto al mercato italiano.",
      "I presenti termini sono regolati dalla legge italiana, salvo diversa applicazione di norme imperative a tutela dei consumatori residenti in altri Paesi.",
@@ -121,8 +111,7 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
      'dati di account, come email, identificativo utente, username, nome visualizzato, avatar, data di nascita e genere se forniti',
      'dati di utilizzo del servizio, come backlog, stati dei giochi, preferenze e interazioni con alcune funzioni',
      'dati tecnici e di sicurezza, come log essenziali, identificativi tecnici, crash report e informazioni sul dispositivo',
-     "dati relativi a pagamenti e abbonamenti, come stato dell'abbonamento e conferma del piano acquistato tramite Apple o Google",
-     "dati legati a pubblicita o analytics, solo se e quando tali strumenti verranno effettivamente attivati e nel rispetto delle regole applicabili",
+     'dati forniti nelle richieste di supporto, come testo della segnalazione e informazioni necessarie a risolvere il problema',
     ],
    },
    {
@@ -131,8 +120,7 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
      "fornire il servizio richiesto dall'utente e gestire l'account: esecuzione del contratto",
      'mantenere sicurezza, prevenire abusi e proteggere il servizio: legittimo interesse e, se necessario, obblighi di legge',
      'gestire richieste di supporto, eliminazione account e contestazioni: esecuzione del contratto e obblighi di legge',
-     'gestire eventuali pagamenti, rinnovi e stato premium: esecuzione del contratto',
-     'misurare uso, performance o campagne pubblicitarie future ove richiesto: consenso, quando previsto dalla normativa applicabile',
+     'migliorare stabilita, sicurezza e performance del servizio: legittimo interesse, nei limiti consentiti dalla normativa applicabile',
     ],
    },
    {
@@ -147,7 +135,7 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
     paragraphs: [
      "L'utente puo' richiedere l'eliminazione dell'account direttamente dall'app.",
      `In alternativa, puo' scrivere a ${SUPPORT_EMAIL}.`,
-     "L'eliminazione dell'account non impedisce la conservazione temporanea di alcuni dati quando cio sia necessario per obblighi di legge, sicurezza, prevenzione frodi o gestione di reclami e rimborsi.",
+     "L'eliminazione dell'account non impedisce la conservazione temporanea di alcuni dati quando cio sia necessario per obblighi di legge, sicurezza, prevenzione frodi o gestione di reclami.",
     ],
    },
    {
@@ -166,7 +154,7 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
    {
     title: '7. Sicurezza e terzi',
     paragraphs: [
-     "Possiamo condividere dati solo con soggetti necessari a fornire il servizio, ad esempio fornitori infrastrutturali, autenticazione, database, piattaforme di pagamento in-app e altri strumenti tecnici eventualmente attivati.",
+     "Possiamo condividere dati solo con soggetti necessari a fornire il servizio, ad esempio fornitori infrastrutturali, autenticazione, database e altri strumenti tecnici necessari al funzionamento dell'app.",
      "Adottiamo misure tecniche e organizzative ragionevoli per ridurre i rischi di accesso non autorizzato, perdita, distruzione o divulgazione impropria dei dati.",
     ],
    },
@@ -180,54 +168,39 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
   ],
  },
  policy: {
-  title: 'Policy abbonamenti, pubblicita e rimborsi',
+  title: "Stato gratuito dell'app",
   subtitle:
-   "Questa policy descrive come QuestSave+ gestisce funzioni premium, rinnovi, pubblicita, cancellazioni e richieste di rimborso quando tali modelli saranno attivati.",
+   "QuestSave+ e' attualmente gratuita. Questa sezione chiarisce cosa significa per chi scarica o testa l'app dagli store ufficiali.",
   lastUpdated: 'Ultimo aggiornamento: 10 aprile 2026',
   sections: [
    {
-    title: '1. Stato attuale del prodotto',
+    title: '1. Accesso gratuito',
     paragraphs: [
-     "QuestSave+ puo' essere resa disponibile inizialmente in forma gratuita.",
-     "In una fase successiva il servizio potra' includere pubblicita, e successivamente anche un modello freemium con funzionalita premium acquistabili tramite abbonamento mensile o annuale su iOS e Android.",
+     "Le funzionalita disponibili nell'app non richiedono un costo diretto da parte dell'utente.",
     ],
    },
    {
-    title: '2. Abbonamenti premium',
-    bullets: [
-     "gli eventuali piani premium potranno essere mensili o annuali",
-     "potra' essere prevista una prova gratuita iniziale di 48 ore",
-     "il rinnovo automatico si applichera salvo disattivazione da parte dell'utente tramite il proprio account store",
-     'la gestione di pagamento, rinnovo e fatturazione avviene tramite Apple App Store o Google Play',
+    title: '2. Nessun piano attivo',
+    paragraphs: [
+     "Non sono presenti piani mensili, annuali, prove con rinnovo automatico o funzionalita riservate a utenti paganti.",
     ],
    },
    {
-    title: '3. Cancellazione degli abbonamenti',
+    title: '3. Nessun annuncio integrato',
     paragraphs: [
-     "L'utente puo' annullare il rinnovo automatico in qualsiasi momento dalle impostazioni del proprio account Apple o Google.",
-     "La cancellazione impedisce il rinnovo successivo ma, salvo diversa previsione di legge o della piattaforma, non interrompe immediatamente il periodo gia pagato.",
+     "L'app non include al momento annunci o formati sponsorizzati interni.",
     ],
    },
    {
-    title: '4. Rimborsi',
+    title: '4. Supporto operativo',
     paragraphs: [
-     'Per gli acquisti effettuati tramite Apple App Store o Google Play, le richieste di rimborso devono in linea generale seguire le procedure previste dalla piattaforma che ha elaborato il pagamento.',
-     "Apple e Google applicano regole proprie sui rimborsi; inoltre l'utente mantiene i diritti inderogabili previsti dalla normativa applicabile, incluse eventuali tutele dei consumatori nel proprio Paese.",
-     `Quando possibile, QuestSave+ puo' fornire assistenza informativa sulla procedura corretta tramite ${SUPPORT_EMAIL}, ma il rimborso puo' dipendere dal provider di pagamento e dalla legge applicabile.`,
+     `Per dubbi sull'accesso, problemi account, eliminazione dati o beta Android puoi scrivere a ${SUPPORT_EMAIL}.`,
     ],
    },
    {
-    title: '5. Pubblicita',
+    title: '5. Eliminazione account',
     paragraphs: [
-     "Se verra introdotta pubblicita, questa potra comparire nel piano gratuito o in specifiche aree dell'app in modo coerente con l'esperienza utente e con la normativa applicabile.",
-     "Al momento i provider pubblicitari o analytics futuri non sono ancora definiti in modo definitivo.",
-    ],
-   },
-   {
-    title: '6. Eliminazione account e acquisti',
-    paragraphs: [
-     "La richiesta di eliminazione dell'account non annulla automaticamente gli abbonamenti attivi nello store: l'utente deve gestire anche la cancellazione del rinnovo tramite Apple o Google.",
-     "Le informazioni essenziali sugli acquisti possono essere conservate per finalita contabili, fiscali, antifrode o di gestione dei reclami, nei limiti consentiti dalla legge.",
+     "La richiesta di eliminazione dell'account riguarda i dati collegati a QuestSave+ e non comporta procedure collegate a costi ricorrenti, perche non sono presenti piani attivi.",
     ],
    },
   ],
@@ -237,8 +210,7 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
 const enDocuments: Record<LegalDocumentType, LegalDocument> = {
  terms: {
   title: 'Terms of use',
-  subtitle:
-   'These terms govern the use of the QuestSave+ app, its related services, and any premium features that may be introduced over time.',
+  subtitle: 'These terms govern the use of the QuestSave+ app and its related services.',
   lastUpdated: 'Last updated: April 10, 2026',
   sections: [
    {
@@ -252,7 +224,7 @@ const enDocuments: Record<LegalDocumentType, LegalDocument> = {
     title: '2. Scope of the service',
     paragraphs: [
      'QuestSave+ is an app focused on video game discovery, backlog organization, and related informational content.',
-     'The service may start as free, may later include advertising, and may subsequently offer premium features through monthly or yearly subscriptions purchased on the App Store or Google Play.',
+     'The service is currently free and does not require in-app purchases or reserved paid plans.',
     ],
    },
    {
@@ -277,23 +249,14 @@ const enDocuments: Record<LegalDocumentType, LegalDocument> = {
     ],
    },
    {
-    title: '5. Premium features, ads, and in-app purchases',
+    title: '5. Free service status',
     paragraphs: [
-     'QuestSave+ may remain free in an initial phase. Later, advertising and premium features may be introduced.',
-     'Premium subscriptions may be offered monthly or yearly, with an initial 48-hour free trial and automatic renewal unless cancelled in time through the applicable store.',
-     'In-app purchases and subscriptions on iOS and Android are handled respectively by Apple and Google through their payment systems.',
+     'QuestSave+ is free. There are currently no fees, in-app purchases, reserved plans, or integrated ads.',
+     'QuestSave+ does not manage charges or automatic renewals connected to app features.',
     ],
    },
    {
-    title: '6. Renewals, cancellations, and refunds',
-    paragraphs: [
-     'Subscriptions, if introduced, renew automatically unless cancelled through the relevant App Store or Google Play account before the renewal date.',
-     'Refund requests for purchases made through mobile stores are subject to the rules of the payment platform and any mandatory consumer protection laws applicable in the user country.',
-     `When possible, users may also contact ${SUPPORT_EMAIL} for guidance on the proper process or to assert any rights granted by law.`,
-    ],
-   },
-   {
-    title: '7. Account deletion',
+    title: '6. Account deletion',
     paragraphs: [
      'Users may request deletion of their account directly from the app.',
      `Alternatively, they may send a request to ${SUPPORT_EMAIL}.`,
@@ -301,21 +264,21 @@ const enDocuments: Record<LegalDocumentType, LegalDocument> = {
     ],
    },
    {
-    title: '8. Suspension or termination',
+    title: '7. Suspension or termination',
     paragraphs: [
      'We may restrict, suspend, or terminate access to the service in case of unlawful use, abuse, violation of these terms, or risks to app or user security.',
      'We may also modify, update, or discontinue some features for technical or business reasons.',
     ],
    },
    {
-    title: '9. Intellectual property',
+    title: '8. Intellectual property',
     paragraphs: [
      'The QuestSave+ brand, app interface, design, original copy, and materials created for the service remain the property of the project owner or the relevant licensors.',
      'Third-party brands, game names, and third-party content remain the property of their respective owners.',
     ],
    },
    {
-    title: '10. Applicable law and initial market',
+    title: '9. Applicable law and initial market',
     paragraphs: [
      'The service is initially intended for the Italian market.',
      'These terms are governed by Italian law, without prejudice to any mandatory consumer protection rules applicable in the user country.',
@@ -342,8 +305,7 @@ const enDocuments: Record<LegalDocumentType, LegalDocument> = {
      'account data such as email, user id, username, display name, avatar, birth date, and gender if provided',
      'service usage data such as backlog, game statuses, preferences, and interactions with certain features',
      'technical and security data such as essential logs, technical identifiers, crash reports, and device information',
-     'subscription and payment-related data such as subscription status and plan confirmation received from Apple or Google',
-     'advertising or analytics-related data only if and when such tools are actually enabled and in compliance with applicable law',
+     'data provided in support requests, such as the message content and information needed to resolve the issue',
     ],
    },
    {
@@ -352,8 +314,7 @@ const enDocuments: Record<LegalDocumentType, LegalDocument> = {
      'providing the requested service and managing the account: contract performance',
      'maintaining security, preventing abuse, and protecting the service: legitimate interest and, where needed, legal obligations',
      'handling support, account deletion, and disputes: contract performance and legal obligations',
-     'managing payments, renewals, and premium access: contract performance',
-     'measuring usage, performance, or future advertising campaigns where required: consent, when applicable',
+     'improving service stability, security, and performance: legitimate interest, within the limits allowed by applicable law',
     ],
    },
    {
@@ -368,7 +329,7 @@ const enDocuments: Record<LegalDocumentType, LegalDocument> = {
     paragraphs: [
      'Users may request account deletion directly from the app.',
      `Alternatively, they may write to ${SUPPORT_EMAIL}.`,
-     'Deleting the account does not prevent temporary retention of some data where necessary for legal obligations, security, fraud prevention, or complaints and refunds handling.',
+     'Deleting the account does not prevent temporary retention of some data where necessary for legal obligations, security, fraud prevention, or complaint handling.',
     ],
    },
    {
@@ -387,7 +348,7 @@ const enDocuments: Record<LegalDocumentType, LegalDocument> = {
    {
     title: '7. Security and third parties',
     paragraphs: [
-     'We may share data only with parties necessary to provide the service, such as infrastructure providers, authentication services, databases, in-app payment platforms, and other technical tools that may be enabled over time.',
+     'We may share data only with parties necessary to provide the service, such as infrastructure providers, authentication services, databases, and other technical tools required for app operation.',
      'We adopt reasonable technical and organizational measures to reduce the risks of unauthorized access, loss, destruction, or improper disclosure of data.',
     ],
    },
@@ -401,54 +362,39 @@ const enDocuments: Record<LegalDocumentType, LegalDocument> = {
   ],
  },
  policy: {
-  title: 'Subscriptions, ads, and refunds policy',
+  title: 'Free app status',
   subtitle:
-   'This policy explains how QuestSave+ may handle premium features, renewals, advertising, cancellations, and refund requests when those business models are activated.',
+   'QuestSave+ is currently free. This section clarifies what that means for users downloading or testing the app through official stores.',
   lastUpdated: 'Last updated: April 10, 2026',
   sections: [
    {
-    title: '1. Current product stage',
+    title: '1. Free access',
     paragraphs: [
-     'QuestSave+ may initially be offered as a free app.',
-     'At a later stage the service may include advertising and, afterwards, a freemium model with premium monthly or yearly subscriptions on iOS and Android.',
+     'The features available in the app do not require a direct cost from the user.',
     ],
    },
    {
-    title: '2. Premium subscriptions',
-    bullets: [
-     'premium plans may be monthly or yearly',
-     'an initial 48-hour free trial may be offered',
-     'automatic renewal applies unless disabled by the user through the relevant store account',
-     'payments, billing, and renewals are handled through Apple App Store or Google Play',
+    title: '2. No active paid plan',
+    paragraphs: [
+     'There are no monthly plans, yearly plans, automatic-renewal trials, or features reserved for paying users.',
     ],
    },
    {
-    title: '3. Subscription cancellation',
+    title: '3. No integrated ads',
     paragraphs: [
-     'Users may disable auto-renewal at any time in their Apple or Google account settings.',
-     'Cancellation stops future renewal but, unless otherwise required by law or platform rules, does not immediately terminate the already paid period.',
+     'The app currently does not include ads or internal sponsored formats.',
     ],
    },
    {
-    title: '4. Refunds',
+    title: '4. Operational support',
     paragraphs: [
-     'For purchases made through Apple App Store or Google Play, refund requests generally follow the procedures set by the platform that processed the payment.',
-     'Apple and Google apply their own refund rules, and users also retain any mandatory rights provided by applicable consumer law in their country.',
-     `Where possible, QuestSave+ may provide procedural support via ${SUPPORT_EMAIL}, but the refund decision may depend on the payment provider and the applicable law.`,
+     `For access questions, account issues, data deletion, or Android beta support, contact ${SUPPORT_EMAIL}.`,
     ],
    },
    {
-    title: '5. Advertising',
+    title: '5. Account deletion',
     paragraphs: [
-     'If advertising is introduced, it may appear in the free tier or in specific areas of the app in a way that remains consistent with the product experience and applicable law.',
-     'At the moment, future advertising or analytics providers have not yet been definitively selected.',
-    ],
-   },
-   {
-    title: '6. Account deletion and purchases',
-    paragraphs: [
-     'Deleting the account does not automatically cancel active store subscriptions: users must also manage cancellation through Apple or Google.',
-     'Essential purchase information may be retained for accounting, tax, anti-fraud, or complaint-handling purposes, within the limits permitted by law.',
+     'Account deletion concerns data connected to QuestSave+ and does not require procedures related to recurring costs, because no active paid plans exist.',
     ],
    },
   ],

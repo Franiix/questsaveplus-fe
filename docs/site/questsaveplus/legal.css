@@ -39,6 +39,7 @@ body {
   min-height: 100vh;
   font-family: var(--font-sans);
   color: var(--text-primary);
+  overflow-x: hidden;
   background:
     radial-gradient(circle at top left, rgba(108, 99, 255, 0.2), transparent 32%),
     radial-gradient(circle at top right, rgba(0, 212, 255, 0.12), transparent 30%),
@@ -47,12 +48,43 @@ body {
 
 a {
   color: inherit;
+  overflow-wrap: anywhere;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .page-shell {
   width: min(980px, calc(100vw - 32px));
   margin: 0 auto;
   padding: 48px 0 72px;
+}
+
+.top-link-row {
+  margin-bottom: 14px;
+}
+
+.back-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 9px 13px;
+  border: 1px solid rgba(108, 99, 255, 0.26);
+  border-radius: 999px;
+  background: rgba(108, 99, 255, 0.1);
+  color: #ddd9ff;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.back-home:hover {
+  transform: translateY(-1px);
+  border-color: rgba(108, 99, 255, 0.5);
+  background: rgba(108, 99, 255, 0.16);
 }
 
 .hero-card,
@@ -290,9 +322,19 @@ a {
 
 @media (max-width: 820px) {
   .page-shell {
-    width: min(100vw - 20px, 980px);
-    padding-top: 24px;
+    width: min(100vw - 18px, 980px);
+    padding-top: 18px;
     padding-bottom: 42px;
+  }
+
+  .top-link-row {
+    margin-bottom: 10px;
+  }
+
+  .back-home {
+    width: 100%;
+    justify-content: center;
+    min-height: 42px;
   }
 
   .hero-card,
@@ -302,10 +344,57 @@ a {
 
   .hero-card,
   .section-card {
-    padding: 20px;
+    padding: 18px;
   }
 
   .hero-grid {
     grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(32px, 11vw, 44px);
+  }
+
+  .hero-copy p {
+    font-size: 15px;
+    line-height: 1.68;
+  }
+
+  .brand-pill {
+    max-width: 100%;
+    font-size: 11px;
+  }
+
+  .meta-stack {
+    gap: 10px;
+  }
+
+  .meta-chip {
+    padding: 13px 14px;
+  }
+
+  .nav-grid,
+  .quick-links {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-link {
+    min-height: 64px;
+  }
+
+  .section-card h2 {
+    font-size: 20px;
+  }
+
+  .section-card p,
+  .section-card li,
+  .quick-link p {
+    font-size: 13.5px;
+    line-height: 1.68;
+  }
+
+  .footer-note {
+    padding: 16px;
   }
 }
