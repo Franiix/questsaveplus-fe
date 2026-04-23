@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { Badge } from '@/components/base/display/Badge';
+import { Card } from '@/components/base/display/Card';
 import { ModalCloseButton } from '@/components/base/feedback/ModalCloseButton';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
-import { Card } from '@/components/base/display/Card';
 import type { GameCatalogLabel } from '@/shared/models/GameCatalogLabel.model';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
 
@@ -73,7 +73,12 @@ export function GameCatalogInfoBadgeGroup({
     </View>
    </View>
 
-   <Modal visible={isOpen} animationType="slide" transparent onRequestClose={() => setIsOpen(false)}>
+   <Modal
+    visible={isOpen}
+    animationType="slide"
+    transparent
+    onRequestClose={() => setIsOpen(false)}
+   >
     <View style={{ flex: 1, backgroundColor: 'rgba(4,4,10,0.82)', justifyContent: 'flex-end' }}>
      <View
       style={{
@@ -89,7 +94,10 @@ export function GameCatalogInfoBadgeGroup({
        <View style={{ flex: 1, paddingRight: spacing.md }}>
         <SectionTitle title={label} />
        </View>
-       <ModalCloseButton label={closeLabel ?? t('gameDetail.closeInfo')} onPress={() => setIsOpen(false)} />
+       <ModalCloseButton
+        label={closeLabel ?? t('gameDetail.closeInfo')}
+        onPress={() => setIsOpen(false)}
+       />
       </View>
 
       <ScrollView contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xs }}>

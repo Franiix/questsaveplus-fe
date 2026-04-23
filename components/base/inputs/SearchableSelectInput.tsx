@@ -1,17 +1,17 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
- SectionList,
+ type ListRenderItemInfo,
  Modal,
  Pressable,
+ SectionList,
+ type SectionListData,
  Text,
  TouchableOpacity,
  View,
-  type ViewStyle,
- type ListRenderItemInfo,
- type SectionListData,
+ type ViewStyle,
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
 import { ModalCloseButton } from '@/components/base/feedback/ModalCloseButton';
 import { SearchBar } from '@/components/base/inputs/SearchBar';
 import { useInputStyles } from '@/components/base/inputs/useInputStyles';
@@ -322,7 +322,7 @@ export function SearchableSelectInput({
      <Pressable style={{ flex: 1 }} onPress={handleClose} />
 
      <View
-     style={{
+      style={{
        backgroundColor: 'rgba(14,16,28,0.98)',
        minHeight: 420,
        maxHeight: '86%',
@@ -412,7 +412,7 @@ export function SearchableSelectInput({
 
       {sections.some((section) => section.data.length > 0) ? (
        <SectionList
-       sections={sections.filter((section) => section.data.length > 0)}
+        sections={sections.filter((section) => section.data.length > 0)}
         keyExtractor={(item) => item.value}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
@@ -425,7 +425,7 @@ export function SearchableSelectInput({
         ItemSeparatorComponent={() => <View style={{ height: spacing.sm }} />}
         SectionSeparatorComponent={() => <View style={{ height: spacing.sm }} />}
         keyboardShouldPersistTaps="handled"
-      />
+       />
       ) : (
        <View
         style={{

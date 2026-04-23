@@ -6,8 +6,8 @@ import {
  Text,
  TouchableOpacity,
  type TouchableOpacityProps,
- type ViewStyle,
  View,
+ type ViewStyle,
 } from 'react-native';
 import Animated, {
  useAnimatedStyle,
@@ -116,10 +116,17 @@ function inferButtonIcon(
  label: string,
  variant: ButtonVariant,
  color?: string,
-): { left?: React.ComponentProps<typeof FontAwesome5>['name']; right?: React.ComponentProps<typeof FontAwesome5>['name'] } {
+): {
+ left?: React.ComponentProps<typeof FontAwesome5>['name'];
+ right?: React.ComponentProps<typeof FontAwesome5>['name'];
+} {
  const normalized = label.trim().toLowerCase();
 
- if (normalized.includes('esci') || normalized.includes('logout') || normalized.includes('sign out')) {
+ if (
+  normalized.includes('esci') ||
+  normalized.includes('logout') ||
+  normalized.includes('sign out')
+ ) {
   return { left: 'sign-out-alt' };
  }
 
@@ -195,7 +202,11 @@ function inferButtonIcon(
   return { left: 'check' };
  }
 
- if (normalized.includes('modifica') || normalized.includes('edit') || normalized.includes('cambia')) {
+ if (
+  normalized.includes('modifica') ||
+  normalized.includes('edit') ||
+  normalized.includes('cambia')
+ ) {
   return { left: 'pen' };
  }
 
@@ -206,7 +217,14 @@ function inferButtonIcon(
  return {};
 }
 
-function FilledButton({ gradientColors, isInactive, fullWidth, onPress, children, ...props }: FilledButtonProps) {
+function FilledButton({
+ gradientColors,
+ isInactive,
+ fullWidth,
+ onPress,
+ children,
+ ...props
+}: FilledButtonProps) {
  const shineX = useSharedValue(-120);
  const shineOpacity = useSharedValue(0);
  const fullWidthStyle: ViewStyle | undefined = fullWidth ? { width: '100%' } : undefined;
@@ -246,8 +264,8 @@ function FilledButton({ gradientColors, isInactive, fullWidth, onPress, children
     colors={gradientColors}
     start={{ x: 0, y: 0 }}
     end={{ x: 1, y: 0 }}
-     style={[baseContainerShared, fullWidthStyle, { overflow: 'hidden' }]}
-    >
+    style={[baseContainerShared, fullWidthStyle, { overflow: 'hidden' }]}
+   >
     {children}
     {/* Shine ray */}
     <Animated.View

@@ -1,5 +1,5 @@
-import { Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Text, View } from 'react-native';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { Card } from '@/components/base/display/Card';
 import { ChipGroup } from '@/components/base/inputs/ChipGroup';

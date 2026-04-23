@@ -3,12 +3,13 @@ import { useCatalogDevelopers } from '@/hooks/useCatalogDevelopers';
 import { useCatalogGenres } from '@/hooks/useCatalogGenres';
 import { useCatalogParentPlatforms } from '@/hooks/useCatalogParentPlatforms';
 import { useCatalogPublishers } from '@/hooks/useCatalogPublishers';
+import { useGames } from '@/hooks/useGames';
 import { useHomeDiscoveryContext } from '@/hooks/useHomeDiscoveryContext';
 import { useHomeEditorialSections } from '@/hooks/useHomeEditorialSections';
-import { useGames } from '@/hooks/useGames';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import type { HomeOrdering } from '@/shared/models/home/HomeOrdering.model';
 import type { HomeScreenRouteParams } from '@/shared/models/home/HomeScreenRouteParams.model';
+
 export type { HomeAppliedFilterChip } from '@/shared/models/home/HomeAppliedFilterChip.model';
 export type { HomeDiscoveryContextCard } from '@/shared/models/home/HomeDiscoveryContextCard.model';
 export type { HomeFilterDescriptor } from '@/shared/models/home/HomeFilterDescriptor.model';
@@ -16,8 +17,8 @@ export type { HomeOrdering } from '@/shared/models/home/HomeOrdering.model';
 export type { HomeQuickPresetAction } from '@/shared/models/home/HomeQuickPresetAction.model';
 export type { HomeQuickPresetDescriptor } from '@/shared/models/home/HomeQuickPresetDescriptor.model';
 export type { HomeScreenRouteParams } from '@/shared/models/home/HomeScreenRouteParams.model';
-export type { HomeSortOption } from '@/shared/models/home/HomeSortOption.model';
 export type { HomeSectionViewModel } from '@/shared/models/home/HomeSectionViewModel.model';
+export type { HomeSortOption } from '@/shared/models/home/HomeSortOption.model';
 
 type UseHomeScreenViewModelParams = {
  appliedFilters: GameDiscoveryFilters;
@@ -46,13 +47,13 @@ export function useHomeScreenViewModel({
 
  // Le query catalog sparano solo quando il pannello filtri è aperto o ci sono
  // filtri attivi — evita 4 richieste di rete inutili al mount dell'home screen.
-  const hasCatalogActiveFilters =
-    Boolean(appliedFilters.genre) ||
-    Boolean(appliedFilters.platform) ||
-    Boolean(appliedFilters.developer) ||
-    Boolean(appliedFilters.publisher);
+ const hasCatalogActiveFilters =
+  Boolean(appliedFilters.genre) ||
+  Boolean(appliedFilters.platform) ||
+  Boolean(appliedFilters.developer) ||
+  Boolean(appliedFilters.publisher);
 
-  const catalogEnabled = isFilterSheetOpen || hasCatalogActiveFilters;
+ const catalogEnabled = isFilterSheetOpen || hasCatalogActiveFilters;
 
  const {
   data: genres = [],
@@ -75,19 +76,12 @@ export function useHomeScreenViewModel({
   isError: isPublishersError,
  } = useCatalogPublishers(catalogEnabled);
 
- const {
-  data,
-  isFetching,
-  isFetchingNextPage,
-  hasNextPage,
-  fetchNextPage,
-  isError,
-  refetch,
- } = useGames({
-  search: debouncedSearch,
-  filters: appliedFilters,
-  ordering: orderingParam,
- });
+ const { data, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage, isError, refetch } =
+  useGames({
+   search: debouncedSearch,
+   filters: appliedFilters,
+   ordering: orderingParam,
+  });
 
  const games = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
  const {
@@ -101,13 +95,13 @@ export function useHomeScreenViewModel({
   quickDiscoveryPresets,
   sortOptions,
  } = useHomeDiscoveryContext({
- appliedFilters,
- debouncedSearch,
- developers,
+  appliedFilters,
+  debouncedSearch,
+  developers,
   genres,
- params,
- platforms: parentPlatforms,
- publishers,
+  params,
+  platforms: parentPlatforms,
+  publishers,
  });
  const { areAllSectionsError, homeSections, isSectionsLoading } = useHomeEditorialSections();
 

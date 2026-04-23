@@ -4,6 +4,7 @@ import {
  listEdgeCatalogTaxonomy,
  searchEdgeCatalogGames,
 } from '@/lib/catalog/providers/edgeCatalogProvider';
+import type { CatalogTaxonomyKind } from '@/shared/enums/CatalogTaxonomyKind.enum';
 import type {
  CatalogCompany,
  CatalogGame,
@@ -12,7 +13,6 @@ import type {
  CatalogPage,
  CatalogPlatform,
 } from '@/shared/models/Catalog.model';
-import type { CatalogTaxonomyKind } from '@/shared/enums/CatalogTaxonomyKind.enum';
 import type { CatalogCompanyRole } from '@/shared/models/CatalogCompanyRole.model';
 import type { CatalogSearchParams } from '@/shared/models/CatalogSearchParams.model';
 

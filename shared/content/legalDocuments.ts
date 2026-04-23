@@ -43,15 +43,15 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
     bullets: [
      "non usare l'app per violare leggi, diritti di terzi o condizioni delle piattaforme di distribuzione",
      "non tentare di interferire con il funzionamento dell'app, delle API o dell'infrastruttura",
-     "non copiare, estrarre in massa o riutilizzare contenuti e dati in modo non autorizzato",
-     "non pubblicare contenuti offensivi, illeciti, diffamatori o idonei a danneggiare altri utenti o il servizio",
+     'non copiare, estrarre in massa o riutilizzare contenuti e dati in modo non autorizzato',
+     'non pubblicare contenuti offensivi, illeciti, diffamatori o idonei a danneggiare altri utenti o il servizio',
     ],
    },
    {
     title: '5. Contenuti, accuratezza e disponibilita',
     paragraphs: [
      "Le schede dei videogiochi, i metadati e parte dei contenuti informativi possono provenire da fornitori terzi come IGDB e da dati inseriti dall'utente.",
-     "Pur cercando di mantenere i dati accurati e aggiornati, non garantiamo che ogni informazione sia sempre completa, esatta o disponibile in ogni momento.",
+     'Pur cercando di mantenere i dati accurati e aggiornati, non garantiamo che ogni informazione sia sempre completa, esatta o disponibile in ogni momento.',
     ],
    },
    {
@@ -80,14 +80,14 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
     title: '9. Proprieta intellettuale',
     paragraphs: [
      "Il marchio QuestSave+, l'interfaccia dell'app, il design, i testi originali e i materiali creati per il servizio restano di proprieta del titolare del progetto o dei rispettivi licenzianti.",
-     "I marchi, i nomi dei videogiochi e i contenuti di terzi restano di proprieta dei rispettivi titolari.",
+     'I marchi, i nomi dei videogiochi e i contenuti di terzi restano di proprieta dei rispettivi titolari.',
     ],
    },
    {
     title: '10. Legge applicabile e mercato iniziale',
     paragraphs: [
      "Il servizio e' inizialmente rivolto al mercato italiano.",
-     "I presenti termini sono regolati dalla legge italiana, salvo diversa applicazione di norme imperative a tutela dei consumatori residenti in altri Paesi.",
+     'I presenti termini sono regolati dalla legge italiana, salvo diversa applicazione di norme imperative a tutela dei consumatori residenti in altri Paesi.',
     ],
    },
   ],
@@ -95,7 +95,7 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
  privacy: {
   title: 'Privacy policy',
   subtitle:
-   "Questa informativa spiega quali dati personali trattiamo quando usi QuestSave+, per quali finalita, per quanto tempo e quali diritti puoi esercitare.",
+   'Questa informativa spiega quali dati personali trattiamo quando usi QuestSave+, per quali finalita, per quanto tempo e quali diritti puoi esercitare.',
   lastUpdated: 'Ultimo aggiornamento: 10 aprile 2026',
   sections: [
    {
@@ -155,7 +155,7 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
     title: '7. Sicurezza e terzi',
     paragraphs: [
      "Possiamo condividere dati solo con soggetti necessari a fornire il servizio, ad esempio fornitori infrastrutturali, autenticazione, database e altri strumenti tecnici necessari al funzionamento dell'app.",
-     "Adottiamo misure tecniche e organizzative ragionevoli per ridurre i rischi di accesso non autorizzato, perdita, distruzione o divulgazione impropria dei dati.",
+     'Adottiamo misure tecniche e organizzative ragionevoli per ridurre i rischi di accesso non autorizzato, perdita, distruzione o divulgazione impropria dei dati.',
     ],
    },
    {
@@ -182,14 +182,12 @@ const itDocuments: Record<LegalDocumentType, LegalDocument> = {
    {
     title: '2. Nessun piano attivo',
     paragraphs: [
-     "Non sono presenti piani mensili, annuali, prove con rinnovo automatico o funzionalita riservate a utenti paganti.",
+     'Non sono presenti piani mensili, annuali, prove con rinnovo automatico o funzionalita riservate a utenti paganti.',
     ],
    },
    {
     title: '3. Nessun annuncio integrato',
-    paragraphs: [
-     "L'app non include al momento annunci o formati sponsorizzati interni.",
-    ],
+    paragraphs: ["L'app non include al momento annunci o formati sponsorizzati interni."],
    },
    {
     title: '4. Supporto operativo',
@@ -369,9 +367,7 @@ const enDocuments: Record<LegalDocumentType, LegalDocument> = {
   sections: [
    {
     title: '1. Free access',
-    paragraphs: [
-     'The features available in the app do not require a direct cost from the user.',
-    ],
+    paragraphs: ['The features available in the app do not require a direct cost from the user.'],
    },
    {
     title: '2. No active paid plan',
@@ -381,9 +377,7 @@ const enDocuments: Record<LegalDocumentType, LegalDocument> = {
    },
    {
     title: '3. No integrated ads',
-    paragraphs: [
-     'The app currently does not include ads or internal sponsored formats.',
-    ],
+    paragraphs: ['The app currently does not include ads or internal sponsored formats.'],
    },
    {
     title: '4. Operational support',
@@ -401,7 +395,10 @@ const enDocuments: Record<LegalDocumentType, LegalDocument> = {
  },
 };
 
-const legalDocumentsByLanguage: Record<SupportedLegalLanguage, Record<LegalDocumentType, LegalDocument>> = {
+const legalDocumentsByLanguage: Record<
+ SupportedLegalLanguage,
+ Record<LegalDocumentType, LegalDocument>
+> = {
  it: itDocuments,
  en: enDocuments,
 };
@@ -410,9 +407,6 @@ function normalizeLegalLanguage(language: string): SupportedLegalLanguage {
  return language.toLowerCase().startsWith('en') ? 'en' : 'it';
 }
 
-export function getLegalDocumentContent(
- language: string,
- type: LegalDocumentType,
-): LegalDocument {
+export function getLegalDocumentContent(language: string, type: LegalDocumentType): LegalDocument {
  return legalDocumentsByLanguage[normalizeLegalLanguage(language)][type];
 }

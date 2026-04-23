@@ -1,9 +1,9 @@
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
-import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
-import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
+import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { BacklogMetadataMap } from '@/shared/models/backlog/BacklogMetadataMap.model';
 import type { BacklogScreenViewModel } from '@/shared/models/backlog/BacklogScreenViewModel.model';
+import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 
 const STATUS_ORDER: Record<string, number> = {
  PLAYING: 0,
@@ -43,10 +43,7 @@ function countActiveDiscoveryFilters(filters: GameDiscoveryFilters) {
  );
 }
 
-function matchesMetadataFilter(
- selectedValue: string | undefined,
- values: string[] | undefined,
-) {
+function matchesMetadataFilter(selectedValue: string | undefined, values: string[] | undefined) {
  return !selectedValue || (values ?? []).includes(selectedValue);
 }
 
@@ -73,6 +70,8 @@ function getSortableAddedAt(item: BacklogItemEntity) {
 function sortItems(items: BacklogItemEntity[], sort: BacklogSortEnum): BacklogItemEntity[] {
  const sorted = [...items];
  switch (sort) {
+  case BacklogSortEnum.PRIORITY:
+   return sorted.sort((a, b) => getPlayNextPriority(a) - getPlayNextPriority(b));
   case BacklogSortEnum.NEWEST:
    return sorted.sort((a, b) => getSortableAddedAt(b) - getSortableAddedAt(a));
   case BacklogSortEnum.OLDEST:
@@ -84,9 +83,7 @@ function sortItems(items: BacklogItemEntity[], sort: BacklogSortEnum): BacklogIt
   case BacklogSortEnum.RATING_DESC:
    return sorted.sort((a, b) => (b.personal_rating ?? -1) - (a.personal_rating ?? -1));
   case BacklogSortEnum.STATUS:
-   return sorted.sort(
-    (a, b) => (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99),
-   );
+   return sorted.sort((a, b) => (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99));
   default:
    return sorted;
  }
@@ -113,9 +110,7 @@ export function createBacklogScreenViewModel({
 }: CreateBacklogScreenViewModelParams): BacklogScreenViewModel {
  const normalizedSearch = search.trim().toLowerCase();
  const hasAppliedFilters =
-  Boolean(activeFilter) ||
-  normalizedSearch.length > 0 ||
-  hasDiscoveryFilters(appliedFilters);
+  Boolean(activeFilter) || normalizedSearch.length > 0 || hasDiscoveryFilters(appliedFilters);
 
  const filteredItems = backlogItems.filter((item) => {
   const matchesStatus = !activeFilter || item.status === activeFilter;

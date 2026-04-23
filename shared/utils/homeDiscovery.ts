@@ -1,9 +1,5 @@
 import type { TFunction } from 'i18next';
-import type {
- CatalogCompany,
- CatalogGenre,
- CatalogPlatform,
-} from '@/shared/models/Catalog.model';
+import type { CatalogCompany, CatalogGenre, CatalogPlatform } from '@/shared/models/Catalog.model';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import type { HomeAppliedFilterChip } from '@/shared/models/home/HomeAppliedFilterChip.model';
 import type { HomeDiscoveryContextCard } from '@/shared/models/home/HomeDiscoveryContextCard.model';
@@ -94,7 +90,7 @@ export function resolveHomeFilterLabels(params: {
    ? resolveGenreName(appliedFilters.genre, genres, fallbackLabels.genre, t)
    : null,
   platform: appliedFilters.platform
-   ? platformMap.get(appliedFilters.platform) ?? appliedFilters.platform
+   ? (platformMap.get(appliedFilters.platform) ?? appliedFilters.platform)
    : null,
   developer: appliedFilters.developer
    ? resolveCompanyName(appliedFilters.developer, developers, fallbackLabels.developer)
@@ -276,10 +272,7 @@ export function createQuickDiscoveryPresets(
  });
 }
 
-export function createHomeSortOptions(
- debouncedSearch: string,
- t: TFunction,
-): HomeSortOption[] {
+export function createHomeSortOptions(debouncedSearch: string, t: TFunction): HomeSortOption[] {
  const options: HomeSortOption[] = [];
 
  if (debouncedSearch.trim().length > 0) {

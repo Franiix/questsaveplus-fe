@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
-import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
-import type { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
-import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
+import type { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
+import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { BacklogMetadataMap } from '@/shared/models/backlog/BacklogMetadataMap.model';
+import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import { createBacklogScreenViewModel } from '@/shared/utils/backlogScreen';
 
 type UseBacklogScreenViewModelParams = {

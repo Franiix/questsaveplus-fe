@@ -139,17 +139,37 @@ export function useHomeEditorialSections() {
   () => [
    createHomeSectionViewModel('trending', t('home.trendingNow'), trendingGames, trendingQuery),
    createHomeSectionViewModel('new', t('home.newGames'), newGames, newGamesQuery),
-   createHomeSectionViewModel('upcoming', t('home.upcomingGames'), upcomingGames, upcomingGamesQuery),
+   createHomeSectionViewModel(
+    'upcoming',
+    t('home.upcomingGames'),
+    upcomingGames,
+    upcomingGamesQuery,
+   ),
   ],
   [newGames, newGamesQuery, t, trendingGames, trendingQuery, upcomingGames, upcomingGamesQuery],
  );
 
  const deferredSections = useMemo<HomeSectionViewModel[]>(
   () => [
-   createHomeSectionViewModel('best-of-year', t('home.bestOfYear'), bestOfYearGames, bestOfYearQuery),
+   createHomeSectionViewModel(
+    'best-of-year',
+    t('home.bestOfYear'),
+    bestOfYearGames,
+    bestOfYearQuery,
+   ),
    createHomeSectionViewModel('classics', t('home.classicMustPlays'), classicGames, classicsQuery),
-   createHomeSectionViewModel('all-time-top-250', t('home.allTimeTop250'), allTimeTopGames, allTimeTopQuery),
-   createHomeSectionViewModel('indie-watchlist', t('home.indieWatchlist'), indieWatchGames, indieWatchQuery),
+   createHomeSectionViewModel(
+    'all-time-top-250',
+    t('home.allTimeTop250'),
+    allTimeTopGames,
+    allTimeTopQuery,
+   ),
+   createHomeSectionViewModel(
+    'indie-watchlist',
+    t('home.indieWatchlist'),
+    indieWatchGames,
+    indieWatchQuery,
+   ),
    createHomeSectionViewModel('coop-games', t('home.localCoopGames'), coopGames, coopGamesQuery),
   ],
   [

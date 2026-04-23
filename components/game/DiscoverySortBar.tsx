@@ -25,7 +25,6 @@ export function DiscoverySortBar({ options, selectedKey, onSelect }: DiscoverySo
     paddingBottom: spacing.sm,
     borderTopWidth: 1,
     borderTopColor: colors.border.DEFAULT,
-    backgroundColor: colors.background.primary,
    }}
   >
    {options.map((option) => (

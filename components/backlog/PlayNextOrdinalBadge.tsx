@@ -12,7 +12,10 @@ const SIZE_CONFIG = {
  md: { dim: 26, borderAlpha: '66', bgAlpha: '18' },
 } as const;
 
-export const PlayNextOrdinalBadge = memo(function PlayNextOrdinalBadge({ ordinal, size = 'md' }: Props) {
+export const PlayNextOrdinalBadge = memo(function PlayNextOrdinalBadge({
+ ordinal,
+ size = 'md',
+}: Props) {
  const { dim, borderAlpha, bgAlpha } = SIZE_CONFIG[size];
 
  return (
@@ -29,7 +32,9 @@ export const PlayNextOrdinalBadge = memo(function PlayNextOrdinalBadge({ ordinal
     justifyContent: 'center',
    }}
   >
-   <Text style={{ color: colors.primary['200'], fontSize: 10, fontFamily: typography.font.semibold }}>
+   <Text
+    style={{ color: colors.primary['200'], fontSize: 10, fontFamily: typography.font.semibold }}
+   >
     #{ordinal}
    </Text>
   </View>

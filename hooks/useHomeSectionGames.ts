@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { searchCatalogGames } from '@/lib/catalog';
 import { getCatalogQuerySignature } from '@/shared/config/catalog';
-import type { CatalogPage, CatalogGame } from '@/shared/models/Catalog.model';
+import type { CatalogGame, CatalogPage } from '@/shared/models/Catalog.model';
 
 type HomeSectionParams = {
  queryKey: string;

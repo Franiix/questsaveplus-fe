@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Modal, ScrollView, Text, View } from 'react-native';
-import { ModalCloseButton } from '@/components/base/feedback/ModalCloseButton';
 import { Card } from '@/components/base/display/Card';
+import { ModalCloseButton } from '@/components/base/feedback/ModalCloseButton';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
 import { borderRadius, colors, spacing } from '@/shared/theme/tokens';
 
@@ -46,7 +46,11 @@ export function GameCatalogModalCardList({
      <ScrollView contentContainerStyle={{ gap: spacing.sm }}>
       {values.map((value) => (
        <Card key={`${title}-${value}`} variant="outlined" style={{ padding: spacing.md }}>
-        {renderValue ? renderValue(value) : <Text style={{ color: colors.text.primary }}>{value}</Text>}
+        {renderValue ? (
+         renderValue(value)
+        ) : (
+         <Text style={{ color: colors.text.primary }}>{value}</Text>
+        )}
        </Card>
       ))}
      </ScrollView>

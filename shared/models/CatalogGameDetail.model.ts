@@ -1,11 +1,11 @@
-import type { CatalogImage } from '@/shared/models/CatalogImage.model';
 import type { CatalogGame } from '@/shared/models/CatalogGame.model';
-import type { GameReleaseReadiness } from '@/shared/models/GameReleaseReadiness.model';
+import type { CatalogImage } from '@/shared/models/CatalogImage.model';
 import type {
  CatalogCompany,
  CatalogNamedItem,
  CatalogPlatform,
 } from '@/shared/models/CatalogNamedItem.model';
+import type { GameReleaseReadiness } from '@/shared/models/GameReleaseReadiness.model';
 
 export type CatalogGameDetail = CatalogGame & {
  summary: string | null;

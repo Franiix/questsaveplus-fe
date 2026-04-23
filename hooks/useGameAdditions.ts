@@ -15,6 +15,6 @@ export function useGameAdditions({ gameId, enabled = true }: UseGameAdditionsPar
    return response.items.filter((game) => getCatalogGameNumericId(game) !== gameId);
   },
   enabled: enabled && Number.isFinite(gameId),
- staleTime: 10 * 60 * 1000,
+  staleTime: 10 * 60 * 1000,
  });
 }

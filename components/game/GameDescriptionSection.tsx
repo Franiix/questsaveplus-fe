@@ -1,5 +1,5 @@
-import { Pressable, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Pressable, Text, View } from 'react-native';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 
@@ -26,13 +26,13 @@ export function GameDescriptionSection({
   <View style={{ marginBottom: spacing.lg }}>
    {title ? <SectionTitle title={title} /> : null}
    <Text
-     style={{
-      color: colors.text.secondary,
-      fontSize: typography.size.base,
-      lineHeight: typography.size.base * typography.lineHeight.relaxed,
-      fontFamily: typography.font.regular,
-      marginTop: title ? spacing.sm : 0,
-     }}
+    style={{
+     color: colors.text.secondary,
+     fontSize: typography.size.base,
+     lineHeight: typography.size.base * typography.lineHeight.relaxed,
+     fontFamily: typography.font.regular,
+     marginTop: title ? spacing.sm : 0,
+    }}
     numberOfLines={isExpanded ? undefined : collapsedLines}
    >
     {description}

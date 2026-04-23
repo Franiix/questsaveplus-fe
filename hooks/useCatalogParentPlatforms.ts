@@ -35,11 +35,10 @@ export function useCatalogParentPlatforms(enabled = true) {
   staleTime: 60 * 60 * 1000,
   enabled,
   select: (platforms) =>
-   [...platforms]
-    .sort((a, b) => {
-     const rankDiff = getPlatformRank(a) - getPlatformRank(b);
-     if (rankDiff !== 0) return rankDiff;
-     return a.name.localeCompare(b.name);
-    }),
+   [...platforms].sort((a, b) => {
+    const rankDiff = getPlatformRank(a) - getPlatformRank(b);
+    if (rankDiff !== 0) return rankDiff;
+    return a.name.localeCompare(b.name);
+   }),
  });
 }

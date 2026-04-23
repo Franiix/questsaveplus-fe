@@ -7,8 +7,8 @@ import { GameDescriptionSection } from '@/components/game/GameDescriptionSection
 import { GameEditorialFeatureCard } from '@/components/game/GameEditorialFeatureCard';
 import { GameMediaSection } from '@/components/game/GameMediaSection';
 import { GameReleaseReadinessCard } from '@/components/game/GameReleaseReadinessCard';
-import { spacing } from '@/shared/theme/tokens';
 import type { CatalogGameDetail } from '@/shared/models/Catalog.model';
+import { spacing } from '@/shared/theme/tokens';
 import type { GameEditorialRow } from '@/shared/utils/gameCatalog';
 
 type GameDetailContentViewModel = {
@@ -35,8 +35,8 @@ type GameDetailContentSectionsProps = {
  game: CatalogGameDetail;
  locale: string;
  onDescriptionToggle: () => void;
-  onRegisterSectionOffset: (key: string, y: number) => void;
-  onStorylineToggle: () => void;
+ onRegisterSectionOffset: (key: string, y: number) => void;
+ onStorylineToggle: () => void;
  uiState: {
   isDescriptionExpanded: boolean;
   isStorylineExpanded: boolean;
@@ -124,7 +124,11 @@ export function GameDetailContentSections({
 
    {viewModel.hasCatalogInfoSection ? (
     <View onLayout={(event) => onRegisterSectionOffset('game-info', event.nativeEvent.layout.y)}>
-     <GameCatalogInfoSection providerId={game.providerId} raw={game.metadata?.raw} locale={locale} />
+     <GameCatalogInfoSection
+      providerId={game.providerId}
+      raw={game.metadata?.raw}
+      locale={locale}
+     />
     </View>
    ) : null}
 

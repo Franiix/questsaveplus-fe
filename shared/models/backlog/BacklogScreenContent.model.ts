@@ -6,7 +6,10 @@ export type BacklogStatusLabelMap = Record<BacklogStatusEnum, string>;
 
 export type BacklogStatusColorMap = Record<BacklogStatusEnum, string>;
 
-export type BacklogStatusIconMap = Record<BacklogStatusEnum, React.ComponentProps<typeof FontAwesome5>['name']>;
+export type BacklogStatusIconMap = Record<
+ BacklogStatusEnum,
+ React.ComponentProps<typeof FontAwesome5>['name']
+>;
 
 export type BacklogScreenContentState = {
  activeFilter: BacklogStatusEnum | null;

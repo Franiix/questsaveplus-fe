@@ -11,7 +11,9 @@ type Props = {
  iconName: React.ComponentProps<typeof FontAwesome5>['name'];
  isActive?: boolean;
  isDisabled?: boolean;
- onPress: (event: Parameters<NonNullable<React.ComponentProps<typeof Pressable>['onPress']>>[0]) => void;
+ onPress: (
+  event: Parameters<NonNullable<React.ComponentProps<typeof Pressable>['onPress']>>[0],
+ ) => void;
 };
 
 export function ActionIconButton({

@@ -8,11 +8,11 @@ import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { RetryState } from '@/components/base/feedback/RetryState';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { GameDetailContentSections } from '@/components/game/GameDetailContentSections';
-import { getIgdbNamedItemExternalId } from '@/shared/utils/gameCatalog';
 import { GameDetailOverviewSection } from '@/components/game/GameDetailOverviewSection';
 import { GameDetailRelatedSections } from '@/components/game/GameDetailRelatedSections';
 import { GameHeroBanner } from '@/components/game/GameHeroBanner';
 import { GameStickyHeader } from '@/components/game/GameStickyHeader';
+import { useDeferredGameDetailSectionsGate } from '@/hooks/useDeferredGameDetailSectionsGate';
 import { useGameAdditions } from '@/hooks/useGameAdditions';
 import { useGameBacklogController } from '@/hooks/useGameBacklogController';
 import { useGameCommunityRating } from '@/hooks/useGameCommunityRating';
@@ -20,11 +20,11 @@ import { useGameDetail } from '@/hooks/useGameDetail';
 import { useGameDetailNavigation } from '@/hooks/useGameDetailNavigation';
 import { useGameDetailScreenState } from '@/hooks/useGameDetailScreenState';
 import { useGameDetailViewModel } from '@/hooks/useGameDetailViewModel';
-import { useDeferredGameDetailSectionsGate } from '@/hooks/useDeferredGameDetailSectionsGate';
 import { useGameSeries } from '@/hooks/useGameSeries';
 import { useGameSimilar } from '@/hooks/useGameSimilar';
 import { useRelatedCompanyGames } from '@/hooks/useRelatedCompanyGames';
 import { colors, spacing } from '@/shared/theme/tokens';
+import { getIgdbNamedItemExternalId } from '@/shared/utils/gameCatalog';
 
 const HERO_HEIGHT = 320;
 
@@ -49,8 +49,8 @@ export default function GameDetailScreen() {
   setDescriptionExpanded,
   setStorylineExpanded,
   stickyHeaderOpacity,
- stickyHeaderTranslateY,
- storylineExpanded,
+  stickyHeaderTranslateY,
+  storylineExpanded,
  } = useGameDetailScreenState({ stickyThreshold });
  const { data: game, isLoading, isError } = useGameDetail(gameId);
  const secondarySectionsEnabled = useDeferredGameDetailSectionsGate(Boolean(game));
@@ -79,9 +79,7 @@ export default function GameDetailScreen() {
   companyName: primaryDeveloper?.name ?? null,
   companyType: 'developers',
   enabled:
-   Number.isFinite(gameId) &&
-   secondarySectionsEnabled &&
-   Boolean(primaryDeveloperCatalogId),
+   Number.isFinite(gameId) && secondarySectionsEnabled && Boolean(primaryDeveloperCatalogId),
  });
  const { data: publisherGames = [], isLoading: isPublisherGamesLoading } = useRelatedCompanyGames({
   currentGameId: gameId,
@@ -89,11 +87,11 @@ export default function GameDetailScreen() {
   companyName: primaryPublisher?.name ?? null,
   companyType: 'publishers',
   enabled:
-    Number.isFinite(gameId) &&
-    secondarySectionsEnabled &&
-    Boolean(primaryPublisherCatalogId) &&
-    primaryPublisher?.name !== primaryDeveloper?.name,
-  });
+   Number.isFinite(gameId) &&
+   secondarySectionsEnabled &&
+   Boolean(primaryPublisherCatalogId) &&
+   primaryPublisher?.name !== primaryDeveloper?.name,
+ });
  const { handleBackPress, handleDeveloperPress, handlePublisherPress, handleRelatedGamePress } =
   useGameDetailNavigation({
    developerCatalogId: primaryDeveloperCatalogId,
@@ -236,16 +234,16 @@ export default function GameDetailScreen() {
     })}
     contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xl }}
    >
-     <GameHeroBanner
+    <GameHeroBanner
      imageUri={game.backgroundImage?.url ?? game.coverImage?.url ?? null}
-      width={screenWidth}
-      height={HERO_HEIGHT}
+     width={screenWidth}
+     height={HERO_HEIGHT}
      metacritic={game.criticScore ?? null}
      gradientColors={[
       'rgba(8,8,16,0.35)',
       'transparent',
-     'rgba(8,8,16,0.85)',
-     colors.background.primary,
+      'rgba(8,8,16,0.85)',
+      colors.background.primary,
      ]}
      gradientLocations={[0, 0.25, 0.7, 1]}
      topInset={insets.top}
@@ -297,33 +295,32 @@ export default function GameDetailScreen() {
       whereItFits={whereItFits}
      />
 
-      {secondarySectionsEnabled ? (
-       <GameDetailRelatedSections
-        sameSeriesGames={viewModel.sameSeriesGames}
-        isSeriesLoading={isSeriesLoading}
-        seriesTitle={viewModel.seriesTitle}
-        dlcGames={viewModel.dlcGames}
-        isAdditionsLoading={isAdditionsLoading}
-        dlcTitle={t('gameDetail.dlc')}
-        editionGames={viewModel.editionGames}
-        editionsTitle={t('gameDetail.editions')}
-        expansionGames={viewModel.expansionGames}
-        expansionsTitle={t('gameDetail.expansions')}
-        moreFromDeveloper={viewModel.moreFromDeveloper}
-        isDeveloperGamesLoading={isDeveloperGamesLoading}
-        moreFromDeveloperTitle={viewModel.moreFromDeveloperTitle}
-        moreFromPublisher={viewModel.moreFromPublisher}
-        isPublisherGamesLoading={isPublisherGamesLoading}
-        moreFromPublisherTitle={viewModel.moreFromPublisherTitle}
-        similarGames={viewModel.similarGames}
-        isSimilarGamesLoading={isSimilarGamesLoading}
-        similarGamesTitle={t('gameDetail.similarGames')}
-        relatedCardWidth={relatedCardWidth}
-        onRelatedGamePress={handleRelatedGamePress}
-        registerSectionOffset={registerSectionOffset}
-       />
-      ) : null}
-
+     {secondarySectionsEnabled ? (
+      <GameDetailRelatedSections
+       sameSeriesGames={viewModel.sameSeriesGames}
+       isSeriesLoading={isSeriesLoading}
+       seriesTitle={viewModel.seriesTitle}
+       dlcGames={viewModel.dlcGames}
+       isAdditionsLoading={isAdditionsLoading}
+       dlcTitle={t('gameDetail.dlc')}
+       editionGames={viewModel.editionGames}
+       editionsTitle={t('gameDetail.editions')}
+       expansionGames={viewModel.expansionGames}
+       expansionsTitle={t('gameDetail.expansions')}
+       moreFromDeveloper={viewModel.moreFromDeveloper}
+       isDeveloperGamesLoading={isDeveloperGamesLoading}
+       moreFromDeveloperTitle={viewModel.moreFromDeveloperTitle}
+       moreFromPublisher={viewModel.moreFromPublisher}
+       isPublisherGamesLoading={isPublisherGamesLoading}
+       moreFromPublisherTitle={viewModel.moreFromPublisherTitle}
+       similarGames={viewModel.similarGames}
+       isSimilarGamesLoading={isSimilarGamesLoading}
+       similarGamesTitle={t('gameDetail.similarGames')}
+       relatedCardWidth={relatedCardWidth}
+       onRelatedGamePress={handleRelatedGamePress}
+       registerSectionOffset={registerSectionOffset}
+      />
+     ) : null}
     </View>
    </Animated.ScrollView>
 

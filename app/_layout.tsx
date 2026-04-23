@@ -43,11 +43,7 @@ function AuthGuard() {
  const { t } = useTranslation();
  const router = useRouter();
  const segments = useSegments();
- const {
-  session,
-  isLoading: isAuthLoading,
-  initialize,
- } = useAuthStore();
+ const { session, isLoading: isAuthLoading, initialize } = useAuthStore();
  const {
   profile,
   currentUserId,
@@ -91,15 +87,19 @@ function AuthGuard() {
   } else if (session && profile && inAuthGroup && !inCheckEmail) {
    router.replace('/(tabs)');
   }
- }, [session, profile, segments, router, isAuthLoading, shouldBootstrapProfile, inAuthGroup, inCheckEmail]);
+ }, [
+  session,
+  profile,
+  segments,
+  router,
+  isAuthLoading,
+  shouldBootstrapProfile,
+  inAuthGroup,
+  inCheckEmail,
+ ]);
 
  if (isAuthLoading || shouldBootstrapProfile) {
-  return (
-   <AuthBootScreen
-    title="QuestSave+"
-    subtitle={t('auth.boot.loading')}
-   />
-  );
+  return <AuthBootScreen title="QuestSave+" subtitle={t('auth.boot.loading')} />;
  }
 
  return null;
@@ -128,12 +128,7 @@ export default function RootLayout() {
  }, [fontsLoaded, fontError]);
 
  if (!fontsLoaded && !fontError) {
-  return (
-   <AuthBootScreen
-    title="QuestSave+"
-    subtitle="Loading interface..."
-   />
-  );
+  return <AuthBootScreen title="QuestSave+" subtitle="Loading interface..." />;
  }
 
  return (

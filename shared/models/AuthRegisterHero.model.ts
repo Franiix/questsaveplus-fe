@@ -1,5 +1,5 @@
-import type { ComponentProps } from 'react';
 import type { FontAwesome5 } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
 
 export type RegisterHeroLabelKey =
  | 'auth.register.title'

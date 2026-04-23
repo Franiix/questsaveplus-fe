@@ -1,6 +1,6 @@
-import type { EdgeGameSearchItem } from './EdgeGameSearchItem.model';
-import type { IgdbRawExtras } from '@/shared/models/IgdbCatalogExtras.model';
 import type { GameReleaseReadiness } from '@/shared/models/GameReleaseReadiness.model';
+import type { IgdbRawExtras } from '@/shared/models/IgdbCatalogExtras.model';
+import type { EdgeGameSearchItem } from './EdgeGameSearchItem.model';
 
 export type EdgeGameDetail = EdgeGameSearchItem & {
  description: string | null;

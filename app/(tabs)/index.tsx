@@ -1,7 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useWindowDimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { GameDetailSheet } from '@/components/game/GameDetailSheet';
 import { GameFilterSheet } from '@/components/game/GameFilterSheet';
@@ -27,13 +27,8 @@ export default function HomeScreen() {
  const router = useSafeRouter();
  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
  const deferredHomeSideEffectsEnabled = useDeferredInteractionGate({ delayMs: 500 });
- const {
-  currentVersion,
-  isUpdateAvailable,
-  latestVersion,
-  canOpenStore,
-  openStore,
- } = useAppUpdateAvailabilityWithOptions(deferredHomeSideEffectsEnabled);
+ const { currentVersion, isUpdateAvailable, latestVersion, canOpenStore, openStore } =
+  useAppUpdateAvailabilityWithOptions(deferredHomeSideEffectsEnabled);
 
  const {
   activeFilterCount,
@@ -152,7 +147,9 @@ export default function HomeScreen() {
     gamesCount={games.length}
     isDiscoveryMode={isDiscoveryMode}
     isFilterActive={hasActiveFilters || isFilterSheetOpen}
-    isSearchLoading={uiState.isFetching && !uiState.isFetchingNextPage && (search.length > 0 || hasActiveFilters)}
+    isSearchLoading={
+     uiState.isFetching && !uiState.isFetchingNextPage && (search.length > 0 || hasActiveFilters)
+    }
     onClearSearch={() => setSearch('')}
     onFilterPress={openFilters}
     onPressUpdate={isUpdateAvailable && canOpenStore ? () => void openStore() : undefined}
@@ -193,9 +190,7 @@ export default function HomeScreen() {
     uiState={uiState}
    />
 
-   {sheetGame ? (
-    <GameDetailSheet game={sheetGame} isOpen onClose={closeGameSheet} />
-   ) : null}
+   {sheetGame ? <GameDetailSheet game={sheetGame} isOpen onClose={closeGameSheet} /> : null}
 
    <GameFilterSheet
     isVisible={isFilterSheetOpen}

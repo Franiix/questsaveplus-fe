@@ -137,8 +137,8 @@
  },
  profile: {
   editButton: 'Modifica profilo',
- changeEmailButton: 'Cambia email',
- changePasswordButton: 'Cambia password',
+  changeEmailButton: 'Cambia email',
+  changePasswordButton: 'Cambia password',
   infoButton: 'Info e crediti',
   infoSubtitle: 'Fonti dati, documenti legali e riferimenti del progetto.',
   logoutButton: 'Esci',
@@ -228,6 +228,7 @@
   sort: {
    label: 'Ordina',
    title: 'Ordina per',
+   PRIORITY: 'Priorità',
    NEWEST: 'Più recenti',
    OLDEST: 'Meno recenti',
    TITLE_ASC: 'A → Z',
@@ -237,9 +238,9 @@
   },
  },
  playNext: {
- title: 'Play Next',
+  title: 'Play Next',
   subtitle: 'La tua coda, ordinata per priorità.',
- searchPlaceholder: 'Cerca in Play Next...',
+  searchPlaceholder: 'Cerca in Play Next...',
   reorderHint: 'Tieni premuto per riordinare.',
   dragHint: 'Tieni premuto per ordinare',
   reorderSuccess: 'Priorità Play Next aggiornata',
@@ -257,6 +258,18 @@
    communityLoved: 'Amato dalla community',
    questSaveFavorite: 'Top su QuestSave+',
    waitingLong: 'In attesa da tempo',
+  },
+  manualReorder: {
+   button: 'Modifica ordinamento',
+   title: 'Ordina manualmente',
+   subtitle: 'Sposta i giochi nelle posizioni che preferisci.',
+   gamePlaceholder: 'Nome del gioco...',
+   positionPlaceholder: 'Pos.',
+   positionHint: 'Ora: {{name}}',
+   addRow: 'Aggiungi',
+   apply: 'Applica',
+   cancel: 'Annulla',
+   noGamesFound: 'Nessun gioco trovato',
   },
  },
  gameDetail: {
@@ -483,7 +496,7 @@
    },
    playstyle: {
     title: 'Come si gioca',
-        modeLabel: 'Modalità',
+    modeLabel: 'Modalità',
     perspectiveLabel: 'Prospettiva',
     themeLabel: 'Temi',
     multiplayerLabel: 'Multiplayer',
@@ -507,7 +520,7 @@
    },
    audience: {
     title: 'Per chi è questo gioco',
-        subtitle: "Un colpo d'occhio rapido su chi potrebbe amarlo di più.",
+    subtitle: "Un colpo d'occhio rapido su chi potrebbe amarlo di più.",
     localCoop: 'Ideale per co-op locale',
     onlineCoop: 'Perfetto da giocare in compagnia online',
     thirdPersonHorror: 'Horror in terza persona con forte atmosfera',
@@ -590,7 +603,8 @@
    loading: 'Verifica account in corso...',
    success: 'Account confermato!',
    badge: 'Nuovo giocatore',
-   successSub: 'La tua email è stata confermata con successo.\nOra puoi accedere di nuovo a QuestSave+.',
+   successSub:
+    'La tua email è stata confermata con successo.\nOra puoi accedere di nuovo a QuestSave+.',
    goToDashboard: 'Vai alla dashboard',
    error: 'Qualcosa è andato storto. Riprova.',
    backToLogin: 'Torna al login',

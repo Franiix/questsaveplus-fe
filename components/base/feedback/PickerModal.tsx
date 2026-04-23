@@ -1,6 +1,6 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import { FlatList, Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { FlatList, Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { ModalCloseButton } from '@/components/base/feedback/ModalCloseButton';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
 
@@ -18,7 +18,14 @@ type PickerModalProps = {
  onChange: (value: string) => void;
 };
 
-export function PickerModal({ isVisible, onClose, title, options, value, onChange }: PickerModalProps) {
+export function PickerModal({
+ isVisible,
+ onClose,
+ title,
+ options,
+ value,
+ onChange,
+}: PickerModalProps) {
  const { t } = useTranslation();
 
  function handleSelect(nextValue: string) {

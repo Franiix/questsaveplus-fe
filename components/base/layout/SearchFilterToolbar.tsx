@@ -1,7 +1,7 @@
 import { View } from 'react-native';
-import { spacing } from '@/shared/theme/tokens';
 import { FilterIconButton } from '@/components/base/inputs/FilterIconButton';
 import { SearchBar } from '@/components/base/inputs/SearchBar';
+import { spacing } from '@/shared/theme/tokens';
 
 type SearchFilterToolbarProps = {
  value: string;
@@ -26,7 +26,7 @@ export function SearchFilterToolbar({
  activeCount = 0,
  isFilterActive = false,
 }: SearchFilterToolbarProps) {
-  const hasActiveCount = activeCount > 0;
+ const hasActiveCount = activeCount > 0;
 
  return (
   <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>

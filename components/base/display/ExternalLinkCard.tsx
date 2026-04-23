@@ -72,20 +72,20 @@ export function ExternalLinkCard({
       </Text>
      </View>
 
-      <View
-       style={{
-        width: 34,
-        height: 34,
-        borderRadius: borderRadius.full,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: colors.background.surface,
-        borderWidth: 1,
-        borderColor: `${accentColor}33`,
-       }}
-      >
-       <FontAwesome5 name={primaryActionIconName} size={13} color={accentColor} solid />
-      </View>
+     <View
+      style={{
+       width: 34,
+       height: 34,
+       borderRadius: borderRadius.full,
+       alignItems: 'center',
+       justifyContent: 'center',
+       backgroundColor: colors.background.surface,
+       borderWidth: 1,
+       borderColor: `${accentColor}33`,
+      }}
+     >
+      <FontAwesome5 name={primaryActionIconName} size={13} color={accentColor} solid />
+     </View>
     </View>
 
     <View style={{ flexDirection: 'row', gap: spacing.sm }}>
@@ -135,10 +135,10 @@ export function ExternalLinkCard({
         fontFamily: typography.font.semibold,
        }}
       >
-         <FontAwesome5 name={primaryActionIconName} size={12} color={colors.text.inverse} solid />{' '}
-         {primaryAction.label}
-        </Text>
-      </Pressable>
+       <FontAwesome5 name={primaryActionIconName} size={12} color={colors.text.inverse} solid />{' '}
+       {primaryAction.label}
+      </Text>
+     </Pressable>
     </View>
    </View>
   </Card>

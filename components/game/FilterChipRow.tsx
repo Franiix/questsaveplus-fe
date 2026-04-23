@@ -25,12 +25,42 @@ const CHIP_ROW_CONTENT_CONTAINER_STYLE = {
 
 const FILTERS: FilterDefinition[] = [
  { value: null, labelKey: 'backlog.filterAll', color: colors.primary.DEFAULT },
- { value: BacklogStatusEnum.WISHLIST, labelKey: 'backlog.status.WISHLIST', color: colors.status.wishlist, icon: 'shopping-bag' },
- { value: BacklogStatusEnum.WANT_TO_PLAY, labelKey: 'backlog.status.WANT_TO_PLAY', color: colors.status.want_to_play, icon: 'bookmark' },
- { value: BacklogStatusEnum.PLAYING, labelKey: 'backlog.status.PLAYING', color: colors.status.playing, icon: 'play' },
- { value: BacklogStatusEnum.ONGOING, labelKey: 'backlog.status.ONGOING', color: colors.status.ongoing, icon: 'sync-alt' },
- { value: BacklogStatusEnum.COMPLETED, labelKey: 'backlog.status.COMPLETED', color: colors.status.completed, icon: 'trophy' },
- { value: BacklogStatusEnum.ABANDONED, labelKey: 'backlog.status.ABANDONED', color: colors.status.abandoned, icon: 'ban' },
+ {
+  value: BacklogStatusEnum.WISHLIST,
+  labelKey: 'backlog.status.WISHLIST',
+  color: colors.status.wishlist,
+  icon: 'shopping-bag',
+ },
+ {
+  value: BacklogStatusEnum.WANT_TO_PLAY,
+  labelKey: 'backlog.status.WANT_TO_PLAY',
+  color: colors.status.want_to_play,
+  icon: 'bookmark',
+ },
+ {
+  value: BacklogStatusEnum.PLAYING,
+  labelKey: 'backlog.status.PLAYING',
+  color: colors.status.playing,
+  icon: 'play',
+ },
+ {
+  value: BacklogStatusEnum.ONGOING,
+  labelKey: 'backlog.status.ONGOING',
+  color: colors.status.ongoing,
+  icon: 'sync-alt',
+ },
+ {
+  value: BacklogStatusEnum.COMPLETED,
+  labelKey: 'backlog.status.COMPLETED',
+  color: colors.status.completed,
+  icon: 'trophy',
+ },
+ {
+  value: BacklogStatusEnum.ABANDONED,
+  labelKey: 'backlog.status.ABANDONED',
+  color: colors.status.abandoned,
+  icon: 'ban',
+ },
 ];
 
 /**

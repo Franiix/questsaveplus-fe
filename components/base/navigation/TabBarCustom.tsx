@@ -18,14 +18,20 @@ const TAB_ICONS: Record<TabKey, IconName> = {
  profile: 'user',
 };
 
-const TAB_LABEL_KEYS: Record<TabKey, 'tabs.home' | 'tabs.backlog' | 'tabs.playNext' | 'tabs.profile'> = {
+const TAB_LABEL_KEYS: Record<
+ TabKey,
+ 'tabs.home' | 'tabs.backlog' | 'tabs.playNext' | 'tabs.profile'
+> = {
  index: 'tabs.home',
  backlog: 'tabs.backlog',
  'play-next': 'tabs.playNext',
  profile: 'tabs.profile',
 };
 
-const TAB_ROUTES: Record<TabKey, '/(tabs)' | '/(tabs)/backlog' | '/(tabs)/play-next' | '/(tabs)/profile'> = {
+const TAB_ROUTES: Record<
+ TabKey,
+ '/(tabs)' | '/(tabs)/backlog' | '/(tabs)/play-next' | '/(tabs)/profile'
+> = {
  index: '/(tabs)',
  backlog: '/(tabs)/backlog',
  'play-next': '/(tabs)/play-next',
@@ -60,11 +66,9 @@ export function TabBarCustom() {
  const { width: screenWidth } = useWindowDimensions();
  const insets = useSafeAreaInsets();
 
- const hidden =
-  segments[0] === '(auth)' ||
-  (segments[0] === 'auth' && segments[1] === 'callback');
+ const hidden = segments[0] === '(auth)' || (segments[0] === 'auth' && segments[1] === 'callback');
 
-const activeTab = resolveActiveTab(segments);
+ const activeTab = resolveActiveTab(segments);
  const barWidth = screenWidth - HORIZONTAL_INSET * 2;
  const innerWidth = barWidth - CONTAINER_PADDING * 2;
  const tabWidth = innerWidth / TAB_ORDER.length;
@@ -113,11 +117,11 @@ const activeTab = resolveActiveTab(segments);
     <View
      pointerEvents="none"
      style={{
-     position: 'absolute',
-     inset: 0,
-     borderRadius: 24,
+      position: 'absolute',
+      inset: 0,
+      borderRadius: 24,
       backgroundColor: 'rgba(255,255,255,0.025)',
-    }}
+     }}
     />
     <View
      pointerEvents="none"
@@ -160,7 +164,7 @@ const activeTab = resolveActiveTab(segments);
       const iconColor = isFocused ? colors.primary['200'] : colors.text.disabled;
       const label = t(TAB_LABEL_KEYS[tab]);
 
-     return (
+      return (
        <Pressable
         key={tab}
         accessibilityRole="button"
@@ -177,23 +181,20 @@ const activeTab = resolveActiveTab(segments);
          borderRadius: 18,
         }}
        >
-        <FontAwesome5
-         name={TAB_ICONS[tab]}
-         size={17}
-         color={iconColor}
-         solid={isFocused}
-        />
+        <FontAwesome5 name={TAB_ICONS[tab]} size={17} color={iconColor} solid={isFocused} />
         <Text
          numberOfLines={1}
          style={{
-         color: iconColor,
-         fontSize: typography.size.xs,
-         fontFamily: isFocused ? typography.font.semibold : typography.font.medium,
+          color: iconColor,
+          fontSize: typography.size.xs,
+          fontFamily: isFocused ? typography.font.semibold : typography.font.medium,
           opacity: isFocused ? 1 : 0.82,
           textShadowColor: isFocused ? 'rgba(0,0,0,0.35)' : 'transparent',
           textShadowOffset: { width: 0, height: 1 },
           textShadowRadius: 4,
-          letterSpacing: isFocused ? typography.letterSpacing.normal : typography.letterSpacing.tight,
+          letterSpacing: isFocused
+           ? typography.letterSpacing.normal
+           : typography.letterSpacing.tight,
          }}
         >
          {label}

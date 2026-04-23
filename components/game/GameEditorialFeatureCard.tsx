@@ -1,12 +1,12 @@
-import { useMemo, useState } from 'react';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { Badge } from '@/components/base/display/Badge';
 import { Card } from '@/components/base/display/Card';
 import { ModalCloseButton } from '@/components/base/feedback/ModalCloseButton';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
-import type { GameEditorialRow } from '@/shared/utils/gameCatalog';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
+import type { GameEditorialRow } from '@/shared/utils/gameCatalog';
 
 type GameEditorialFeatureCardProps = {
  title: string;
@@ -27,7 +27,9 @@ export function GameEditorialFeatureCard({
  bullets = [],
  closeLabel = 'Close',
 }: GameEditorialFeatureCardProps) {
- const [expandedRow, setExpandedRow] = useState<(GameEditorialRow & { onPress?: (() => void) | null }) | null>(null);
+ const [expandedRow, setExpandedRow] = useState<
+  (GameEditorialRow & { onPress?: (() => void) | null }) | null
+ >(null);
  const renderedRows = useMemo(
   () =>
    rows.map((row) => {
@@ -123,7 +125,9 @@ export function GameEditorialFeatureCard({
          >
           {row.label}
          </Text>
-         <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: spacing.xs }}>
+         <View
+          style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: spacing.xs }}
+         >
           <Text
            style={{
             color: colors.text.primary,
@@ -146,9 +150,7 @@ export function GameEditorialFeatureCard({
             </Text>
            </Pressable>
           ) : null}
-          {row.onPress ? (
-           <FontAwesome5 name="chevron-right" size={11} color={accentColor} />
-          ) : null}
+          {row.onPress ? <FontAwesome5 name="chevron-right" size={11} color={accentColor} /> : null}
          </View>
         </View>
        );
@@ -196,7 +198,12 @@ export function GameEditorialFeatureCard({
     ) : null}
    </Card>
 
-   <Modal visible={Boolean(expandedRow)} animationType="slide" transparent onRequestClose={() => setExpandedRow(null)}>
+   <Modal
+    visible={Boolean(expandedRow)}
+    animationType="slide"
+    transparent
+    onRequestClose={() => setExpandedRow(null)}
+   >
     <View style={{ flex: 1, backgroundColor: 'rgba(4,4,10,0.82)', justifyContent: 'flex-end' }}>
      <View
       style={{

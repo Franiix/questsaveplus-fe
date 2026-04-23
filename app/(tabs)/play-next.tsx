@@ -1,11 +1,14 @@
-import DraggableFlatList, {
- ScaleDecorator,
- type RenderItemParams,
-} from 'react-native-draggable-flatlist';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import DraggableFlatList, {
+ type RenderItemParams,
+ ScaleDecorator,
+} from 'react-native-draggable-flatlist';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { BacklogListItem } from '@/components/backlog/BacklogListItem';
 import { GradientUnderline } from '@/components/base/display/GradientUnderline';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
 import { EmptyState } from '@/components/base/feedback/EmptyState';
@@ -15,20 +18,19 @@ import { SortIconButton } from '@/components/base/inputs/SortIconButton';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { ScreenHeader } from '@/components/base/layout/ScreenHeader';
 import { SearchFilterToolbar } from '@/components/base/layout/SearchFilterToolbar';
-import { BacklogListItem } from '@/components/backlog/BacklogListItem';
 import { GameFilterSheet } from '@/components/game/GameFilterSheet';
 import { useBacklogGameMetadata } from '@/hooks/useBacklogGameMetadata';
 import { useBacklogSortPreference } from '@/hooks/useBacklogSortPreference';
-import { usePrefetchGameResources } from '@/hooks/usePrefetchGameResources';
-import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { useBacklogStatusPresentation } from '@/hooks/useBacklogStatusPresentation';
 import { useCatalogDevelopers } from '@/hooks/useCatalogDevelopers';
 import { useCatalogGenres } from '@/hooks/useCatalogGenres';
 import { useCatalogParentPlatforms } from '@/hooks/useCatalogParentPlatforms';
 import { useCatalogPublishers } from '@/hooks/useCatalogPublishers';
+import { usePrefetchGameResources } from '@/hooks/usePrefetchGameResources';
+import { useSafeRouter } from '@/hooks/useSafeRouter';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
-import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
+import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import { borderRadius, colors, layout, spacing, typography } from '@/shared/theme/tokens';
 import {
@@ -36,8 +38,8 @@ import {
  getPlayNextItems,
  shouldLoadBacklogMetadata,
 } from '@/shared/utils/backlogScreen';
-import { getPlayNextReasonKey } from '@/shared/utils/playNextReason';
 import { createEmptyGameDiscoveryFilters } from '@/shared/utils/gameDiscoveryFilters';
+import { getPlayNextReasonKey } from '@/shared/utils/playNextReason';
 import { useAuthStore } from '@/stores/auth.store';
 import { useBacklogStore } from '@/stores/backlog.store';
 import { useToastStore } from '@/stores/toast.store';
@@ -49,7 +51,9 @@ const styles = StyleSheet.create({
   paddingHorizontal: HORIZONTAL_PADDING,
   paddingTop: spacing.sm,
   paddingBottom: layout.screenBottomPadding,
-  gap: spacing.sm,
+ },
+ itemSeparator: {
+  height: spacing.sm,
  },
 });
 
@@ -71,17 +75,25 @@ export default function PlayNextScreen() {
  const clearError = useBacklogStore((state) => state.clearError);
  const [search, setSearch] = useState('');
  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
- const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
- const [draftFilters, setDraftFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
+ const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(
+  createEmptyGameDiscoveryFilters,
+ );
+ const [draftFilters, setDraftFilters] = useState<GameDiscoveryFilters>(
+  createEmptyGameDiscoveryFilters,
+ );
  const [isReordering, setIsReordering] = useState(false);
  const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
  const [pendingPlayItem, setPendingPlayItem] = useState<BacklogItemEntity | null>(null);
- const { sortOrder: playNextSortOrder, setSortOrder: setPlayNextSortOrder } = useBacklogSortPreference('play_next_sort_order');
+ const { sortOrder: playNextSortOrder, setSortOrder: setPlayNextSortOrder } =
+  useBacklogSortPreference('play_next_sort_order', BacklogSortEnum.PRIORITY);
  const userId = session?.user?.id;
  const playNextItems = useMemo(() => getPlayNextItems(backlogItems), [backlogItems]);
  const catalogFiltersEnabled = isFilterSheetOpen || shouldLoadBacklogMetadata(appliedFilters);
- const { data: genres = [], isLoading: isGenresLoading, isError: isGenresError } =
-  useCatalogGenres(catalogFiltersEnabled);
+ const {
+  data: genres = [],
+  isLoading: isGenresLoading,
+  isError: isGenresError,
+ } = useCatalogGenres(catalogFiltersEnabled);
  const {
   data: parentPlatforms = [],
   isLoading: isParentPlatformsLoading,
@@ -113,9 +125,16 @@ export default function PlayNextScreen() {
    }),
   [appliedFilters, backlogMetadata, playNextItems, playNextSortOrder, search],
  );
- const canReorder = !hasAppliedFilters && !isReordering;
+ const canReorder =
+  !hasAppliedFilters && !isReordering && playNextSortOrder === BacklogSortEnum.PRIORITY;
  const sortOptions = useMemo<PickerOption[]>(
-  () => Object.values(BacklogSortEnum).map((value) => ({ label: t(`backlog.sort.${value}`), value })),
+  () =>
+   [
+    BacklogSortEnum.PRIORITY,
+    BacklogSortEnum.TITLE_ASC,
+    BacklogSortEnum.TITLE_DESC,
+    BacklogSortEnum.RATING_DESC,
+   ].map((value) => ({ label: t(`backlog.sort.${value}`), value })),
   [t],
  );
 
@@ -248,10 +267,7 @@ export default function PlayNextScreen() {
    }
 
    const updateError = useBacklogStore.getState().error;
-   showToast(
-    updateError ?? t('playNext.reorderSuccess'),
-    updateError ? 'error' : 'success',
-   );
+   showToast(updateError ?? t('playNext.reorderSuccess'), updateError ? 'error' : 'success');
    setIsReordering(false);
   },
   [clearError, showToast, t, update],
@@ -267,33 +283,42 @@ export default function PlayNextScreen() {
    const itemMeta = backlogMetadata?.get(item.game_id) ?? null;
    const reasonKey = getPlayNextReasonKey(item, itemMeta);
    const reasonToPlay = reasonKey ? t(`playNext.reason.${reasonKey}`) : undefined;
+   const longPressGesture = canReorder
+    ? Gesture.LongPress()
+       .minDuration(300)
+       .runOnJS(true)
+       .onStart(() => drag())
+    : Gesture.LongPress().enabled(false);
    return (
     <ScaleDecorator activeScale={1.03}>
-     <BacklogListItem
-     item={item}
-     onPress={handleItemPress}
-     onPressIn={handleItemPressIn}
-     onLongPress={canReorder ? () => drag() : undefined}
-     onQuickStatusChange={handleQuickStatusChange}
-     onTogglePlayNext={handleTogglePlayNext}
-     onPrimaryAction={handleRequestPlay}
-     onRequestRemove={() => {}}
-     isUpdatingStatus={isMutating && activeMutation === 'update'}
-     isUpdatingPlayNext={isMutating && activeMutation === 'update'}
-     isDragActive={isActive}
-     dragHintLabel={canReorder ? t('playNext.dragHint') : undefined}
-     primaryActionLabel={t('playNext.playAction')}
-     playNextOrdinal={item.play_next_priority ?? undefined}
-     quickActionsMode="play-only"
-     playNextPinLabel={t('backlog.playNext.pinAction')}
-     playNextUnpinLabel={t('backlog.playNext.unpinAction')}
-     removeLabel={t('gameDetail.confirmRemove.confirm')}
-     labelMap={labelMap}
-     colorMap={colorMap}
-     iconMap={iconMap}
-     reasonToPlay={reasonToPlay}
-    />
-   </ScaleDecorator>
+     <GestureDetector gesture={longPressGesture}>
+      <View>
+       <BacklogListItem
+        item={item}
+        onPress={handleItemPress}
+        onPressIn={handleItemPressIn}
+        onQuickStatusChange={handleQuickStatusChange}
+        onTogglePlayNext={handleTogglePlayNext}
+        onPrimaryAction={handleRequestPlay}
+        onRequestRemove={() => {}}
+        isUpdatingStatus={isMutating && activeMutation === 'update'}
+        isUpdatingPlayNext={isMutating && activeMutation === 'update'}
+        isDragActive={isActive}
+        dragHintLabel={canReorder ? t('playNext.dragHint') : undefined}
+        primaryActionLabel={t('playNext.playAction')}
+        playNextOrdinal={item.play_next_priority ?? undefined}
+        quickActionsMode="play-only"
+        playNextPinLabel={t('backlog.playNext.pinAction')}
+        playNextUnpinLabel={t('backlog.playNext.unpinAction')}
+        removeLabel={t('gameDetail.confirmRemove.confirm')}
+        labelMap={labelMap}
+        colorMap={colorMap}
+        iconMap={iconMap}
+        reasonToPlay={reasonToPlay}
+       />
+      </View>
+     </GestureDetector>
+    </ScaleDecorator>
    );
   },
   [
@@ -390,9 +415,39 @@ export default function PlayNextScreen() {
      <SortIconButton
       onPress={() => setIsSortSheetOpen(true)}
       accessibilityLabel={t('backlog.sort.label')}
-      isActive={playNextSortOrder !== BacklogSortEnum.NEWEST}
+      isActive={playNextSortOrder !== BacklogSortEnum.PRIORITY}
      />
     </View>
+    {playNextItems.length > 1 ? (
+     <Pressable
+      onPress={() => router.push('/play-next-reorder')}
+      style={{ alignSelf: 'flex-start' }}
+     >
+      <View
+       style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: spacing.xs,
+        minHeight: 38,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm,
+        borderRadius: borderRadius.full,
+        backgroundColor: 'rgba(255,255,255,0.06)',
+       }}
+      >
+       <FontAwesome5 name="sort-amount-down" size={10} color={colors.primary['100']} solid />
+       <Text
+        style={{
+         color: colors.primary['100'],
+         fontSize: typography.size.sm,
+         fontFamily: typography.font.semibold,
+        }}
+       >
+        {t('playNext.manualReorder.button')}
+       </Text>
+      </View>
+     </Pressable>
+    ) : null}
    </View>
 
    {isReadingList ? <LoadingSpinner fullScreen /> : null}
@@ -411,34 +466,33 @@ export default function PlayNextScreen() {
      action={{ label: t('playNext.emptyAction'), onPress: handleOpenBacklog }}
     />
    ) : null}
-   {!isReadingList && !error && playNextItems.length > 0
-    ? filteredItems.length === 0
-      ? (
-        <EmptyState
-         icon="filter"
-         title={t('backlog.emptyFiltered.title')}
-         subtitle={t('backlog.emptyFiltered.subtitle')}
-        />
-       )
-      : (
-        <DraggableFlatList
-         data={filteredItems}
-         renderItem={renderItem}
-         keyExtractor={(item) => item.id}
-         contentContainerStyle={styles.listContent}
-         showsVerticalScrollIndicator={false}
-         keyboardShouldPersistTaps="handled"
-         activationDistance={16}
-         autoscrollThreshold={72}
-         autoscrollSpeed={220}
-         removeClippedSubviews
-         onDragEnd={({ data, from, to }) => {
-          if (!canReorder || from === to) return;
-          void persistPlayNextOrder(data);
-         }}
-        />
-       )
-    : null}
+   {!isReadingList && !error && playNextItems.length > 0 ? (
+    filteredItems.length === 0 ? (
+     <EmptyState
+      icon="filter"
+      title={t('backlog.emptyFiltered.title')}
+      subtitle={t('backlog.emptyFiltered.subtitle')}
+     />
+    ) : (
+     <DraggableFlatList
+      data={filteredItems}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={styles.listContent}
+      ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      activationDistance={16}
+      autoscrollThreshold={72}
+      autoscrollSpeed={220}
+      removeClippedSubviews
+      onDragEnd={({ data, from, to }) => {
+       if (!canReorder || from === to) return;
+       void persistPlayNextOrder(data);
+      }}
+     />
+    )
+   ) : null}
 
    <GameFilterSheet
     isVisible={isFilterSheetOpen}
@@ -458,7 +512,7 @@ export default function PlayNextScreen() {
     value={draftFilters}
     onChange={setDraftFilters}
     onApply={handleApplyFilters}
-   onReset={handleResetFilters}
+    onReset={handleResetFilters}
    />
 
    <PickerModal
@@ -479,7 +533,6 @@ export default function PlayNextScreen() {
     onConfirm={() => void handleConfirmPlay()}
     onCancel={() => setPendingPlayItem(null)}
    />
-
   </SafeAreaView>
  );
 }

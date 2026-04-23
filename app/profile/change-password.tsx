@@ -1,5 +1,6 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +24,7 @@ function mapPasswordError(error: string, t: (key: string) => string): string {
 
 export default function ChangePasswordScreen() {
  const { t } = useTranslation();
+ const router = useRouter();
  const { updatePassword, isLoading, error, clearError } = useAuthStore();
  const [success, setSuccess] = useState(false);
 
@@ -132,6 +134,15 @@ export default function ChangePasswordScreen() {
     isLoading={isLoading}
     fullWidth
    />
+   <View style={{ marginTop: spacing.sm }}>
+    <BaseButton
+     label={t('common.cancel')}
+     variant="outlined"
+     onPress={() => router.back()}
+     isDisabled={isLoading}
+     fullWidth
+    />
+   </View>
   </ScreenContainer>
  );
 }

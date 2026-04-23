@@ -97,24 +97,56 @@ export function AuthBootScreen({ title, subtitle }: AuthBootScreenProps) {
       inset: 0,
       backgroundColor: colors.primary.glowSoft,
       opacity: 0.7,
-    }}
+     }}
     />
-    <FallingController icon="gamepad" delay={0} size={28} left={24} top={20} opacity={0.5} rotate="-12deg" />
-    <FallingController icon="dice-d20" delay={220} size={22} left={126} top={34} opacity={0.35} rotate="9deg" />
-    <FallingController icon="headset" delay={420} size={24} left={110} top={118} opacity={0.3} rotate="-8deg" />
-    <FallingController icon="gamepad" delay={620} size={20} left={38} top={120} opacity={0.26} rotate="6deg" />
+    <FallingController
+     icon="gamepad"
+     delay={0}
+     size={28}
+     left={24}
+     top={20}
+     opacity={0.5}
+     rotate="-12deg"
+    />
+    <FallingController
+     icon="dice-d20"
+     delay={220}
+     size={22}
+     left={126}
+     top={34}
+     opacity={0.35}
+     rotate="9deg"
+    />
+    <FallingController
+     icon="headset"
+     delay={420}
+     size={24}
+     left={110}
+     top={118}
+     opacity={0.3}
+     rotate="-8deg"
+    />
+    <FallingController
+     icon="gamepad"
+     delay={620}
+     size={20}
+     left={38}
+     top={120}
+     opacity={0.26}
+     rotate="6deg"
+    />
 
     <View
-      style={{
-       width: 78,
-       height: 78,
-       borderRadius: 39,
-       backgroundColor: colors.background.elevated,
-       borderWidth: 1,
-       borderColor: colors.border.DEFAULT,
-       alignItems: 'center',
-       justifyContent: 'center',
-      }}
+     style={{
+      width: 78,
+      height: 78,
+      borderRadius: 39,
+      backgroundColor: colors.background.elevated,
+      borderWidth: 1,
+      borderColor: colors.border.DEFAULT,
+      alignItems: 'center',
+      justifyContent: 'center',
+     }}
     >
      <FontAwesome5 name="gamepad" size={28} color={colors.accent.DEFAULT} solid />
     </View>

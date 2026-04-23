@@ -1,4 +1,4 @@
-import { FontAwesome5 } from '@expo/vector-icons';
+import type { FontAwesome5 } from '@expo/vector-icons';
 import { Badge } from './Badge';
 
 type StatusBadgeProps<T extends string> = {

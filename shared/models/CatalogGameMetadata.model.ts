@@ -1,6 +1,6 @@
 import type { CatalogProviderId } from '@/shared/enums/CatalogProvider.enum';
-import type { IgdbRawExtras } from '@/shared/models/IgdbCatalogExtras.model';
 import type { GameReleaseReadiness } from '@/shared/models/GameReleaseReadiness.model';
+import type { IgdbRawExtras } from '@/shared/models/IgdbCatalogExtras.model';
 
 export type CatalogGameMetadata = {
  gameId?: number | null;

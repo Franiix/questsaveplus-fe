@@ -1,6 +1,6 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Pressable, Text, type ViewStyle, View } from 'react-native';
+import { Pressable, Text, View, type ViewStyle } from 'react-native';
 import {
  borderRadius,
  colors,
@@ -26,7 +26,10 @@ const CHIP_CONTENT_STYLE: ViewStyle = {
  justifyContent: 'center',
 };
 
-const CHIP_CONTENT_STYLE_SELECTED: ViewStyle[] = [CHIP_CONTENT_STYLE, { flexDirection: 'row', gap: 5 }];
+const CHIP_CONTENT_STYLE_SELECTED: ViewStyle[] = [
+ CHIP_CONTENT_STYLE,
+ { flexDirection: 'row', gap: 5 },
+];
 
 const CHIP_CONTENT_STYLE_UNSELECTED: ViewStyle[] = [
  CHIP_CONTENT_STYLE,
@@ -55,7 +58,15 @@ type FilterChipProps = {
  * Selected: sfondo tinto (15% opacità) + bordo brand.
  * Unselected: sfondo trasparente + bordo default.
  */
-export function FilterChip({ label, isSelected, onPress, isDisabled = false, color, icon, count }: FilterChipProps) {
+export function FilterChip({
+ label,
+ isSelected,
+ onPress,
+ isDisabled = false,
+ color,
+ icon,
+ count,
+}: FilterChipProps) {
  const selectedColor = colors.primary.DEFAULT;
  const selectedGlow = colors.primary.glow;
  const iconColor = color ?? '#FFFFFF';
@@ -63,11 +74,7 @@ export function FilterChip({ label, isSelected, onPress, isDisabled = false, col
   minHeight: 42,
   borderRadius: borderRadius.full,
   borderWidth: 1.5,
-  borderColor: isSelected
-    ? colors.primary['300']
-    : color
-      ? `${color}45`
-      : `${selectedColor}40`,
+  borderColor: isSelected ? colors.primary['300'] : color ? `${color}45` : `${selectedColor}40`,
   padding: 1,
   alignItems: 'center' as const,
   justifyContent: 'center' as const,
@@ -101,7 +108,14 @@ export function FilterChip({ label, isSelected, onPress, isDisabled = false, col
      <Text style={CHIP_LABEL_STYLE}>{label}</Text>
      {typeof count === 'number' ? (
       <View style={[COUNT_BADGE_STYLE_BASE, { backgroundColor: 'rgba(255,255,255,0.22)' }]}>
-       <Text style={{ color: '#FFFFFF', fontSize: typography.size['2xs'], fontFamily: typography.font.semibold, lineHeight: 14 }}>
+       <Text
+        style={{
+         color: '#FFFFFF',
+         fontSize: typography.size['2xs'],
+         fontFamily: typography.font.semibold,
+         lineHeight: 14,
+        }}
+       >
         {count}
        </Text>
       </View>
@@ -113,7 +127,14 @@ export function FilterChip({ label, isSelected, onPress, isDisabled = false, col
      <Text style={CHIP_LABEL_STYLE}>{label}</Text>
      {typeof count === 'number' ? (
       <View style={[COUNT_BADGE_STYLE_BASE, { backgroundColor: `${iconColor}22` }]}>
-       <Text style={{ color: iconColor, fontSize: typography.size['2xs'], fontFamily: typography.font.semibold, lineHeight: 14 }}>
+       <Text
+        style={{
+         color: iconColor,
+         fontSize: typography.size['2xs'],
+         fontFamily: typography.font.semibold,
+         lineHeight: 14,
+        }}
+       >
         {count}
        </Text>
       </View>

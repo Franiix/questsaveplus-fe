@@ -154,5 +154,5 @@ export const opacity = {
 
 export const layout = {
  screenContentTopPadding: 84, // ScreenHeader height + safe area inset
- screenBottomPadding: 110,    // tab bar height + clearance
+ screenBottomPadding: 110, // tab bar height + clearance
 } as const;

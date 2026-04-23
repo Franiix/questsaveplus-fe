@@ -24,6 +24,6 @@ export type GameCatalogInfo = {
  websites: string[];
 };
 
-export type { GameCatalogLinkItem } from './GameCatalogLinkItem.model';
 export type { GameCatalogLanguageSupportRow } from './GameCatalogLanguageSupportRow.model';
+export type { GameCatalogLinkItem } from './GameCatalogLinkItem.model';
 export type { GameCatalogReleaseDateItem } from './GameCatalogReleaseDateItem.model';

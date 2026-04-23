@@ -153,11 +153,11 @@ export const GameCard = memo(function GameCard({
     style={[
      cardStyle,
      {
-     width,
-     height: cardHeight,
-     borderRadius: 18,
-     overflow: 'hidden',
-     backgroundColor: colors.background.surface,
+      width,
+      height: cardHeight,
+      borderRadius: 18,
+      overflow: 'hidden',
+      backgroundColor: colors.background.surface,
       opacity: isLocked ? 0.78 : 1,
      },
     ]}

@@ -173,7 +173,7 @@ export function HomeScreenContent({
    <View style={{ paddingHorizontal: HORIZONTAL_PADDING, paddingTop: spacing.sm }}>
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: COLUMN_GAP }}>
      {Array.from({ length: 6 }).map((_, index) => (
-     <GameCardSkeleton
+      <GameCardSkeleton
        // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton grid, no reordering
        key={index}
        width={cardWidth}
@@ -301,14 +301,14 @@ export function HomeScreenContent({
     {homeSections.map((section) => (
      <GameCarouselSection
       key={section.key}
-     title={section.title}
-     games={[]}
-     cardWidth={carouselCardWidth}
-     isLoading
-     onPress={onGamePress}
-     onPressIn={onGamePressIn}
-     onLongPress={onGameLongPress}
-    />
+      title={section.title}
+      games={[]}
+      cardWidth={carouselCardWidth}
+      isLoading
+      onPress={onGamePress}
+      onPressIn={onGamePressIn}
+      onLongPress={onGameLongPress}
+     />
     ))}
    </View>
   );

@@ -8,11 +8,7 @@ type ModalCloseButtonProps = {
  iconName?: React.ComponentProps<typeof FontAwesome5>['name'];
 };
 
-export function ModalCloseButton({
- label,
- onPress,
- iconName = 'times',
-}: ModalCloseButtonProps) {
+export function ModalCloseButton({ label, onPress, iconName = 'times' }: ModalCloseButtonProps) {
  return (
   <Pressable
    onPress={onPress}

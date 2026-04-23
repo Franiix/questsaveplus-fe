@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
+import { useCallback } from 'react';
 import { getCatalogGameDetail } from '@/lib/catalog';
 import type { CatalogGame } from '@/shared/models/Catalog.model';
 import { getCatalogGameNumericId } from '@/shared/utils/catalogGame';

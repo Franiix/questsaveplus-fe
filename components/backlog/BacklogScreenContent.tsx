@@ -1,6 +1,6 @@
 import { memo, useCallback } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { BacklogListItem } from '@/components/backlog/BacklogListItem';
 import { BacklogPlayNextCallout } from '@/components/backlog/BacklogPlayNextCallout';
 import { EmptyState } from '@/components/base/feedback/EmptyState';
@@ -125,7 +125,11 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
  return (
   <>
    <View style={{ marginBottom: spacing.xs }}>
-    <FilterChipRow activeFilter={state.activeFilter} onFilterChange={onFilterChange} countMap={state.statusCounts} />
+    <FilterChipRow
+     activeFilter={state.activeFilter}
+     onFilterChange={onFilterChange}
+     countMap={state.statusCounts}
+    />
    </View>
    <BacklogPlayNextCallout playNextCount={state.playNextCount} onPress={onOpenPlayNext} />
 
@@ -133,8 +137,14 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
     <View style={{ paddingTop: spacing.md }}>
      <EmptyState
       icon="gamepad"
-      title={state.hasAppliedFilters ? t('backlog.emptyFiltered.title') : t('backlog.emptyAll.title')}
-      subtitle={state.hasAppliedFilters ? t('backlog.emptyFiltered.subtitle') : t('backlog.emptyAll.subtitle')}
+      title={
+       state.hasAppliedFilters ? t('backlog.emptyFiltered.title') : t('backlog.emptyAll.title')
+      }
+      subtitle={
+       state.hasAppliedFilters
+        ? t('backlog.emptyFiltered.subtitle')
+        : t('backlog.emptyAll.subtitle')
+      }
      />
     </View>
    ) : (

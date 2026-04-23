@@ -1,6 +1,6 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
-import { useCallback, useMemo, type ReactNode } from 'react';
+import { type ReactNode, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';

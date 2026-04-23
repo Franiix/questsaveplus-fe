@@ -4,8 +4,8 @@ import { FlatList, Pressable, Text, View } from 'react-native';
 import { ImageWithFallback } from '@/components/base/display/ImageWithFallback';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
 import { usePrefetchGameResources } from '@/hooks/usePrefetchGameResources';
-import { useSingleAction } from '@/hooks/useSingleAction';
 import { useSafeRouter } from '@/hooks/useSafeRouter';
+import { useSingleAction } from '@/hooks/useSingleAction';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
 import { useAuthStore } from '@/stores/auth.store';
@@ -15,53 +15,55 @@ const CARD_WIDTH = 110;
 const CARD_HEIGHT = 160;
 
 export function RecentlyAddedRow() {
-  const { t } = useTranslation();
-  const router = useSafeRouter();
-  const { session } = useAuthStore();
-  const { recentBacklogItems, readAll, clearBacklog } = useBacklogStore();
-  const { prefetchGameById } = usePrefetchGameResources();
+ const { t } = useTranslation();
+ const router = useSafeRouter();
+ const { session } = useAuthStore();
+ const { recentBacklogItems, readAll, clearBacklog } = useBacklogStore();
+ const { prefetchGameById } = usePrefetchGameResources();
 
-  const userId = session?.user?.id;
+ const userId = session?.user?.id;
 
-  useEffect(() => {
-    if (!userId) {
-      clearBacklog();
-      return;
-    }
+ useEffect(() => {
+  if (!userId) {
+   clearBacklog();
+   return;
+  }
 
-    void readAll(userId, { orderBy: 'added_at', limit: 5, target: 'recentBacklogItems' });
-  }, [clearBacklog, readAll, userId]);
+  void readAll(userId, { orderBy: 'added_at', limit: 5, target: 'recentBacklogItems' });
+ }, [clearBacklog, readAll, userId]);
 
-  useEffect(() => {
-    void Promise.all(
-      recentBacklogItems.slice(0, 4).map((item) =>
-        prefetchGameById(item.game_id, item.game_cover_url ? [item.game_cover_url] : []),
-      ),
-    );
-  }, [prefetchGameById, recentBacklogItems]);
-
-  const handlePress = useCallback(
-    (item: BacklogItemEntity) => {
-      router.push({ pathname: '/game/[id]', params: { id: item.game_id } });
-    },
-    [router],
+ useEffect(() => {
+  void Promise.all(
+   recentBacklogItems
+    .slice(0, 4)
+    .map((item) =>
+     prefetchGameById(item.game_id, item.game_cover_url ? [item.game_cover_url] : []),
+    ),
   );
+ }, [prefetchGameById, recentBacklogItems]);
 
-  if (recentBacklogItems.length === 0) return null;
+ const handlePress = useCallback(
+  (item: BacklogItemEntity) => {
+   router.push({ pathname: '/game/[id]', params: { id: item.game_id } });
+  },
+  [router],
+ );
 
-  return (
-    <View style={{ gap: spacing.sm, marginBottom: spacing.md }}>
-      <SectionTitle title={t('home.recentlyAdded')} style={{ paddingHorizontal: spacing.md }} />
-      <FlatList
-        horizontal
-        data={recentBacklogItems}
-        keyExtractor={(item) => item.id}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: spacing.md, gap: spacing.sm }}
-        renderItem={({ item }) => <RecentlyAddedCard item={item} onPress={handlePress} />}
-      />
-    </View>
-  );
+ if (recentBacklogItems.length === 0) return null;
+
+ return (
+  <View style={{ gap: spacing.sm, marginBottom: spacing.md }}>
+   <SectionTitle title={t('home.recentlyAdded')} style={{ paddingHorizontal: spacing.md }} />
+   <FlatList
+    horizontal
+    data={recentBacklogItems}
+    keyExtractor={(item) => item.id}
+    showsHorizontalScrollIndicator={false}
+    contentContainerStyle={{ paddingHorizontal: spacing.md, gap: spacing.sm }}
+    renderItem={({ item }) => <RecentlyAddedCard item={item} onPress={handlePress} />}
+   />
+  </View>
+ );
 }
 
 function RecentlyAddedCard({

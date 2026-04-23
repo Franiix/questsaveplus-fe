@@ -1,12 +1,12 @@
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons';
 import { SearchFilterToolbar } from '@/components/base/layout/SearchFilterToolbar';
 import { AppliedGameFiltersRow } from '@/components/game/AppliedGameFiltersRow';
 import { QuickDiscoveryPresetsRow } from '@/components/game/QuickDiscoveryPresetsRow';
-import { colors, spacing, typography } from '@/shared/theme/tokens';
 import type { HomeAppliedFilterChip } from '@/shared/models/home/HomeAppliedFilterChip.model';
 import type { HomeQuickPresetAction } from '@/shared/models/home/HomeQuickPresetAction.model';
+import { colors, spacing, typography } from '@/shared/theme/tokens';
 
 type HomeScreenHeaderProps = {
  activeFilterCount: number;

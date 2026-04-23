@@ -51,7 +51,11 @@ export default function ProfileSetupScreen() {
  });
 
  const genderOptions = useMemo(
-  () => PROFILE_GENDERS.map((gender) => ({ label: t(`profile.genderOptions.${gender}`), value: gender })),
+  () =>
+   PROFILE_GENDERS.map((gender) => ({
+    label: t(`profile.genderOptions.${gender}`),
+    value: gender,
+   })),
   [t],
  );
  const today = useMemo(() => new Date(), []);

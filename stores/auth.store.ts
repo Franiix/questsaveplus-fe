@@ -1,5 +1,5 @@
-import * as Linking from 'expo-linking';
 import type { Session } from '@supabase/supabase-js';
+import * as Linking from 'expo-linking';
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 import { useBacklogStore } from '@/stores/backlog.store';
@@ -25,7 +25,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>(
  (set, get): AuthState => ({
- session: null,
+  session: null,
   sessionOrigin: null,
   isLoading: true,
   error: null,
@@ -56,13 +56,7 @@ export const useAuthStore = create<AuthState>(
     set({
      session,
      sessionOrigin:
-      event === 'INITIAL_SESSION'
-       ? session
-         ? 'restored'
-         : null
-       : session
-         ? 'interactive'
-         : null,
+      event === 'INITIAL_SESSION' ? (session ? 'restored' : null) : session ? 'interactive' : null,
      isLoading: false,
     });
    });
@@ -89,7 +83,7 @@ export const useAuthStore = create<AuthState>(
    set({ isLoading: false, error: error ? error.message : null });
   },
 
- signOut: async () => {
+  signOut: async () => {
    set({ isLoading: true, error: null, sessionOrigin: null });
    await supabase.auth.signOut();
   },
@@ -104,7 +98,7 @@ export const useAuthStore = create<AuthState>(
    set({ isLoading: true, error: null });
    const { error } = await supabase.auth.updateUser(
     { email: newEmail },
-    { emailRedirectTo: authEmailRedirectTo }
+    { emailRedirectTo: authEmailRedirectTo },
    );
    set({ isLoading: false, error: error ? error.message : null });
   },
@@ -125,8 +119,8 @@ export const useAuthStore = create<AuthState>(
     set({ isLoading: false, error: 'wrong_password' });
     return;
    }
-  const { error } = await supabase.auth.updateUser({ password: newPassword });
-  set({ isLoading: false, error: error ? error.message : null });
+   const { error } = await supabase.auth.updateUser({ password: newPassword });
+   set({ isLoading: false, error: error ? error.message : null });
   },
 
   deleteAccount: async (confirmation) => {

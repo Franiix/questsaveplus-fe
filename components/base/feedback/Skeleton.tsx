@@ -2,11 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { useWindowDimensions, View } from 'react-native';
-import Animated, {
- useAnimatedStyle,
- useSharedValue,
- withTiming,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { borderRadius as borderRadiusTokens, colors } from '@/shared/theme/tokens';
 
 type SkeletonProps = {

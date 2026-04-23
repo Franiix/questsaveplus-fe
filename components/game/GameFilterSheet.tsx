@@ -2,12 +2,11 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, View } from 'react-native';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { BottomSheet } from '@/components/base/feedback/BottomSheet';
-import { SearchableSelectInput, type SearchableSelectOption } from '@/components/base/inputs/SearchableSelectInput';
-import type {
- CatalogCompany,
- CatalogGenre,
- CatalogPlatform,
-} from '@/shared/models/Catalog.model';
+import {
+ SearchableSelectInput,
+ type SearchableSelectOption,
+} from '@/components/base/inputs/SearchableSelectInput';
+import type { CatalogCompany, CatalogGenre, CatalogPlatform } from '@/shared/models/Catalog.model';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 
@@ -165,113 +164,125 @@ export function GameFilterSheet({
  const suggestedDeveloperOptions = developerOptions.slice(0, 8);
  const suggestedPublisherOptions = publisherOptions.slice(0, 8);
  const suggestedPlatformOptions = platformOptions.filter((platform) =>
-  SUGGESTED_PLATFORM_TERMS.some((term) =>
-   platform.searchText?.toLowerCase().includes(term),
-  ),
+  SUGGESTED_PLATFORM_TERMS.some((term) => platform.searchText?.toLowerCase().includes(term)),
  );
 
  return (
   <BottomSheet isVisible={isVisible} onClose={onClose} title={title}>
    <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 420 }}>
-   <View style={{ gap: spacing.lg }}>
-      <View style={{ gap: spacing.sm }}>
-       <FilterSectionLabel>{genresTitle}</FilterSectionLabel>
-       <SearchableSelectInput
-        options={genreOptions}
-        value={value.genre}
-        onChange={(genre) => onChange({ ...value, genre })}
-        placeholder={getSelectPlaceholder(genresLoading, genresError, genres.length === 0, genrePlaceholder, t)}
-        title={genresTitle}
-        searchPlaceholder={t('common.searchOptions')}
-        accessibilityLabel={genresTitle}
-        allowClear
-        clearLabel={t('common.none')}
-        isDisabled={genresLoading || genresError || genres.length === 0}
-        emptyLabel={t('common.noOptionsAvailable')}
-        emptySearchLabel={t('common.noMatchingOptions')}
-       />
-      </View>
+    <View style={{ gap: spacing.lg }}>
+     <View style={{ gap: spacing.sm }}>
+      <FilterSectionLabel>{genresTitle}</FilterSectionLabel>
+      <SearchableSelectInput
+       options={genreOptions}
+       value={value.genre}
+       onChange={(genre) => onChange({ ...value, genre })}
+       placeholder={getSelectPlaceholder(
+        genresLoading,
+        genresError,
+        genres.length === 0,
+        genrePlaceholder,
+        t,
+       )}
+       title={genresTitle}
+       searchPlaceholder={t('common.searchOptions')}
+       accessibilityLabel={genresTitle}
+       allowClear
+       clearLabel={t('common.none')}
+       isDisabled={genresLoading || genresError || genres.length === 0}
+       emptyLabel={t('common.noOptionsAvailable')}
+       emptySearchLabel={t('common.noMatchingOptions')}
+      />
+     </View>
 
-      <View style={{ gap: spacing.sm }}>
-       <FilterSectionLabel>{t('home.developersTitle')}</FilterSectionLabel>
-       <SearchableSelectInput
-        options={developerOptions}
-        suggestedOptions={suggestedDeveloperOptions}
-        value={value.developer}
-        onChange={(developer) => onChange({ ...value, developer })}
-        placeholder={getSelectPlaceholder(developersLoading, developersError, developers.length === 0, developerPlaceholder, t)}
-        title={t('home.developersTitle')}
-        searchPlaceholder={t('common.searchOptions')}
-        accessibilityLabel={t('home.developersTitle')}
-        allowClear
-        clearLabel={t('common.none')}
-        isDisabled={developersLoading || developersError || developers.length === 0}
-        emptyLabel={t('common.noOptionsAvailable')}
-        emptySearchLabel={t('common.noMatchingOptions')}
-        suggestedTitle={t('common.suggestedOptions')}
-        allOptionsTitle={t('common.allOptions')}
-       />
-      </View>
+     <View style={{ gap: spacing.sm }}>
+      <FilterSectionLabel>{t('home.developersTitle')}</FilterSectionLabel>
+      <SearchableSelectInput
+       options={developerOptions}
+       suggestedOptions={suggestedDeveloperOptions}
+       value={value.developer}
+       onChange={(developer) => onChange({ ...value, developer })}
+       placeholder={getSelectPlaceholder(
+        developersLoading,
+        developersError,
+        developers.length === 0,
+        developerPlaceholder,
+        t,
+       )}
+       title={t('home.developersTitle')}
+       searchPlaceholder={t('common.searchOptions')}
+       accessibilityLabel={t('home.developersTitle')}
+       allowClear
+       clearLabel={t('common.none')}
+       isDisabled={developersLoading || developersError || developers.length === 0}
+       emptyLabel={t('common.noOptionsAvailable')}
+       emptySearchLabel={t('common.noMatchingOptions')}
+       suggestedTitle={t('common.suggestedOptions')}
+       allOptionsTitle={t('common.allOptions')}
+      />
+     </View>
 
-      <View style={{ gap: spacing.sm }}>
-       <FilterSectionLabel>{t('home.publishersTitle')}</FilterSectionLabel>
-       <SearchableSelectInput
-        options={publisherOptions}
-        suggestedOptions={suggestedPublisherOptions}
-        value={value.publisher}
-        onChange={(publisher) => onChange({ ...value, publisher })}
-        placeholder={getSelectPlaceholder(publishersLoading, publishersError, publishers.length === 0, publisherPlaceholder, t)}
-        title={t('home.publishersTitle')}
-        searchPlaceholder={t('common.searchOptions')}
-        accessibilityLabel={t('home.publishersTitle')}
-        allowClear
-        clearLabel={t('common.none')}
-        isDisabled={publishersLoading || publishersError || publishers.length === 0}
-        emptyLabel={t('common.noOptionsAvailable')}
-        emptySearchLabel={t('common.noMatchingOptions')}
-        suggestedTitle={t('common.suggestedOptions')}
-        allOptionsTitle={t('common.allOptions')}
-       />
-      </View>
+     <View style={{ gap: spacing.sm }}>
+      <FilterSectionLabel>{t('home.publishersTitle')}</FilterSectionLabel>
+      <SearchableSelectInput
+       options={publisherOptions}
+       suggestedOptions={suggestedPublisherOptions}
+       value={value.publisher}
+       onChange={(publisher) => onChange({ ...value, publisher })}
+       placeholder={getSelectPlaceholder(
+        publishersLoading,
+        publishersError,
+        publishers.length === 0,
+        publisherPlaceholder,
+        t,
+       )}
+       title={t('home.publishersTitle')}
+       searchPlaceholder={t('common.searchOptions')}
+       accessibilityLabel={t('home.publishersTitle')}
+       allowClear
+       clearLabel={t('common.none')}
+       isDisabled={publishersLoading || publishersError || publishers.length === 0}
+       emptyLabel={t('common.noOptionsAvailable')}
+       emptySearchLabel={t('common.noMatchingOptions')}
+       suggestedTitle={t('common.suggestedOptions')}
+       allOptionsTitle={t('common.allOptions')}
+      />
+     </View>
 
-      <View style={{ gap: spacing.sm }}>
-       <FilterSectionLabel>{platformsTitle}</FilterSectionLabel>
-       <SearchableSelectInput
-        options={platformOptions}
-        suggestedOptions={suggestedPlatformOptions}
-        value={value.platform}
-        onChange={(platform) => onChange({ ...value, platform })}
-        placeholder={getSelectPlaceholder(platformsLoading, platformsError, platforms.length === 0, platformPlaceholder, t)}
+     <View style={{ gap: spacing.sm }}>
+      <FilterSectionLabel>{platformsTitle}</FilterSectionLabel>
+      <SearchableSelectInput
+       options={platformOptions}
+       suggestedOptions={suggestedPlatformOptions}
+       value={value.platform}
+       onChange={(platform) => onChange({ ...value, platform })}
+       placeholder={getSelectPlaceholder(
+        platformsLoading,
+        platformsError,
+        platforms.length === 0,
+        platformPlaceholder,
+        t,
+       )}
        title={platformsTitle}
        searchPlaceholder={t('common.searchOptions')}
        accessibilityLabel={platformsTitle}
        allowClear
-        clearLabel={t('common.none')}
-        isDisabled={platformsLoading || platformsError || platforms.length === 0}
-        emptyLabel={t('common.noOptionsAvailable')}
-        emptySearchLabel={t('common.noMatchingOptions')}
-        suggestedTitle={t('common.suggestedOptions')}
-       />
-      </View>
-
+       clearLabel={t('common.none')}
+       isDisabled={platformsLoading || platformsError || platforms.length === 0}
+       emptyLabel={t('common.noOptionsAvailable')}
+       emptySearchLabel={t('common.noMatchingOptions')}
+       suggestedTitle={t('common.suggestedOptions')}
+      />
+     </View>
     </View>
    </ScrollView>
 
    <View style={{ flexDirection: 'row', gap: spacing.sm, marginTop: spacing.lg }}>
     <View style={{ flex: 1 }}>
-     <BaseButton
-      label={resetLabel}
-      onPress={onReset}
-      variant="outlined"
-      fullWidth
-     />
+     <BaseButton label={resetLabel} onPress={onReset} variant="outlined" fullWidth />
     </View>
     <View style={{ flex: 1 }}>
-     <BaseButton
-      label={applyLabel}
-      onPress={onApply}
-      fullWidth
-     />
+     <BaseButton label={applyLabel} onPress={onApply} fullWidth />
     </View>
    </View>
   </BottomSheet>

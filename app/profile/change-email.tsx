@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +16,7 @@ import { useAuthStore } from '@/stores/auth.store';
 
 export default function ChangeEmailScreen() {
  const { t } = useTranslation();
+ const router = useRouter();
  const { updateEmail, isLoading, error, clearError } = useAuthStore();
  const [sent, setSent] = useState(false);
 
@@ -107,6 +109,15 @@ export default function ChangeEmailScreen() {
     isLoading={isLoading}
     fullWidth
    />
+   <View style={{ marginTop: spacing.sm }}>
+    <BaseButton
+     label={t('common.cancel')}
+     variant="outlined"
+     onPress={() => router.back()}
+     isDisabled={isLoading}
+     fullWidth
+    />
+   </View>
   </ScreenContainer>
  );
 }

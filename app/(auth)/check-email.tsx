@@ -47,7 +47,11 @@ export default function CheckEmailScreen() {
     </Text>
 
     <HintBox style={{ marginBottom: spacing['2xl'] }}>
-     <AuthMessageAccent icon="trophy" label={t('auth.checkEmail.badge')} containerStyle={{ marginBottom: spacing.md }} />
+     <AuthMessageAccent
+      icon="trophy"
+      label={t('auth.checkEmail.badge')}
+      containerStyle={{ marginBottom: spacing.md }}
+     />
      <Text
       style={{
        color: colors.text.secondary,

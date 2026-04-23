@@ -68,7 +68,7 @@ export function GameHeroBanner({
    ) : null}
 
    {metacritic !== null ? (
-   <View
+    <View
      style={{
       position: 'absolute',
       top: topInset + spacing.sm,

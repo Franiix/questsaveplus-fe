@@ -177,6 +177,15 @@ export default function EditProfileScreen() {
      isLoading={isLoading}
      fullWidth
     />
+    <View style={{ marginTop: spacing.sm }}>
+     <BaseButton
+      label={t('common.cancel')}
+      variant="outlined"
+      onPress={() => router.back()}
+      isDisabled={isLoading}
+      fullWidth
+     />
+    </View>
    </ScreenContainer>
   </View>
  );

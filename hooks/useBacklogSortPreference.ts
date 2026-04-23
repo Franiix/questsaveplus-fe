@@ -2,10 +2,11 @@ import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState } from 'react';
 import { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
 
-const DEFAULT_SORT = BacklogSortEnum.NEWEST;
-
-export function useBacklogSortPreference(storageKey = 'backlog_sort_order') {
- const [sortOrder, setSortOrderState] = useState<BacklogSortEnum>(DEFAULT_SORT);
+export function useBacklogSortPreference(
+ storageKey = 'backlog_sort_order',
+ defaultSort = BacklogSortEnum.NEWEST,
+) {
+ const [sortOrder, setSortOrderState] = useState<BacklogSortEnum>(defaultSort);
 
  useEffect(() => {
   SecureStore.getItemAsync(storageKey).then((stored) => {

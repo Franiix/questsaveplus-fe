@@ -3,14 +3,14 @@ import { memo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { BottomSheet } from '@/components/base/feedback/BottomSheet';
 import { BacklogCardTitle } from '@/components/backlog/BacklogCardTitle';
+import { BacklogQuickActions } from '@/components/backlog/BacklogQuickActions';
 import { CardCoverWithScrim } from '@/components/backlog/CardCoverWithScrim';
 import { CardLeadingControl } from '@/components/backlog/CardLeadingControl';
-import { BacklogQuickActions } from '@/components/backlog/BacklogQuickActions';
 import { StatusBadge } from '@/components/base/display/StatusBadge';
-import { StarRatingInput } from '@/components/base/inputs/StarRatingInput';
+import { BottomSheet } from '@/components/base/feedback/BottomSheet';
 import { ActionIconButton } from '@/components/base/inputs/ActionIconButton';
+import { StarRatingInput } from '@/components/base/inputs/StarRatingInput';
 import { useSingleAction } from '@/hooks/useSingleAction';
 import { getBacklogQuickStatusGroups } from '@/shared/consts/BacklogQuickStatusActions.const';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
@@ -86,8 +86,7 @@ export const BacklogListItem = memo(function BacklogListItem({
  const isPlayNext = item.is_play_next === true;
  const effectiveOrdinal = playNextOrdinal ?? item.play_next_priority ?? undefined;
  const canTogglePlayNext =
-  Boolean(onTogglePlayNext) &&
-  (item.status === BacklogStatusEnum.WANT_TO_PLAY || isPlayNext);
+  Boolean(onTogglePlayNext) && (item.status === BacklogStatusEnum.WANT_TO_PLAY || isPlayNext);
  const showPinInQuickActions = quickActionsMode === 'default' && canTogglePlayNext;
  const quickPrimaryCount = showPinInQuickActions ? 2 : 3;
  const { secondaryActions } = getBacklogQuickStatusGroups(item.status, quickPrimaryCount);
@@ -134,7 +133,9 @@ export const BacklogListItem = memo(function BacklogListItem({
 
  function renderRightActions() {
   return (
-   <View style={{ flexDirection: 'row', alignItems: 'stretch', gap: spacing.sm, marginLeft: spacing.sm }}>
+   <View
+    style={{ flexDirection: 'row', alignItems: 'stretch', gap: spacing.sm, marginLeft: spacing.sm }}
+   >
     {onRatingChange ? (
      <Pressable
       onPress={() => setIsRatingSheetOpen(true)}
@@ -323,7 +324,11 @@ export const BacklogListItem = memo(function BacklogListItem({
         numberOfLines={1}
        >
         {t('backlog.addedOn', {
-         date: formatDate(item.added_at, i18n.language, { day: 'numeric', month: 'short', year: 'numeric' }),
+         date: formatDate(item.added_at, i18n.language, {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+         }),
         })}
        </Text>
       ) : null}
@@ -336,7 +341,12 @@ export const BacklogListItem = memo(function BacklogListItem({
        }}
       >
        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-        <StatusBadge value={item.status} colorMap={colorMap} labelMap={labelMap} iconMap={iconMap} />
+        <StatusBadge
+         value={item.status}
+         colorMap={colorMap}
+         labelMap={labelMap}
+         iconMap={iconMap}
+        />
         {item.notes ? (
          <FontAwesome5 name="sticky-note" size={10} color={colors.text.tertiary} solid />
         ) : null}

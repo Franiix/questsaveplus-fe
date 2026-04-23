@@ -73,19 +73,19 @@ export function GameCarouselSection({
      </Text>
      {onRetry ? (
       <Text
-        onPress={onRetry}
+       onPress={onRetry}
        style={{
         color: colors.primary.DEFAULT,
         fontSize: typography.size.sm,
         fontFamily: typography.font.semibold,
-        }}
+       }}
       >
        {retryLabel}
       </Text>
      ) : null}
     </View>
    ) : isLoading ? (
-     <FlatList
+    <FlatList
      horizontal
      data={Array.from({ length: 4 }, (_, index) => ({ id: `skeleton-${title}-${index}` }))}
      keyExtractor={(item) => item.id}
@@ -107,9 +107,7 @@ export function GameCarouselSection({
      onEndReachedThreshold={0.5}
      showsHorizontalScrollIndicator={false}
      contentContainerStyle={{ paddingHorizontal: horizontalPadding, gap: spacing.sm }}
-     ListFooterComponent={
-      isFetchingNextPage ? <GameCardSkeleton width={cardWidth} /> : null
-     }
+     ListFooterComponent={isFetchingNextPage ? <GameCardSkeleton width={cardWidth} /> : null}
     />
    )}
   </View>

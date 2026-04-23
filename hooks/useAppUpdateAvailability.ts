@@ -59,7 +59,7 @@ export function useAppUpdateAvailabilityWithOptions(enabled = true) {
     });
 
     if (!response.ok) {
-      throw new Error(`Unable to load update manifest: ${response.status}`);
+     throw new Error(`Unable to load update manifest: ${response.status}`);
     }
 
     const json = (await response.json()) as unknown;

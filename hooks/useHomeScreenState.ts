@@ -5,8 +5,8 @@ import type { CatalogGame } from '@/shared/models/Catalog.model';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import type { HomeOrdering } from '@/shared/models/home/HomeOrdering.model';
 import type { HomeScreenRouteParams } from '@/shared/models/home/HomeScreenRouteParams.model';
-import { createRouteDiscoveryFilters } from '@/shared/utils/homeDiscovery';
 import { createEmptyGameDiscoveryFilters } from '@/shared/utils/gameDiscoveryFilters';
+import { createRouteDiscoveryFilters } from '@/shared/utils/homeDiscovery';
 
 type UseHomeScreenStateParams = {
  params: HomeScreenRouteParams;
@@ -16,8 +16,12 @@ export function useHomeScreenState({ params }: UseHomeScreenStateParams) {
  const router = useSafeRouter();
  const [search, setSearch] = useState('');
  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
- const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
- const [draftFilters, setDraftFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
+ const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(
+  createEmptyGameDiscoveryFilters,
+ );
+ const [draftFilters, setDraftFilters] = useState<GameDiscoveryFilters>(
+  createEmptyGameDiscoveryFilters,
+ );
  const [selectedOrdering, setSelectedOrdering] = useState<HomeOrdering | null>(null);
  const [sheetGame, setSheetGame] = useState<CatalogGame | null>(null);
  const [scrollRequestKey, setScrollRequestKey] = useState(0);
@@ -74,18 +78,24 @@ export function useHomeScreenState({ params }: UseHomeScreenStateParams) {
   }));
  }, []);
 
- const applyQuickFilters = useCallback((filters: GameDiscoveryFilters) => {
-  setSearch('');
-  setDraftFilters(filters);
-  setAppliedFilters(filters);
-  setSelectedOrdering(null);
-  requestScrollToTop();
- }, [requestScrollToTop]);
+ const applyQuickFilters = useCallback(
+  (filters: GameDiscoveryFilters) => {
+   setSearch('');
+   setDraftFilters(filters);
+   setAppliedFilters(filters);
+   setSelectedOrdering(null);
+   requestScrollToTop();
+  },
+  [requestScrollToTop],
+ );
 
- const selectOrdering = useCallback((ordering: HomeOrdering) => {
-  setSelectedOrdering(ordering);
-  requestScrollToTop();
- }, [requestScrollToTop]);
+ const selectOrdering = useCallback(
+  (ordering: HomeOrdering) => {
+   setSelectedOrdering(ordering);
+   requestScrollToTop();
+  },
+  [requestScrollToTop],
+ );
 
  const openGameSheet = useCallback((game: CatalogGame) => {
   setSheetGame(game);

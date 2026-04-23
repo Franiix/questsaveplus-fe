@@ -20,18 +20,18 @@ export function useRelatedCompanyGames({
  return useQuery({
   queryKey: ['related-company-games', companyType, companyExternalId, companyName, currentGameId],
   queryFn: async () => {
-    const response = await searchCatalogGames({
-     page: 1,
-      pageSize: 24,
-      ordering: '-released',
-      dates: '1980-01-01,2030-12-31',
-      developers: companyType === 'developers' ? companyExternalId ?? undefined : undefined,
-      publishers: companyType === 'publishers' ? companyExternalId ?? undefined : undefined,
-    });
+   const response = await searchCatalogGames({
+    page: 1,
+    pageSize: 24,
+    ordering: '-released',
+    dates: '1980-01-01,2030-12-31',
+    developers: companyType === 'developers' ? (companyExternalId ?? undefined) : undefined,
+    publishers: companyType === 'publishers' ? (companyExternalId ?? undefined) : undefined,
+   });
 
-    return response.items.filter((game) => getCatalogGameNumericId(game) !== currentGameId);
+   return response.items.filter((game) => getCatalogGameNumericId(game) !== currentGameId);
   },
   enabled: enabled && Number.isFinite(currentGameId) && Boolean(companyExternalId),
- staleTime: 10 * 60 * 1000,
+  staleTime: 10 * 60 * 1000,
  });
 }

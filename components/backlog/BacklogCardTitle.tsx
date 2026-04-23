@@ -1,8 +1,8 @@
 import { memo, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import Animated, {
- Easing,
  cancelAnimation,
+ Easing,
  useAnimatedStyle,
  useSharedValue,
  withSequence,

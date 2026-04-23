@@ -64,7 +64,14 @@ function SummaryChip({
     gap: 4,
    }}
   >
-   {icon ? <FontAwesome5 name={icon as React.ComponentProps<typeof FontAwesome5>['name']} size={9} color={textColor} solid /> : null}
+   {icon ? (
+    <FontAwesome5
+     name={icon as React.ComponentProps<typeof FontAwesome5>['name']}
+     size={9}
+     color={textColor}
+     solid
+    />
+   ) : null}
    <Text
     style={{
      color: textColor,
@@ -84,7 +91,10 @@ function ReleaseMetaRow({
  statusLabel,
  statusColor,
  statusIcon,
-}: Pick<GameSummaryHeaderProps, 'genreText' | 'releaseYear' | 'statusLabel' | 'statusColor' | 'statusIcon'>) {
+}: Pick<
+ GameSummaryHeaderProps,
+ 'genreText' | 'releaseYear' | 'statusLabel' | 'statusColor' | 'statusIcon'
+>) {
  if (!genreText && !releaseYear && !statusLabel) {
   return null;
  }

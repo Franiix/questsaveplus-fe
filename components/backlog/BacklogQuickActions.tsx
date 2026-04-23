@@ -81,12 +81,7 @@ const QuickActionButton = memo(function QuickActionButton({
      accessibilityRole="button"
      accessibilityLabel={accessibilityLabel}
     >
-     <FontAwesome5
-      name={iconName}
-      size={isActive ? 14 : 13}
-      color={color}
-      solid={isActive}
-     />
+     <FontAwesome5 name={iconName} size={isActive ? 14 : 13} color={color} solid={isActive} />
     </AnimatedPressable>
     {typeof rank === 'number' ? (
      <Text
@@ -174,12 +169,12 @@ export const BacklogQuickActions = memo(function BacklogQuickActions({
      />
     ) : null}
     {resolvedActions.map((quickActionProps, index) => {
-      return (
-       <QuickActionButton
+     return (
+      <QuickActionButton
        key={`${currentStatus}-${quickActionProps.iconName}-${quickActionProps.accessibilityLabel}`}
-        accessibilityLabel={quickActionProps.accessibilityLabel}
-        color={quickActionProps.color}
-        iconName={quickActionProps.iconName}
+       accessibilityLabel={quickActionProps.accessibilityLabel}
+       color={quickActionProps.color}
+       iconName={quickActionProps.iconName}
        index={index + (auxiliaryAction ? 1 : 0)}
        isActive={quickActionProps.isActive}
        isDisabled={quickActionProps.isDisabled ?? isDisabled}

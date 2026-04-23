@@ -28,13 +28,15 @@ export function useGenreRecommendations({
     genres: genreSlug,
    });
 
-   return response.items
-    .filter((game) => {
-     const numericId = getCatalogGameNumericId(game);
-     return numericId !== currentGameId && (numericId === null || !normalizedExcludeIds.includes(numericId));
-    });
+   return response.items.filter((game) => {
+    const numericId = getCatalogGameNumericId(game);
+    return (
+     numericId !== currentGameId &&
+     (numericId === null || !normalizedExcludeIds.includes(numericId))
+    );
+   });
   },
   enabled: enabled && Number.isFinite(currentGameId) && Boolean(genreSlug),
- staleTime: 10 * 60 * 1000,
+  staleTime: 10 * 60 * 1000,
  });
 }

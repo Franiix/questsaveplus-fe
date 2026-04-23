@@ -20,18 +20,18 @@ export function FilterIconButton({
    onPress={onPress}
    accessibilityRole="button"
    accessibilityLabel={accessibilityLabel}
-  style={({ pressed }) => ({
+   style={({ pressed }) => ({
     width: 48,
     height: 48,
     borderRadius: borderRadius.lg + 2,
     borderWidth: 1,
     borderColor: isActive || pressed ? colors.primary.DEFAULT : colors.border.strong,
     backgroundColor:
-      isActive || pressed ? `${colors.primary.DEFAULT}18` : colors.background.elevated,
+     isActive || pressed ? `${colors.primary.DEFAULT}18` : colors.background.elevated,
     alignItems: 'center',
     justifyContent: 'center',
-  })}
- >
+   })}
+  >
    <FontAwesome5
     name="sliders-h"
     size={18}

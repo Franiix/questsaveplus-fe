@@ -13,7 +13,10 @@ interface ProfileState {
  isLoading: boolean;
  error: string | null;
  ensureProfile: (userId: string) => Promise<void>;
- fetchProfile: (userId: string, options?: { force?: boolean; mode?: ProfileFetchMode }) => Promise<void>;
+ fetchProfile: (
+  userId: string,
+  options?: { force?: boolean; mode?: ProfileFetchMode },
+ ) => Promise<void>;
  createProfile: (dto: CreateProfileDto) => Promise<void>;
  updateProfile: (userId: string, dto: UpdateProfileDto) => Promise<void>;
  clearProfile: () => void;
@@ -33,7 +36,7 @@ function shouldSkipProfileFetch(
 
 export const useProfileStore = create<ProfileState>(
  (set, get): ProfileState => ({
- profile: null,
+  profile: null,
   currentUserId: null,
   hasResolvedProfile: false,
   isBootstrapping: false,

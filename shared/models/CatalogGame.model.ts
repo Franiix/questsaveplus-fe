@@ -1,10 +1,7 @@
 import type { CatalogProviderId } from '@/shared/enums/CatalogProvider.enum';
-import type { CatalogImage } from '@/shared/models/CatalogImage.model';
 import type { CatalogGameMetadata } from '@/shared/models/CatalogGameMetadata.model';
-import type {
- CatalogGenre,
- CatalogPlatform,
-} from '@/shared/models/CatalogNamedItem.model';
+import type { CatalogImage } from '@/shared/models/CatalogImage.model';
+import type { CatalogGenre, CatalogPlatform } from '@/shared/models/CatalogNamedItem.model';
 
 export type CatalogGame = {
  id: string;

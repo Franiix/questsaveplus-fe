@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { useBacklogStatusPresentation } from '@/hooks/useBacklogStatusPresentation';
+import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { useAuthStore } from '@/stores/auth.store';
 import { useBacklogStore } from '@/stores/backlog.store';
 import { useToastStore } from '@/stores/toast.store';

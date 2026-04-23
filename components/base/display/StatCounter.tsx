@@ -64,22 +64,22 @@ export function StatCounter({
  if (variant === 'card') {
   return (
    <View
-   style={{
+    style={{
      flex: 1,
      minWidth: 0,
      backgroundColor: 'rgba(18,20,36,0.72)',
      borderRadius: 22,
      borderWidth: 1,
      borderColor: 'rgba(255,255,255,0.08)',
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.md + 2,
-      gap: spacing.sm,
-      overflow: 'hidden',
-      shadowColor: '#000',
-      shadowOpacity: 0.18,
-      shadowRadius: 18,
-      shadowOffset: { width: 0, height: 8 },
-      elevation: 8,
+     paddingHorizontal: spacing.md,
+     paddingVertical: spacing.md + 2,
+     gap: spacing.sm,
+     overflow: 'hidden',
+     shadowColor: '#000',
+     shadowOpacity: 0.18,
+     shadowRadius: 18,
+     shadowOffset: { width: 0, height: 8 },
+     elevation: 8,
     }}
    >
     <View
@@ -161,7 +161,7 @@ export function StatCounter({
       textTransform: 'uppercase',
       lineHeight: typography.size.caption * 1.4,
       maxWidth: '86%',
-    }}
+     }}
     >
      {label}
     </Text>
@@ -170,39 +170,39 @@ export function StatCounter({
  }
 
  return (
-   <View
+  <View
+   style={{
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    borderRightWidth: isLast ? 0 : 1,
+    borderRightColor: colors.border.DEFAULT,
+   }}
+  >
+   <Animated.Text
     style={{
-     flex: 1,
-     alignItems: 'center',
-     paddingVertical: spacing.md,
-     borderRightWidth: isLast ? 0 : 1,
-     borderRightColor: colors.border.DEFAULT,
+     color,
+     fontSize: typography.size['2xl'],
+     fontWeight: typography.weight.black,
+     lineHeight: typography.size['2xl'] * 1.2,
+     marginBottom: 4,
     }}
    >
-    <Animated.Text
-     style={{
-      color,
-      fontSize: typography.size['2xl'],
-      fontWeight: typography.weight.black,
-      lineHeight: typography.size['2xl'] * 1.2,
-      marginBottom: 4,
-     }}
-    >
-     {String(displayCount)}
-    </Animated.Text>
-    <Text
-     numberOfLines={1}
-     style={{
-      color: colors.text.secondary,
-      fontSize: typography.size.caption,
-      fontWeight: typography.weight.semibold,
-      letterSpacing: typography.letterSpacing.wide,
-      textTransform: 'uppercase',
-      textAlign: 'center',
-     }}
-    >
-     {label}
-    </Text>
-   </View>
-  );
+    {String(displayCount)}
+   </Animated.Text>
+   <Text
+    numberOfLines={1}
+    style={{
+     color: colors.text.secondary,
+     fontSize: typography.size.caption,
+     fontWeight: typography.weight.semibold,
+     letterSpacing: typography.letterSpacing.wide,
+     textTransform: 'uppercase',
+     textAlign: 'center',
+    }}
+   >
+    {label}
+   </Text>
+  </View>
+ );
 }

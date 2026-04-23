@@ -1,8 +1,8 @@
+import type { FontAwesome5 } from '@expo/vector-icons';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { colors } from '@/shared/theme/tokens';
-import type { FontAwesome5 } from '@expo/vector-icons';
 
 export function useBacklogStatusPresentation() {
  const { t } = useTranslation();

@@ -8,7 +8,11 @@ type SortIconButtonProps = {
  isActive?: boolean;
 };
 
-export function SortIconButton({ onPress, accessibilityLabel, isActive = false }: SortIconButtonProps) {
+export function SortIconButton({
+ onPress,
+ accessibilityLabel,
+ isActive = false,
+}: SortIconButtonProps) {
  return (
   <Pressable
    onPress={onPress}

@@ -1,16 +1,16 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { ListRenderItemInfo } from 'react-native';
 import {
  FlatList,
  Modal,
  Pressable,
  Text,
  TouchableOpacity,
- View,
  useWindowDimensions,
+ View,
 } from 'react-native';
-import type { ListRenderItemInfo } from 'react-native';
 import { ModalCloseButton } from '@/components/base/feedback/ModalCloseButton';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
 import { useInputStyles } from './useInputStyles';
@@ -147,21 +147,21 @@ export function SelectInput({
   }
  }
 
-  function renderItem({ item, index }: ListRenderItemInfo<PickerOption>) {
-   const distance = Math.abs(index - selectedIndex);
-   const isSelected = item.value === effectiveDraftValue;
+ function renderItem({ item, index }: ListRenderItemInfo<PickerOption>) {
+  const distance = Math.abs(index - selectedIndex);
+  const isSelected = item.value === effectiveDraftValue;
   const textColor = isSelected
    ? colors.text.primary
    : distance === 1
-    ? colors.text.secondary
-    : colors.text.tertiary;
+     ? colors.text.secondary
+     : colors.text.tertiary;
   const fontSize = isSelected ? 18 : distance === 1 ? 16 : 15;
 
   return (
-    <Pressable
-     onPress={() => scrollToIndex(index)}
-     accessibilityRole="button"
-     accessibilityState={{ selected: isSelected }}
+   <Pressable
+    onPress={() => scrollToIndex(index)}
+    accessibilityRole="button"
+    accessibilityState={{ selected: isSelected }}
     style={{
      height: ROW_HEIGHT,
      alignItems: 'center',
@@ -290,14 +290,10 @@ export function SelectInput({
         </Text>
        </View>
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-         <ModalCloseButton label={t('common.close')} onPress={handleClose} />
-         <ModalCloseButton
-          label={t('common.confirm')}
-          onPress={commitValue}
-          iconName="check"
-         />
-        </View>
+       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+        <ModalCloseButton label={t('common.close')} onPress={handleClose} />
+        <ModalCloseButton label={t('common.confirm')} onPress={commitValue} iconName="check" />
+       </View>
       </View>
 
       <View
@@ -305,7 +301,7 @@ export function SelectInput({
         height: PICKER_HEIGHT,
         justifyContent: 'center',
         backgroundColor: 'transparent',
-      }}
+       }}
       >
        <View
         pointerEvents="none"
@@ -339,13 +335,9 @@ export function SelectInput({
         contentContainerStyle={{
          paddingVertical: ROW_HEIGHT * CENTER_INDEX_OFFSET,
         }}
-        onMomentumScrollEnd={(event) =>
-         updateDraftFromOffset(event.nativeEvent.contentOffset.y)
-        }
-        onScrollEndDrag={(event) =>
-         updateDraftFromOffset(event.nativeEvent.contentOffset.y)
-        }
-      />
+        onMomentumScrollEnd={(event) => updateDraftFromOffset(event.nativeEvent.contentOffset.y)}
+        onScrollEndDrag={(event) => updateDraftFromOffset(event.nativeEvent.contentOffset.y)}
+       />
       </View>
      </View>
     </View>

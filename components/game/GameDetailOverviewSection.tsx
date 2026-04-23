@@ -2,9 +2,9 @@ import { View } from 'react-native';
 import { GameBacklogPanel } from '@/components/game/GameBacklogPanel';
 import { GameMetaSection } from '@/components/game/GameMetaSection';
 import { GameSummaryHeader } from '@/components/game/GameSummaryHeader';
+import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { CatalogGameDetail } from '@/shared/models/Catalog.model';
 import { spacing } from '@/shared/theme/tokens';
-import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 
 type StatusOption = {
  label: string;

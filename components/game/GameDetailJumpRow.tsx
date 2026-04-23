@@ -41,12 +41,7 @@ export function GameDetailJumpRow({ title, items }: GameDetailJumpRowProps) {
     contentContainerStyle={{ gap: spacing.sm, paddingRight: spacing.md }}
    >
     {visibleItems.map((item) => (
-     <FilterChip
-      key={item.key}
-      label={item.label}
-      isSelected={false}
-      onPress={item.onPress}
-     />
+     <FilterChip key={item.key} label={item.label} isSelected={false} onPress={item.onPress} />
     ))}
    </ScrollView>
   </View>

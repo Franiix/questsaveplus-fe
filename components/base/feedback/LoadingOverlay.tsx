@@ -1,5 +1,6 @@
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useEffect, useRef, useState } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
 import Animated, {
  runOnJS,
@@ -9,7 +10,6 @@ import Animated, {
  withSequence,
  withTiming,
 } from 'react-native-reanimated';
-import { useEffect, useRef, useState } from 'react';
 import { colors, typography } from '@/shared/theme/tokens';
 
 const MIN_VISIBLE_MS = 700;
@@ -21,7 +21,10 @@ type LoadingOverlayProps = {
  visible?: boolean;
 };
 
-export function LoadingOverlay({ message = 'Caricamento...', visible = true }: LoadingOverlayProps) {
+export function LoadingOverlay({
+ message = 'Caricamento...',
+ visible = true,
+}: LoadingOverlayProps) {
  const [shouldRender, setShouldRender] = useState(visible);
  const plusScale = useSharedValue(1);
  const plusOpacity = useSharedValue(1);

@@ -1,4 +1,5 @@
 export enum BacklogSortEnum {
+ PRIORITY = 'PRIORITY',
  NEWEST = 'NEWEST',
  OLDEST = 'OLDEST',
  TITLE_ASC = 'TITLE_ASC',
