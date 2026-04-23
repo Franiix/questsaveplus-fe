@@ -25,7 +25,8 @@ import { useCatalogPublishers } from '@/hooks/useCatalogPublishers';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
-import { colors, spacing, typography } from '@/shared/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
+import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
 import {
  createBacklogScreenViewModel,
  getPlayNextItems,
@@ -297,20 +298,50 @@ export default function PlayNextScreen() {
      paddingHorizontal: HORIZONTAL_PADDING,
      paddingTop: 84,
      paddingBottom: spacing.sm,
-     gap: spacing.sm,
+     gap: spacing.md,
     }}
    >
     <View style={{ gap: spacing.xs }}>
-     <Text
-      style={{
-       fontFamily: typography.font.bold,
-       fontSize: typography.size['2xl'],
-       color: colors.text.primary,
-       letterSpacing: typography.letterSpacing.tight,
-      }}
-     >
-      {t('playNext.title')}
-     </Text>
+     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+      <Text
+       style={{
+        fontFamily: typography.font.bold,
+        fontSize: typography.size['2xl'],
+        color: colors.text.primary,
+        letterSpacing: typography.letterSpacing.tight,
+       }}
+      >
+       {t('playNext.title')}
+      </Text>
+      {playNextItems.length > 0 ? (
+       <View
+        style={{
+         paddingHorizontal: spacing.sm,
+         paddingVertical: 3,
+         borderRadius: borderRadius.full,
+         backgroundColor: `${colors.primary.DEFAULT}25`,
+         borderWidth: 1,
+         borderColor: `${colors.primary['200']}45`,
+        }}
+       >
+        <Text
+         style={{
+          color: colors.primary['200'],
+          fontSize: typography.size.sm,
+          fontFamily: typography.font.semibold,
+         }}
+        >
+         {playNextItems.length}
+        </Text>
+       </View>
+      ) : null}
+     </View>
+     <LinearGradient
+      colors={[colors.primary.DEFAULT, 'transparent']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={{ height: 2, width: 52, borderRadius: 1 }}
+     />
      <Text
       style={{
        color: colors.text.secondary,
@@ -318,19 +349,10 @@ export default function PlayNextScreen() {
        lineHeight: Math.ceil(typography.size.sm * typography.lineHeight.normal),
       }}
      >
-      {t('playNext.subtitle')}
+      {[t('playNext.subtitle'), !hasAppliedFilters ? t('playNext.reorderHint') : null]
+       .filter(Boolean)
+       .join(' · ')}
      </Text>
-     {!hasAppliedFilters ? (
-      <Text
-       style={{
-        color: colors.text.tertiary,
-        fontSize: typography.size.xs,
-        lineHeight: Math.ceil(typography.size.xs * typography.lineHeight.normal),
-       }}
-      >
-       {t('playNext.reorderHint')}
-      </Text>
-     ) : null}
     </View>
 
     <SearchFilterToolbar

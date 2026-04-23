@@ -1,4 +1,5 @@
 import { FontAwesome5 } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { memo, useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
@@ -224,23 +225,30 @@ export const BacklogListItem = memo(function BacklogListItem({
   const { isLocked, run } = useSingleAction(() => onPress(item));
   const swipeableRef = useRef<Swipeable | null>(null);
   const isPlayNext = item.is_play_next === true;
+  const effectivePlayNextOrdinal = playNextOrdinal ?? item.play_next_priority ?? undefined;
   const canTogglePlayNext =
     Boolean(onTogglePlayNext) &&
     (item.status === BacklogStatusEnum.WANT_TO_PLAY || isPlayNext);
-  const quickPrimaryCount =
-    quickActionsMode === 'default' && item.status === BacklogStatusEnum.WANT_TO_PLAY ? 2 : 3;
+  const showPinInQuickActions = quickActionsMode === 'default' && canTogglePlayNext;
+  const quickPrimaryCount = showPinInQuickActions ? 2 : 3;
   const { secondaryActions } = getBacklogQuickStatusGroups(item.status, quickPrimaryCount);
   const isSwipeEnabled = quickActionsMode === 'default';
   const playActionColor = colorMap[BacklogStatusEnum.PLAYING];
-  const playNextColor = colors.primary['200'];
+  const pinAuxiliaryAction = showPinInQuickActions
+    ? {
+        accessibilityLabel: isPlayNext ? playNextUnpinLabel : playNextPinLabel,
+        color: colors.primary['200'],
+        iconName: 'thumbtack' as React.ComponentProps<typeof FontAwesome5>['name'],
+        isActive: isPlayNext,
+        isDisabled: isUpdatingPlayNext,
+        onPress: () => onTogglePlayNext?.(item),
+      }
+    : undefined;
   const shouldRenderLeadingPlayNextControl =
-    quickActionsMode === 'play-only' && typeof playNextOrdinal === 'number';
+    (quickActionsMode === 'play-only' && typeof effectivePlayNextOrdinal === 'number') ||
+    (quickActionsMode === 'default' && isPlayNext && typeof effectivePlayNextOrdinal === 'number');
   const shouldRenderTrailingPlayNextControl =
     quickActionsMode === 'hidden' && canTogglePlayNext;
-  const shouldRenderBacklogPinAction =
-    quickActionsMode === 'default' &&
-    Boolean(onTogglePlayNext) &&
-    item.status === BacklogStatusEnum.WANT_TO_PLAY;
 
   function renderRightActions() {
     return (
@@ -321,27 +329,40 @@ export const BacklogListItem = memo(function BacklogListItem({
   }
 
   const cardContent = (
+    <View
+      style={{
+        backgroundColor: colors.background.surface,
+        borderRadius: borderRadius.lg,
+        borderWidth: 1,
+        borderLeftWidth: 3,
+        borderColor: isDragActive
+          ? colors.primary.DEFAULT
+          : isPlayNext
+            ? `${colors.primary['200']}40`
+            : colors.border.DEFAULT,
+        borderLeftColor: isDragActive
+          ? colors.primary.DEFAULT
+          : `${colorMap[item.status]}90`,
+        overflow: 'hidden',
+        opacity: isLocked ? 0.72 : isDragActive ? 0.92 : 1,
+        transform: [{ scale: isDragActive ? 1.015 : 1 }],
+      }}
+    >
       <Pressable
         onPress={run}
         onPressIn={() => onPressIn?.(item)}
         onLongPress={() => onLongPress?.(item)}
         delayLongPress={260}
         disabled={isLocked}
-        style={{
-          backgroundColor: colors.background.surface,
-          borderRadius: borderRadius.lg,
-          borderWidth: 1,
-          borderColor: isDragActive ? colors.primary.DEFAULT : colors.border.DEFAULT,
-          overflow: 'hidden',
-          opacity: isLocked ? 0.72 : isDragActive ? 0.92 : 1,
-          transform: [{ scale: isDragActive ? 1.015 : 1 }],
-        }}
+        style={({ pressed }) => ({
+          transform: [{ scale: pressed && !isLocked ? 0.985 : 1 }],
+        })}
       >
         <View style={{ flexDirection: 'row', alignItems: 'stretch' }}>
-          {typeof playNextOrdinal === 'number' ? (
+          {shouldRenderLeadingPlayNextControl ? (
             <View
               style={{
-                width: 58,
+                width: quickActionsMode === 'default' ? 40 : 58,
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: spacing.xs,
@@ -349,15 +370,104 @@ export const BacklogListItem = memo(function BacklogListItem({
                 paddingRight: spacing.xs,
               }}
             >
-              {dragHintLabel ? (
-                <FontAwesome5 name="grip-lines" size={12} color={colors.text.tertiary} solid />
-              ) : null}
-              {shouldRenderLeadingPlayNextControl ? (
-               <FontAwesome5 name="thumbtack" size={13} color={colors.primary['200']} solid />
-              ) : null}
+              {quickActionsMode === 'play-only' ? (
+                <>
+                  {dragHintLabel ? (
+                    <View
+                      style={{
+                        paddingHorizontal: spacing.xs,
+                        paddingVertical: 3,
+                        borderRadius: borderRadius.sm,
+                        backgroundColor: `${colors.text.tertiary}18`,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <FontAwesome5 name="grip-lines" size={13} color={colors.text.secondary} solid />
+                    </View>
+                  ) : null}
+                  {canTogglePlayNext ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={isPlayNext ? playNextUnpinLabel : playNextPinLabel}
+                      disabled={isUpdatingPlayNext}
+                      onPress={(event) => {
+                        event.stopPropagation();
+                        onTogglePlayNext?.(item);
+                      }}
+                      style={({ pressed }) => ({
+                        opacity: isUpdatingPlayNext ? 0.56 : pressed ? 0.78 : 1,
+                      })}
+                    >
+                      <FontAwesome5 name="thumbtack" size={15} color={colors.primary['200']} solid />
+                    </Pressable>
+                  ) : (
+                    <FontAwesome5 name="thumbtack" size={15} color={colors.primary['200']} solid />
+                  )}
+                  {typeof effectivePlayNextOrdinal === 'number' ? (
+                    <View
+                      style={{
+                        minWidth: 24,
+                        height: 24,
+                        paddingHorizontal: spacing.xs,
+                        borderRadius: borderRadius.full,
+                        borderWidth: 1,
+                        borderColor: `${colors.primary['200']}80`,
+                        backgroundColor: `${colors.primary['200']}26`,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: colors.primary['200'],
+                          fontSize: 10,
+                          fontFamily: typography.font.semibold,
+                        }}
+                      >
+                        #{effectivePlayNextOrdinal}
+                      </Text>
+                    </View>
+                  ) : null}
+                </>
+              ) : (
+                typeof effectivePlayNextOrdinal === 'number' ? (
+                  <View
+                    style={{
+                      minWidth: 26,
+                      height: 26,
+                      paddingHorizontal: spacing.xs,
+                      borderRadius: borderRadius.full,
+                      borderWidth: 1,
+                      borderColor: `${colors.primary['200']}66`,
+                      backgroundColor: `${colors.primary['200']}18`,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: colors.primary['200'],
+                        fontSize: 10,
+                        fontFamily: typography.font.semibold,
+                      }}
+                    >
+                      #{effectivePlayNextOrdinal}
+                    </Text>
+                  </View>
+                ) : null
+              )}
             </View>
           ) : null}
-          <ImageWithFallback uri={item.game_cover_url} width={60} height={96} radius={0} />
+          <View style={{ width: 60, height: 96 }}>
+            <ImageWithFallback uri={item.game_cover_url} width={60} height={96} radius={0} />
+            <LinearGradient
+              colors={['transparent', `${colors.background.surface}F0`]}
+              start={{ x: 0, y: 0.3 }}
+              end={{ x: 0, y: 1 }}
+              style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
+            />
+          </View>
           <View
             style={{
               flex: 1,
@@ -427,20 +537,8 @@ export const BacklogListItem = memo(function BacklogListItem({
                   iconMap={iconMap}
                   labelMap={labelMap}
                   primaryCount={quickPrimaryCount}
+                  auxiliaryAction={pinAuxiliaryAction}
                   isDisabled={isUpdatingStatus}
-                  auxiliaryAction={
-                    shouldRenderBacklogPinAction
-                      ? {
-                          accessibilityLabel: isPlayNext ? playNextUnpinLabel : playNextPinLabel,
-                          color: playNextColor,
-                          iconName: 'thumbtack',
-                          isActive: isPlayNext,
-                          isDisabled: isUpdatingPlayNext,
-                          rank: isPlayNext ? (playNextOrdinal ?? item.play_next_priority ?? undefined) : undefined,
-                          onPress: () => onTogglePlayNext?.(item),
-                        }
-                      : undefined
-                  }
                   onStatusChange={(status) => onQuickStatusChange(item, status)}
                 />
               </View>
@@ -456,59 +554,35 @@ export const BacklogListItem = memo(function BacklogListItem({
               }}
             >
               <View
-               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: spacing.xs,
-               }}
-              >
-               {typeof playNextOrdinal === 'number' ? (
-                <View
-                 style={{
-                  minWidth: 24,
-                  height: 24,
-                  paddingHorizontal: spacing.xs,
-                  borderRadius: borderRadius.full,
-                  borderWidth: 1,
-                  borderColor: `${colors.primary['200']}80`,
-                  backgroundColor: `${colors.primary['200']}26`,
+                style={{
+                  flexDirection: 'row',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                 }}
-                >
-                 <Text
-                  style={{
-                   color: colors.primary['200'],
-                   fontSize: 10,
-                   fontFamily: typography.font.semibold,
-                  }}
-                 >
-                  #{playNextOrdinal}
-                 </Text>
-                </View>
-               ) : null}
-               <BacklogQuickActions
-                currentStatus={item.status}
-                colorMap={colorMap}
-                iconMap={iconMap}
-                labelMap={labelMap}
-                isDisabled={isUpdatingStatus}
-                customActions={[
-                 {
-                  accessibilityLabel: primaryActionLabel,
-                  color: playActionColor,
-                  iconName: 'play',
-                  isActive: true,
-                  onPress: () => onPrimaryAction(item),
-                 },
-                ]}
-                onStatusChange={(status) => onQuickStatusChange(item, status)}
-               />
+                  gap: spacing.xs,
+                }}
+              >
+                <BacklogQuickActions
+                  currentStatus={item.status}
+                  colorMap={colorMap}
+                  iconMap={iconMap}
+                  labelMap={labelMap}
+                  isDisabled={isUpdatingStatus}
+                  customActions={[
+                    {
+                      accessibilityLabel: primaryActionLabel,
+                      color: playActionColor,
+                      iconName: 'play',
+                      isActive: true,
+                      onPress: () => onPrimaryAction(item),
+                    },
+                  ]}
+                  onStatusChange={(status) => onQuickStatusChange(item, status)}
+                />
               </View>
             </View>
           ) : null}
         </View>
       </Pressable>
+    </View>
   );
 
   if (!isSwipeEnabled) {

@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
@@ -100,6 +101,18 @@ export default function BacklogScreen() {
       backlogMetadata,
       search,
     });
+
+  const statusCounts = useMemo(
+    () =>
+      backlogItems.reduce(
+        (acc, item) => {
+          acc[item.status] = (acc[item.status] ?? 0) + 1;
+          return acc;
+        },
+        {} as Partial<Record<BacklogStatusEnum, number>>,
+      ),
+    [backlogItems],
+  );
   const deferredPrefetchEnabled = useDeferredInteractionGate({
     enabled: filteredItems.length > 0,
     delayMs: 500,
@@ -233,8 +246,9 @@ export default function BacklogScreen() {
       hasAppliedFilters,
       isReadingList,
       playNextCount: playNextItems.length,
+      statusCounts,
     }),
-    [activeFilter, error, filteredItems, hasAppliedFilters, isReadingList, playNextItems.length],
+    [activeFilter, error, filteredItems, hasAppliedFilters, isReadingList, playNextItems.length, statusCounts],
   );
 
   return (
@@ -249,16 +263,24 @@ export default function BacklogScreen() {
           gap: spacing.sm,
         }}
       >
-        <Text
-          style={{
-            fontFamily: typography.font.bold,
-            fontSize: typography.size['2xl'],
-            color: colors.text.primary,
-            letterSpacing: typography.letterSpacing.tight,
-          }}
-        >
-          {t('backlog.title')}
-        </Text>
+        <View style={{ gap: 6 }}>
+          <Text
+            style={{
+              fontFamily: typography.font.bold,
+              fontSize: typography.size['2xl'],
+              color: colors.text.primary,
+              letterSpacing: typography.letterSpacing.tight,
+            }}
+          >
+            {t('backlog.title')}
+          </Text>
+          <LinearGradient
+            colors={[colors.primary.DEFAULT, 'transparent']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{ height: 2, width: 52, borderRadius: 1 }}
+          />
+        </View>
 
         <SearchFilterToolbar
           value={search}

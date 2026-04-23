@@ -1,10 +1,8 @@
-import { FontAwesome5 } from '@expo/vector-icons';
-import { memo, useCallback, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { memo, useCallback } from 'react';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { BacklogListItem } from '@/components/backlog/BacklogListItem';
 import { BacklogPlayNextCallout } from '@/components/backlog/BacklogPlayNextCallout';
-import { HintBox } from '@/components/base/display/HintBox';
 import { EmptyState } from '@/components/base/feedback/EmptyState';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { FilterChipRow } from '@/components/game/FilterChipRow';
@@ -67,7 +65,6 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
  retryLabel,
 }: BacklogScreenContentProps) {
  const { t } = useTranslation();
- const [isHintExpanded, setIsHintExpanded] = useState(false);
 
  const renderItem = useCallback(
   ({ item }: { item: BacklogItemEntity }) => (
@@ -124,58 +121,8 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
  return (
   <>
    <View style={{ marginBottom: spacing.xs }}>
-    <FilterChipRow activeFilter={state.activeFilter} onFilterChange={onFilterChange} />
+    <FilterChipRow activeFilter={state.activeFilter} onFilterChange={onFilterChange} countMap={state.statusCounts} />
    </View>
-   <HintBox
-    style={{
-     marginHorizontal: HORIZONTAL_PADDING,
-     marginBottom: spacing.sm,
-     gap: spacing.sm,
-    }}
-   >
-    <Pressable
-     accessibilityRole="button"
-     accessibilityLabel={
-      isHintExpanded ? t('backlog.interactionHintHide') : t('backlog.interactionHintShow')
-     }
-     onPress={() => setIsHintExpanded((current) => !current)}
-     style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.sm,
-    }}
-    >
-     <FontAwesome5 name="info-circle" size={14} color={colorMap.PLAYING} solid />
-     <Text
-      style={{
-       flex: 1,
-       color: '#FFFFFF',
-       fontSize: 12,
-       lineHeight: 18,
-       fontWeight: '600',
-      }}
-     >
-      {t('backlog.interactionHintTitle')}
-     </Text>
-     <FontAwesome5
-      name={isHintExpanded ? 'chevron-up' : 'chevron-down'}
-      size={12}
-      color="#FFFFFF"
-      solid
-     />
-    </Pressable>
-    {isHintExpanded ? (
-     <Text
-      style={{
-       color: '#FFFFFF',
-       fontSize: 12,
-       lineHeight: 18,
-      }}
-     >
-      {t('backlog.interactionHint')}
-     </Text>
-    ) : null}
-   </HintBox>
    <BacklogPlayNextCallout playNextCount={state.playNextCount} onPress={onOpenPlayNext} />
 
    {state.filteredItems.length === 0 ? (

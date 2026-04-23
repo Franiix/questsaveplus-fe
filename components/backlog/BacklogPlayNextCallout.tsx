@@ -61,18 +61,42 @@ export const BacklogPlayNextCallout = memo(function BacklogPlayNextCallout({
     >
      <FontAwesome5 name="bolt" size={16} color={colors.primary['200']} solid />
     </View>
-    <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+    <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+      <Text
+       style={{
+        color: colors.text.primary,
+        fontSize: typography.size.md,
+        fontFamily: typography.font.semibold,
+       }}
+      >
+       {t('backlog.playNextCta.title')}
+      </Text>
+      {playNextCount > 0 ? (
+       <View
+        style={{
+         paddingHorizontal: 8,
+         paddingVertical: 2,
+         borderRadius: borderRadius.full,
+         backgroundColor: `${colors.primary.DEFAULT}28`,
+         borderWidth: 1,
+         borderColor: `${colors.primary['200']}50`,
+        }}
+       >
+        <Text
+         style={{
+          color: colors.primary['200'],
+          fontSize: typography.size.xs,
+          fontFamily: typography.font.semibold,
+         }}
+        >
+         {playNextCount}
+        </Text>
+       </View>
+      ) : null}
+     </View>
      <Text
-      style={{
-       color: colors.text.primary,
-       fontSize: typography.size.md,
-       fontFamily: typography.font.semibold,
-      }}
-     >
-      {t('backlog.playNextCta.title')}
-     </Text>
-     <Text
-      numberOfLines={2}
+      numberOfLines={1}
       style={{
        color: colors.text.secondary,
        fontSize: typography.size.sm,

@@ -9,6 +9,14 @@ import {
  typography,
 } from '@/shared/theme/tokens';
 
+const COUNT_BADGE_STYLE_BASE = {
+ borderRadius: 9,
+ paddingHorizontal: 5,
+ paddingVertical: 1,
+ minWidth: 18,
+ alignItems: 'center' as const,
+};
+
 const CHIP_CONTENT_STYLE: ViewStyle = {
  minHeight: 39,
  borderRadius: borderRadius.full,
@@ -38,6 +46,7 @@ type FilterChipProps = {
  isDisabled?: boolean;
  color?: string;
  icon?: React.ComponentProps<typeof FontAwesome5>['name'];
+ count?: number;
 };
 
 /**
@@ -46,7 +55,7 @@ type FilterChipProps = {
  * Selected: sfondo tinto (15% opacità) + bordo brand.
  * Unselected: sfondo trasparente + bordo default.
  */
-export function FilterChip({ label, isSelected, onPress, isDisabled = false, color, icon }: FilterChipProps) {
+export function FilterChip({ label, isSelected, onPress, isDisabled = false, color, icon, count }: FilterChipProps) {
  const selectedColor = colors.primary.DEFAULT;
  const selectedGlow = colors.primary.glow;
  const iconColor = color ?? '#FFFFFF';
@@ -54,16 +63,20 @@ export function FilterChip({ label, isSelected, onPress, isDisabled = false, col
   minHeight: 42,
   borderRadius: borderRadius.full,
   borderWidth: 1.5,
-  borderColor: isSelected ? colors.primary['300'] : selectedColor,
+  borderColor: isSelected
+    ? colors.primary['300']
+    : color
+      ? `${color}45`
+      : `${selectedColor}40`,
   padding: 1,
   alignItems: 'center' as const,
   justifyContent: 'center' as const,
   opacity: isDisabled ? opacityTokens.disabled : 1,
-  shadowColor: isSelected ? selectedGlow : selectedColor,
-  shadowOffset: { width: 0, height: isSelected ? 0 : 2 },
+  shadowColor: isSelected ? selectedGlow : color ? `${color}30` : `${selectedColor}25`,
+  shadowOffset: { width: 0, height: isSelected ? 0 : 1 },
   shadowOpacity: isSelected ? 0.45 : 0.2,
-  shadowRadius: isSelected ? 16 : 8,
-  elevation: isSelected ? 8 : 3,
+  shadowRadius: isSelected ? 16 : 5,
+  elevation: isSelected ? 8 : 2,
   transform: [{ scale: pressed ? 0.98 : 1 }],
  });
 
@@ -83,14 +96,28 @@ export function FilterChip({ label, isSelected, onPress, isDisabled = false, col
      start={{ x: 0, y: 0 }}
      end={{ x: 1, y: 0 }}
      style={CHIP_CONTENT_STYLE_SELECTED}
-   >
+    >
      {icon ? <FontAwesome5 name={icon} size={11} color={iconColor} solid /> : null}
      <Text style={CHIP_LABEL_STYLE}>{label}</Text>
+     {typeof count === 'number' ? (
+      <View style={[COUNT_BADGE_STYLE_BASE, { backgroundColor: 'rgba(255,255,255,0.22)' }]}>
+       <Text style={{ color: '#FFFFFF', fontSize: 10, fontFamily: typography.font.semibold, lineHeight: 14 }}>
+        {count}
+       </Text>
+      </View>
+     ) : null}
     </LinearGradient>
    ) : (
     <View style={CHIP_CONTENT_STYLE_UNSELECTED}>
      {icon ? <FontAwesome5 name={icon} size={11} color={iconColor} solid /> : null}
      <Text style={CHIP_LABEL_STYLE}>{label}</Text>
+     {typeof count === 'number' ? (
+      <View style={[COUNT_BADGE_STYLE_BASE, { backgroundColor: `${iconColor}22` }]}>
+       <Text style={{ color: iconColor, fontSize: 10, fontFamily: typography.font.semibold, lineHeight: 14 }}>
+        {count}
+       </Text>
+      </View>
+     ) : null}
     </View>
    )}
   </Pressable>

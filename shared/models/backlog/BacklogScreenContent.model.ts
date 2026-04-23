@@ -15,4 +15,5 @@ export type BacklogScreenContentState = {
  hasAppliedFilters: boolean;
  isReadingList: boolean;
  playNextCount: number;
+ statusCounts: Partial<Record<BacklogStatusEnum, number>>;
 };

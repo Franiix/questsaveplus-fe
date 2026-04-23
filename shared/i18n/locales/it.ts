@@ -195,12 +195,12 @@
    ABANDONED: 'Abbandonato',
   },
   emptyAll: {
-   title: 'Il tuo backlog è vuoto',
-   subtitle: 'Esplora i giochi e aggiungili alla tua collezione',
+   title: 'Nessun gioco salvato',
+   subtitle: 'Fai hunting. Aggiungi giochi e inizia a fare stack.',
   },
   emptyFiltered: {
-   title: 'Nessun gioco con questo stato',
-   subtitle: 'Prova un filtro diverso',
+   title: 'Zero match per questo filtro',
+   subtitle: 'Prova a cambiare o rimuovere il filtro.',
   },
   interactionHintTitle: 'Azioni rapide del backlog',
   interactionHint:
@@ -208,9 +208,10 @@
   interactionHintShow: 'Mostra suggerimenti backlog',
   interactionHintHide: 'Nascondi suggerimenti backlog',
   playNextCta: {
-   title: 'Vedi i tuoi Play Next',
-   subtitle_one: '{{count}} gioco prioritario fissato per la prossima sessione.',
-   subtitle_other: '{{count}} giochi prioritari fissati per la prossima sessione.',
+   title: 'Prossima sessione',
+   subtitle_zero: 'Aggiungi giochi alla coda dal backlog.',
+   subtitle_one: 'Tutto pronto per la prossima sessione.',
+   subtitle_other: 'Tutto pronto per la prossima sessione.',
    accessibilityLabel: 'Apri la lista Play Next',
    action: 'Apri',
   },
@@ -223,9 +224,9 @@
  },
  playNext: {
  title: 'Play Next',
-  subtitle: 'La mini-lista dei giochi che vuoi davvero iniziare o riprendere subito, ordinata per priorità.',
+  subtitle: 'La tua coda, ordinata per priorità.',
  searchPlaceholder: 'Cerca in Play Next...',
-  reorderHint: 'Tieni premuta una card e trascinala per cambiare priorità.',
+  reorderHint: 'Tieni premuto per riordinare.',
   dragHint: 'Tieni premuto per ordinare',
   reorderSuccess: 'Priorità Play Next aggiornata',
   playAction: 'PLAY',
@@ -234,8 +235,8 @@
    'Se premi PLAY, questo gioco uscirà da Play Next e lo ritroverai solo nel tuo backlog come In corso.',
   playConfirmAction: 'Sì, gioca ora',
   playSuccess: 'Gioco spostato in In corso',
-  emptyTitle: 'Nessun gioco in Play Next',
-  emptySubtitle: 'Apri il backlog e usa il pin sulle card per costruire la tua prossima coda di gioco.',
+  emptyTitle: 'La coda è vuota',
+  emptySubtitle: 'Usa il pin sui giochi del backlog per buildare la tua coda.',
   emptyAction: 'Vai al backlog',
  },
  gameDetail: {

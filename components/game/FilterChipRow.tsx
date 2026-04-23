@@ -7,6 +7,7 @@ import { colors, spacing } from '@/shared/theme/tokens';
 type FilterChipRowProps = {
  activeFilter: BacklogStatusEnum | null;
  onFilterChange: (filter: BacklogStatusEnum | null) => void;
+ countMap?: Partial<Record<BacklogStatusEnum, number>>;
 };
 
 type FilterDefinition = {
@@ -38,7 +39,7 @@ const FILTERS: FilterDefinition[] = [
  * Il filtro "All" (null) deseleziona qualsiasi filtro attivo.
  * I colori di ogni chip rispecchiano il colore di stato definito nei token.
  */
-export function FilterChipRow({ activeFilter, onFilterChange }: FilterChipRowProps) {
+export function FilterChipRow({ activeFilter, onFilterChange, countMap }: FilterChipRowProps) {
  const { t } = useTranslation();
 
  return (
@@ -60,6 +61,7 @@ export function FilterChipRow({ activeFilter, onFilterChange }: FilterChipRowPro
       onPress={() => onFilterChange(filter.value)}
       color={filter.color}
       icon={filter.icon}
+      count={filter.value !== null ? countMap?.[filter.value] : undefined}
      />
     );
    })}

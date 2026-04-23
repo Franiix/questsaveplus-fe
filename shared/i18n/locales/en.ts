@@ -195,12 +195,12 @@
    ABANDONED: 'Abandoned',
   },
   emptyAll: {
-   title: 'Your backlog is empty',
-   subtitle: 'Browse games and add them to your collection',
+   title: 'No games saved',
+   subtitle: 'Go hunting. Add games and start stacking your backlog.',
   },
   emptyFiltered: {
-   title: 'No games with this status',
-   subtitle: 'Try a different filter',
+   title: 'No match for this filter',
+   subtitle: 'Try a different filter or clear active ones.',
   },
   interactionHintTitle: 'Backlog quick actions',
   interactionHint:
@@ -208,9 +208,10 @@
   interactionHintShow: 'Show backlog tips',
   interactionHintHide: 'Hide backlog tips',
   playNextCta: {
-   title: 'See your Play Next',
-   subtitle_one: '{{count}} priority game pinned for your next session.',
-   subtitle_other: '{{count}} priority games pinned for your next session.',
+   title: 'On Deck',
+   subtitle_zero: 'Add games to your queue from the backlog.',
+   subtitle_one: 'All set. Ready for your next session.',
+   subtitle_other: 'All set. Ready for your next session.',
    accessibilityLabel: 'Open Play Next list',
    action: 'Open',
   },
@@ -223,9 +224,9 @@
  },
  playNext: {
  title: 'Play Next',
- subtitle: 'A focused mini-list for the games you really want to start or resume next, sorted by priority.',
+ subtitle: 'Your queue, sorted by priority.',
   searchPlaceholder: 'Search Play Next...',
-  reorderHint: 'Long press a card and drag it to change priority.',
+  reorderHint: 'Long press to reorder.',
   dragHint: 'Long press to reorder',
   reorderSuccess: 'Play Next priority updated',
   playAction: 'PLAY',
@@ -234,8 +235,8 @@
    'Once you press PLAY, this game will be removed from Play Next and remain only in your backlog as Playing.',
   playConfirmAction: 'Yes, play now',
   playSuccess: 'Game moved to Playing',
-  emptyTitle: 'No games in Play Next',
-  emptySubtitle: 'Open your backlog and use the pin on game cards to build your next play queue.',
+  emptyTitle: 'Queue is empty',
+  emptySubtitle: 'Pin games from your backlog to build your queue.',
   emptyAction: 'Go to backlog',
  },
  gameDetail: {

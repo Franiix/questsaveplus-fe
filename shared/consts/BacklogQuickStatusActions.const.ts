@@ -15,9 +15,9 @@ export const BACKLOG_QUICK_STATUS_ACTIONS: Record<
 [BacklogStatusEnum.WANT_TO_PLAY]: [
   { status: BacklogStatusEnum.PLAYING, isPrimary: true },
   { status: BacklogStatusEnum.COMPLETED },
+  { status: BacklogStatusEnum.ABANDONED },
   { status: BacklogStatusEnum.ONGOING },
   { status: BacklogStatusEnum.WISHLIST },
-  { status: BacklogStatusEnum.ABANDONED },
  ],
  [BacklogStatusEnum.PLAYING]: [
   { status: BacklogStatusEnum.COMPLETED, isPrimary: true },
