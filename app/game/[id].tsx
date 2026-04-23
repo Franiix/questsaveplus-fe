@@ -110,6 +110,7 @@ export default function GameDetailScreen() {
  );
 
  const {
+  backlogItem,
   isBacklogLoading,
   isMutating,
   isInBacklog,
@@ -277,6 +278,7 @@ export default function GameDetailScreen() {
        onAdd: () => void handleAddToBacklog(),
        onUpdate: () => void handleUpdateBacklog(),
        onRemove: () => setConfirmRemoveVisible(true),
+       addedAt: backlogItem?.added_at ?? null,
       }}
       onRegisterBacklogOffset={(y) => registerSectionOffset('backlog', y)}
      />

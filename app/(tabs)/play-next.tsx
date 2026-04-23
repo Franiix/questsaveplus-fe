@@ -10,12 +10,15 @@ import { GradientUnderline } from '@/components/base/display/GradientUnderline';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
 import { EmptyState } from '@/components/base/feedback/EmptyState';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
+import { PickerModal, type PickerOption } from '@/components/base/feedback/PickerModal';
+import { SortIconButton } from '@/components/base/inputs/SortIconButton';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { ScreenHeader } from '@/components/base/layout/ScreenHeader';
 import { SearchFilterToolbar } from '@/components/base/layout/SearchFilterToolbar';
 import { BacklogListItem } from '@/components/backlog/BacklogListItem';
 import { GameFilterSheet } from '@/components/game/GameFilterSheet';
 import { useBacklogGameMetadata } from '@/hooks/useBacklogGameMetadata';
+import { useBacklogSortPreference } from '@/hooks/useBacklogSortPreference';
 import { usePrefetchGameResources } from '@/hooks/usePrefetchGameResources';
 import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { useBacklogStatusPresentation } from '@/hooks/useBacklogStatusPresentation';
@@ -25,6 +28,7 @@ import { useCatalogParentPlatforms } from '@/hooks/useCatalogParentPlatforms';
 import { useCatalogPublishers } from '@/hooks/useCatalogPublishers';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
+import { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import { borderRadius, colors, layout, spacing, typography } from '@/shared/theme/tokens';
 import {
@@ -32,6 +36,7 @@ import {
  getPlayNextItems,
  shouldLoadBacklogMetadata,
 } from '@/shared/utils/backlogScreen';
+import { getPlayNextReasonKey } from '@/shared/utils/playNextReason';
 import { createEmptyGameDiscoveryFilters } from '@/shared/utils/gameDiscoveryFilters';
 import { useAuthStore } from '@/stores/auth.store';
 import { useBacklogStore } from '@/stores/backlog.store';
@@ -69,7 +74,9 @@ export default function PlayNextScreen() {
  const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
  const [draftFilters, setDraftFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
  const [isReordering, setIsReordering] = useState(false);
+ const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
  const [pendingPlayItem, setPendingPlayItem] = useState<BacklogItemEntity | null>(null);
+ const { sortOrder: playNextSortOrder, setSortOrder: setPlayNextSortOrder } = useBacklogSortPreference('play_next_sort_order');
  const userId = session?.user?.id;
  const playNextItems = useMemo(() => getPlayNextItems(backlogItems), [backlogItems]);
  const catalogFiltersEnabled = isFilterSheetOpen || shouldLoadBacklogMetadata(appliedFilters);
@@ -92,7 +99,7 @@ export default function PlayNextScreen() {
  } = useCatalogPublishers(catalogFiltersEnabled);
  const { data: backlogMetadata } = useBacklogGameMetadata(
   playNextItems.map((item) => item.game_id),
-  shouldLoadBacklogMetadata(appliedFilters),
+  true,
  );
  const { activeFilterCount, filteredItems, hasAppliedFilters } = useMemo(
   () =>
@@ -102,10 +109,15 @@ export default function PlayNextScreen() {
     backlogItems: playNextItems,
     backlogMetadata,
     search,
+    sortOrder: playNextSortOrder,
    }),
-  [appliedFilters, backlogMetadata, playNextItems, search],
+  [appliedFilters, backlogMetadata, playNextItems, playNextSortOrder, search],
  );
  const canReorder = !hasAppliedFilters && !isReordering;
+ const sortOptions = useMemo<PickerOption[]>(
+  () => Object.values(BacklogSortEnum).map((value) => ({ label: t(`backlog.sort.${value}`), value })),
+  [t],
+ );
 
  useEffect(() => {
   if (!userId) {
@@ -115,6 +127,12 @@ export default function PlayNextScreen() {
 
   void readAll(userId);
  }, [clearBacklog, readAll, userId]);
+
+ useEffect(() => {
+  for (const item of playNextItems) {
+   void prefetchGameById(item.game_id, item.game_cover_url ? [item.game_cover_url] : []);
+  }
+ }, [playNextItems, prefetchGameById]);
 
  const handleBackPress = useCallback(() => {
   router.replace('/(tabs)/backlog');
@@ -245,9 +263,13 @@ export default function PlayNextScreen() {
  }, [readAll, userId]);
 
  const renderItem = useCallback(
-  ({ item, drag, isActive }: RenderItemParams<BacklogItemEntity>) => (
-   <ScaleDecorator activeScale={1.03}>
-    <BacklogListItem
+  ({ item, drag, isActive }: RenderItemParams<BacklogItemEntity>) => {
+   const itemMeta = backlogMetadata?.get(item.game_id) ?? null;
+   const reasonKey = getPlayNextReasonKey(item, itemMeta);
+   const reasonToPlay = reasonKey ? t(`playNext.reason.${reasonKey}`) : undefined;
+   return (
+    <ScaleDecorator activeScale={1.03}>
+     <BacklogListItem
      item={item}
      onPress={handleItemPress}
      onPressIn={handleItemPressIn}
@@ -269,9 +291,11 @@ export default function PlayNextScreen() {
      labelMap={labelMap}
      colorMap={colorMap}
      iconMap={iconMap}
+     reasonToPlay={reasonToPlay}
     />
    </ScaleDecorator>
-  ),
+   );
+  },
   [
    activeMutation,
    canReorder,
@@ -283,6 +307,7 @@ export default function PlayNextScreen() {
    handleTogglePlayNext,
    iconMap,
    isMutating,
+   backlogMetadata,
    labelMap,
    t,
   ],
@@ -349,16 +374,25 @@ export default function PlayNextScreen() {
      </Text>
     </View>
 
-    <SearchFilterToolbar
-     value={search}
-     onChangeText={setSearch}
-     onClear={() => setSearch('')}
-     placeholder={t('playNext.searchPlaceholder')}
-     onFilterPress={handleOpenFilters}
-     filterAccessibilityLabel={t('home.filtersButton')}
-     activeCount={activeFilterCount}
-     isFilterActive={isFilterSheetOpen}
-    />
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+     <View style={{ flex: 1 }}>
+      <SearchFilterToolbar
+       value={search}
+       onChangeText={setSearch}
+       onClear={() => setSearch('')}
+       placeholder={t('playNext.searchPlaceholder')}
+       onFilterPress={handleOpenFilters}
+       filterAccessibilityLabel={t('home.filtersButton')}
+       activeCount={activeFilterCount}
+       isFilterActive={isFilterSheetOpen}
+      />
+     </View>
+     <SortIconButton
+      onPress={() => setIsSortSheetOpen(true)}
+      accessibilityLabel={t('backlog.sort.label')}
+      isActive={playNextSortOrder !== BacklogSortEnum.NEWEST}
+     />
+    </View>
    </View>
 
    {isReadingList ? <LoadingSpinner fullScreen /> : null}
@@ -425,6 +459,15 @@ export default function PlayNextScreen() {
     onChange={setDraftFilters}
     onApply={handleApplyFilters}
    onReset={handleResetFilters}
+   />
+
+   <PickerModal
+    isVisible={isSortSheetOpen}
+    onClose={() => setIsSortSheetOpen(false)}
+    title={t('backlog.sort.title')}
+    options={sortOptions}
+    value={playNextSortOrder}
+    onChange={(v) => setPlayNextSortOrder(v as BacklogSortEnum)}
    />
 
    <ConfirmModal

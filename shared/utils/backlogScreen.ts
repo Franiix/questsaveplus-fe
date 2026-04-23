@@ -1,8 +1,18 @@
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
+import { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import type { BacklogMetadataMap } from '@/shared/models/backlog/BacklogMetadataMap.model';
 import type { BacklogScreenViewModel } from '@/shared/models/backlog/BacklogScreenViewModel.model';
+
+const STATUS_ORDER: Record<string, number> = {
+ PLAYING: 0,
+ ONGOING: 1,
+ WANT_TO_PLAY: 2,
+ WISHLIST: 3,
+ COMPLETED: 4,
+ ABANDONED: 5,
+};
 
 type CreateBacklogScreenViewModelParams = {
  activeFilter: BacklogStatusEnum | null;
@@ -10,6 +20,7 @@ type CreateBacklogScreenViewModelParams = {
  backlogItems: BacklogItemEntity[];
  backlogMetadata?: BacklogMetadataMap;
  search: string;
+ sortOrder?: BacklogSortEnum;
 };
 
 const LOWEST_PLAY_NEXT_PRIORITY = Number.MAX_SAFE_INTEGER;
@@ -54,6 +65,33 @@ function getSortableUpdatedAt(item: BacklogItemEntity) {
  return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 
+function getSortableAddedAt(item: BacklogItemEntity) {
+ const timestamp = Date.parse(item.added_at);
+ return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function sortItems(items: BacklogItemEntity[], sort: BacklogSortEnum): BacklogItemEntity[] {
+ const sorted = [...items];
+ switch (sort) {
+  case BacklogSortEnum.NEWEST:
+   return sorted.sort((a, b) => getSortableAddedAt(b) - getSortableAddedAt(a));
+  case BacklogSortEnum.OLDEST:
+   return sorted.sort((a, b) => getSortableAddedAt(a) - getSortableAddedAt(b));
+  case BacklogSortEnum.TITLE_ASC:
+   return sorted.sort((a, b) => a.game_name.localeCompare(b.game_name));
+  case BacklogSortEnum.TITLE_DESC:
+   return sorted.sort((a, b) => b.game_name.localeCompare(a.game_name));
+  case BacklogSortEnum.RATING_DESC:
+   return sorted.sort((a, b) => (b.personal_rating ?? -1) - (a.personal_rating ?? -1));
+  case BacklogSortEnum.STATUS:
+   return sorted.sort(
+    (a, b) => (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99),
+   );
+  default:
+   return sorted;
+ }
+}
+
 export function getPlayNextItems(backlogItems: BacklogItemEntity[]) {
  return [...backlogItems]
   .filter((item) => item.is_play_next === true)
@@ -71,6 +109,7 @@ export function createBacklogScreenViewModel({
  backlogItems,
  backlogMetadata,
  search,
+ sortOrder = BacklogSortEnum.NEWEST,
 }: CreateBacklogScreenViewModelParams): BacklogScreenViewModel {
  const normalizedSearch = search.trim().toLowerCase();
  const hasAppliedFilters =
@@ -100,7 +139,7 @@ export function createBacklogScreenViewModel({
 
  return {
   activeFilterCount: countActiveDiscoveryFilters(appliedFilters),
-  filteredItems,
+  filteredItems: sortItems(filteredItems, sortOrder),
   hasAppliedFilters,
   playNextItems: getPlayNextItems(backlogItems),
  };

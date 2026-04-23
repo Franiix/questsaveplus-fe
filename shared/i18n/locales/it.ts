@@ -221,6 +221,20 @@
    pinSuccess: 'Gioco aggiunto a Play Next',
    unpinSuccess: 'Gioco rimosso da Play Next',
   },
+  addedOn: 'Aggiunto il {{date}}',
+  rateGame: 'Dai un voto',
+  editRating: 'Modifica voto',
+  ratingSheetTitle: 'Il tuo voto',
+  sort: {
+   label: 'Ordina',
+   title: 'Ordina per',
+   NEWEST: 'Più recenti',
+   OLDEST: 'Meno recenti',
+   TITLE_ASC: 'A → Z',
+   TITLE_DESC: 'Z → A',
+   RATING_DESC: 'Rating (alto → basso)',
+   STATUS: 'Stato',
+  },
  },
  playNext: {
  title: 'Play Next',
@@ -238,6 +252,12 @@
   emptyTitle: 'La coda è vuota',
   emptySubtitle: 'Usa il pin sui giochi del backlog per buildare la tua coda.',
   emptyAction: 'Vai al backlog',
+  reason: {
+   criticExcellent: 'Critica eccellente',
+   communityLoved: 'Amato dalla community',
+   questSaveFavorite: 'Top su QuestSave+',
+   waitingLong: 'In attesa da tempo',
+  },
  },
  gameDetail: {
   yourStatus: 'Il tuo stato',

@@ -29,6 +29,7 @@ type BacklogScreenContentProps = {
  onTogglePlayNext: (item: BacklogItemEntity) => void;
  onRefetch: () => void;
  onRequestRemove: (item: BacklogItemEntity) => void;
+ onRatingChange: (item: BacklogItemEntity, rating: number) => void;
  isUpdatingStatus?: boolean;
  isUpdatingPlayNext?: boolean;
  removeLabel: string;
@@ -59,6 +60,7 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
  onTogglePlayNext,
  onRefetch,
  onRequestRemove,
+ onRatingChange,
  isUpdatingStatus = false,
  isUpdatingPlayNext = false,
  removeLabel,
@@ -83,6 +85,8 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
     labelMap={labelMap}
     colorMap={colorMap}
     iconMap={iconMap}
+    showAddedDate
+    onRatingChange={onRatingChange}
    />
   ),
   [
@@ -91,6 +95,7 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
    onQuickStatusChange,
    onTogglePlayNext,
    onRequestRemove,
+   onRatingChange,
    isUpdatingStatus,
    isUpdatingPlayNext,
    removeLabel,

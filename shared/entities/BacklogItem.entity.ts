@@ -13,4 +13,6 @@ export interface BacklogItemEntity extends BaseEntity {
  play_next_priority?: number | null;
  added_at: string; // ISO 8601
  updated_at: string; // ISO 8601
+ started_at: string | null; // ISO 8601
+ completed_at: string | null; // ISO 8601
 }

@@ -1,0 +1,8 @@
+export enum BacklogSortEnum {
+ NEWEST = 'NEWEST',
+ OLDEST = 'OLDEST',
+ TITLE_ASC = 'TITLE_ASC',
+ TITLE_DESC = 'TITLE_DESC',
+ RATING_DESC = 'RATING_DESC',
+ STATUS = 'STATUS',
+}

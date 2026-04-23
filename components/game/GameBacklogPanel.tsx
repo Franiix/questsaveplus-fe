@@ -7,6 +7,7 @@ import { RatingStepper } from '@/components/base/inputs/RatingStepper';
 import { TextAreaInput } from '@/components/base/inputs/TextAreaInput';
 import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
+import { formatDate } from '@/shared/utils/date';
 
 type StatusOption = {
  label: string;
@@ -35,6 +36,7 @@ type GameBacklogPanelProps = {
  onAdd: () => void;
  onUpdate: () => void;
  onRemove: () => void;
+ addedAt?: string | null;
 };
 
 function SectionLabel({ children }: { children: string }) {
@@ -74,8 +76,9 @@ export function GameBacklogPanel({
  onAdd,
  onUpdate,
  onRemove,
+ addedAt,
 }: GameBacklogPanelProps) {
- const { t } = useTranslation();
+ const { t, i18n } = useTranslation();
 
  return (
   <Card
@@ -94,6 +97,20 @@ export function GameBacklogPanel({
       isDisabled={isBacklogLoading || isMutating}
      />
     </View>
+
+    {isInBacklog && addedAt ? (
+     <Text
+      style={{
+       color: colors.text.tertiary,
+       fontSize: typography.size.xs,
+       fontFamily: typography.font.regular,
+      }}
+     >
+      {t('backlog.addedOn', {
+       date: formatDate(addedAt, i18n.language, { day: 'numeric', month: 'long', year: 'numeric' }),
+      })}
+     </Text>
+    ) : null}
 
     {isInBacklog ? (
      <View>

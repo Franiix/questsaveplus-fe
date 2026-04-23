@@ -53,6 +53,7 @@ type GameDetailOverviewSectionProps = {
   selectedRating: number;
   selectedStatus: BacklogStatusEnum;
   statusOptions: readonly StatusOption[];
+  addedAt?: string | null;
  };
  game: Pick<CatalogGameDetail, 'name' | 'platforms'>;
  onDeveloperPress?: (() => void) | null;
@@ -123,6 +124,7 @@ export function GameDetailOverviewSection({
      onAdd={backlogController.onAdd}
      onUpdate={backlogController.onUpdate}
      onRemove={backlogController.onRemove}
+     addedAt={backlogController.addedAt}
     />
    </View>
   </>

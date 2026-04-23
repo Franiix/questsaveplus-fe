@@ -1,7 +1,9 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import { memo, useRef } from 'react';
+import { memo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
+import { BottomSheet } from '@/components/base/feedback/BottomSheet';
 import { BacklogCardTitle } from '@/components/backlog/BacklogCardTitle';
 import { CardCoverWithScrim } from '@/components/backlog/CardCoverWithScrim';
 import { CardLeadingControl } from '@/components/backlog/CardLeadingControl';
@@ -19,6 +21,7 @@ import type {
  BacklogStatusLabelMap,
 } from '@/shared/models/backlog/BacklogScreenContent.model';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
+import { formatDate } from '@/shared/utils/date';
 
 const SWIPE_ACTION_WIDTH = 104;
 const SWIPE_STATUS_WIDTH = 88;
@@ -45,6 +48,9 @@ export type BacklogListItemProps = {
  primaryActionLabel?: string;
  playNextOrdinal?: number;
  quickActionsMode?: 'default' | 'play-only' | 'hidden';
+ showAddedDate?: boolean;
+ onRatingChange?: (item: BacklogItemEntity, rating: number) => void;
+ reasonToPlay?: string;
 };
 
 export const BacklogListItem = memo(function BacklogListItem({
@@ -69,7 +75,12 @@ export const BacklogListItem = memo(function BacklogListItem({
  primaryActionLabel,
  playNextOrdinal,
  quickActionsMode = 'default',
+ showAddedDate = false,
+ onRatingChange,
+ reasonToPlay,
 }: BacklogListItemProps) {
+ const { t, i18n } = useTranslation();
+ const [isRatingSheetOpen, setIsRatingSheetOpen] = useState(false);
  const { isLocked, run } = useSingleAction(() => onPress(item));
  const swipeableRef = useRef<Swipeable | null>(null);
  const isPlayNext = item.is_play_next === true;
@@ -99,31 +110,86 @@ export const BacklogListItem = memo(function BacklogListItem({
     }
   : undefined;
 
+ const pinnedCustomActions =
+  isPlayNext && quickActionsMode === 'default'
+   ? ([
+      {
+       accessibilityLabel: playNextUnpinLabel,
+       color: colors.primary['200'],
+       iconName: 'thumbtack' as React.ComponentProps<typeof FontAwesome5>['name'],
+       isActive: true,
+       isDisabled: isUpdatingPlayNext,
+       onPress: () => onTogglePlayNext?.(item),
+      },
+      {
+       accessibilityLabel: labelMap[BacklogStatusEnum.PLAYING],
+       color: colorMap[BacklogStatusEnum.PLAYING],
+       iconName: iconMap[BacklogStatusEnum.PLAYING],
+       isActive: item.status === BacklogStatusEnum.PLAYING,
+       isDisabled: isUpdatingStatus,
+       onPress: () => onQuickStatusChange(item, BacklogStatusEnum.PLAYING),
+      },
+     ] as const)
+   : undefined;
+
  function renderRightActions() {
   return (
-   <Pressable
-    onPress={() => onRequestRemove(item)}
-    style={{
-     width: SWIPE_ACTION_WIDTH,
-     borderRadius: borderRadius.lg,
-     backgroundColor: colors.error,
-     alignItems: 'center',
-     justifyContent: 'center',
-     gap: spacing.xs,
-     marginLeft: spacing.sm,
-    }}
-   >
-    <FontAwesome5 name="trash-alt" size={16} color={colors.text.primary} solid />
-    <Text
+   <View style={{ flexDirection: 'row', alignItems: 'stretch', gap: spacing.sm, marginLeft: spacing.sm }}>
+    {onRatingChange ? (
+     <Pressable
+      onPress={() => setIsRatingSheetOpen(true)}
+      style={{
+       width: SWIPE_STATUS_WIDTH,
+       borderRadius: borderRadius.lg,
+       borderWidth: 1,
+       borderColor: `${colors.warning}66`,
+       backgroundColor: `${colors.warning}22`,
+       alignItems: 'center',
+       justifyContent: 'center',
+       gap: spacing.xs,
+      }}
+     >
+      <FontAwesome5
+       name={item.personal_rating !== null ? 'star' : 'star'}
+       size={16}
+       color={colors.warning}
+       solid={item.personal_rating !== null}
+      />
+      <Text
+       style={{
+        color: colors.text.primary,
+        fontSize: typography.size.xs,
+        fontFamily: typography.font.semibold,
+        textAlign: 'center',
+       }}
+      >
+       {item.personal_rating !== null ? t('backlog.editRating') : t('backlog.rateGame')}
+      </Text>
+     </Pressable>
+    ) : null}
+    <Pressable
+     onPress={() => onRequestRemove(item)}
      style={{
-      color: colors.text.primary,
-      fontSize: typography.size.sm,
-      fontFamily: typography.font.semibold,
+      width: SWIPE_ACTION_WIDTH,
+      borderRadius: borderRadius.lg,
+      backgroundColor: colors.error,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.xs,
      }}
     >
-     {removeLabel}
-    </Text>
-   </Pressable>
+     <FontAwesome5 name="trash-alt" size={16} color={colors.text.primary} solid />
+     <Text
+      style={{
+       color: colors.text.primary,
+       fontSize: typography.size.sm,
+       fontFamily: typography.font.semibold,
+      }}
+     >
+      {removeLabel}
+     </Text>
+    </Pressable>
+   </View>
   );
  }
 
@@ -224,6 +290,43 @@ export const BacklogListItem = memo(function BacklogListItem({
       }}
      >
       <BacklogCardTitle title={item.game_name} />
+      {reasonToPlay ? (
+       <View
+        style={{
+         alignSelf: 'flex-start',
+         paddingHorizontal: spacing.sm,
+         paddingVertical: 2,
+         borderRadius: borderRadius.full,
+         backgroundColor: `${colors.primary.DEFAULT}20`,
+         borderWidth: 1,
+         borderColor: `${colors.primary['200']}40`,
+        }}
+       >
+        <Text
+         style={{
+          color: colors.primary['200'],
+          fontSize: typography.size['2xs'],
+          fontFamily: typography.font.medium,
+         }}
+        >
+         {reasonToPlay}
+        </Text>
+       </View>
+      ) : null}
+      {showAddedDate && item.added_at ? (
+       <Text
+        style={{
+         color: colors.text.tertiary,
+         fontSize: typography.size['2xs'],
+         fontFamily: typography.font.regular,
+        }}
+        numberOfLines={1}
+       >
+        {t('backlog.addedOn', {
+         date: formatDate(item.added_at, i18n.language, { day: 'numeric', month: 'short', year: 'numeric' }),
+        })}
+       </Text>
+      ) : null}
       <View
        style={{
         flexDirection: 'row',
@@ -232,7 +335,12 @@ export const BacklogListItem = memo(function BacklogListItem({
         gap: spacing.sm,
        }}
       >
-       <StatusBadge value={item.status} colorMap={colorMap} labelMap={labelMap} iconMap={iconMap} />
+       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+        <StatusBadge value={item.status} colorMap={colorMap} labelMap={labelMap} iconMap={iconMap} />
+        {item.notes ? (
+         <FontAwesome5 name="sticky-note" size={10} color={colors.text.tertiary} solid />
+        ) : null}
+       </View>
        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
         {showTrailingPinButton ? (
          <ActionIconButton
@@ -248,7 +356,20 @@ export const BacklogListItem = memo(function BacklogListItem({
          />
         ) : null}
         {item.personal_rating !== null ? (
-         <StarRatingInput value={item.personal_rating} onChange={() => {}} readOnly size="sm" />
+         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+          <Text
+           style={{
+            color: colors.warning,
+            fontSize: typography.size.xs,
+            fontFamily: typography.font.semibold,
+           }}
+          >
+           {item.personal_rating % 1 === 0
+            ? String(item.personal_rating)
+            : item.personal_rating.toFixed(1)}
+          </Text>
+          <FontAwesome5 name="star" size={9} color={colors.warning} solid />
+         </View>
         ) : null}
        </View>
       </View>
@@ -268,7 +389,8 @@ export const BacklogListItem = memo(function BacklogListItem({
         iconMap={iconMap}
         labelMap={labelMap}
         primaryCount={quickPrimaryCount}
-        auxiliaryAction={pinAuxiliaryAction}
+        auxiliaryAction={pinnedCustomActions ? undefined : pinAuxiliaryAction}
+        customActions={pinnedCustomActions}
         isDisabled={isUpdatingStatus}
         onStatusChange={(status) => onQuickStatusChange(item, status)}
        />
@@ -307,22 +429,49 @@ export const BacklogListItem = memo(function BacklogListItem({
   </View>
  );
 
+ const ratingSheet = onRatingChange ? (
+  <BottomSheet
+   isVisible={isRatingSheetOpen}
+   onClose={() => setIsRatingSheetOpen(false)}
+   title={t('backlog.ratingSheetTitle')}
+  >
+   <View style={{ alignItems: 'center', paddingVertical: spacing.md }}>
+    <StarRatingInput
+     value={item.personal_rating ?? undefined}
+     size="lg"
+     onChange={(rating) => {
+      onRatingChange(item, rating);
+      setIsRatingSheetOpen(false);
+     }}
+    />
+   </View>
+  </BottomSheet>
+ ) : null;
+
  if (!isSwipeEnabled) {
-  return cardContent;
+  return (
+   <>
+    {cardContent}
+    {ratingSheet}
+   </>
+  );
  }
 
  return (
-  <Swipeable
-   ref={swipeableRef}
-   overshootLeft={false}
-   overshootRight={false}
-   leftThreshold={40}
-   rightThreshold={40}
-   friction={2}
-   renderLeftActions={renderLeftActions}
-   renderRightActions={renderRightActions}
-  >
-   {cardContent}
-  </Swipeable>
+  <>
+   <Swipeable
+    ref={swipeableRef}
+    overshootLeft={false}
+    overshootRight={false}
+    leftThreshold={40}
+    rightThreshold={40}
+    friction={2}
+    renderLeftActions={renderLeftActions}
+    renderRightActions={renderRightActions}
+   >
+    {cardContent}
+   </Swipeable>
+   {ratingSheet}
+  </>
  );
 });

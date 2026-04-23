@@ -4,4 +4,7 @@ export type BacklogGameMetadata = {
  platforms: string[];
  developers: string[];
  publishers: string[];
+ igdbRating: number | null;
+ criticScore: number | null;
+ questSaveRating: number | null;
 };

@@ -221,6 +221,20 @@
    pinSuccess: 'Game added to Play Next',
    unpinSuccess: 'Game removed from Play Next',
   },
+  addedOn: 'Added on {{date}}',
+  rateGame: 'Rate this game',
+  editRating: 'Edit rating',
+  ratingSheetTitle: 'Your rating',
+  sort: {
+   label: 'Sort',
+   title: 'Sort by',
+   NEWEST: 'Newest first',
+   OLDEST: 'Oldest first',
+   TITLE_ASC: 'A → Z',
+   TITLE_DESC: 'Z → A',
+   RATING_DESC: 'Rating (high → low)',
+   STATUS: 'Status',
+  },
  },
  playNext: {
  title: 'Play Next',
@@ -238,6 +252,12 @@
   emptyTitle: 'Queue is empty',
   emptySubtitle: 'Pin games from your backlog to build your queue.',
   emptyAction: 'Go to backlog',
+  reason: {
+   criticExcellent: 'Critics love it',
+   communityLoved: 'Community favourite',
+   questSaveFavorite: 'Top on QuestSave+',
+   waitingLong: 'Waiting a long time',
+  },
  },
  gameDetail: {
   yourStatus: 'Your status',

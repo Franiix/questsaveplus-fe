@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
+import { PickerModal, type PickerOption } from '@/components/base/feedback/PickerModal';
+import { SortIconButton } from '@/components/base/inputs/SortIconButton';
 import { GradientUnderline } from '@/components/base/display/GradientUnderline';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { SearchFilterToolbar } from '@/components/base/layout/SearchFilterToolbar';
@@ -14,6 +16,7 @@ import { usePrefetchGameResources } from '@/hooks/usePrefetchGameResources';
 import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { useBacklogGameMetadata } from '@/hooks/useBacklogGameMetadata';
 import { useBacklogScreenViewModel } from '@/hooks/useBacklogScreenViewModel';
+import { useBacklogSortPreference } from '@/hooks/useBacklogSortPreference';
 import { useBacklogStatusPresentation } from '@/hooks/useBacklogStatusPresentation';
 import { useCatalogDevelopers } from '@/hooks/useCatalogDevelopers';
 import { useCatalogGenres } from '@/hooks/useCatalogGenres';
@@ -21,6 +24,7 @@ import { useCatalogParentPlatforms } from '@/hooks/useCatalogParentPlatforms';
 import { useCatalogPublishers } from '@/hooks/useCatalogPublishers';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
+import { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import { colors, layout, spacing, typography } from '@/shared/theme/tokens';
 import { createEmptyGameDiscoveryFilters } from '@/shared/utils/gameDiscoveryFilters';
@@ -56,8 +60,10 @@ export default function BacklogScreen() {
   const [activeFilter, setActiveFilter] = useState<BacklogStatusEnum | null>(null);
   const [search, setSearch] = useState('');
  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+ const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
  const [pendingDeleteItem, setPendingDeleteItem] = useState<BacklogItemEntity | null>(null);
   const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
+  const { sortOrder, setSortOrder } = useBacklogSortPreference();
   const [draftFilters, setDraftFilters] = useState<GameDiscoveryFilters>(createEmptyGameDiscoveryFilters);
  const catalogFiltersEnabled = isFilterSheetOpen || shouldLoadBacklogMetadata(appliedFilters);
  const { data: genres = [], isLoading: isGenresLoading, isError: isGenresError } =
@@ -100,6 +106,7 @@ export default function BacklogScreen() {
       backlogItems,
       backlogMetadata,
       search,
+      sortOrder,
     });
 
   const statusCounts = useMemo(
@@ -224,6 +231,16 @@ export default function BacklogScreen() {
     [clearError, showToast, t, update],
   );
 
+  const handleRatingChange = useCallback(
+    async (item: BacklogItemEntity, rating: number) => {
+      clearError();
+      await update(item.id, { personal_rating: rating });
+      const updateError = useBacklogStore.getState().error;
+      if (updateError) showToast(updateError, 'error');
+    },
+    [clearError, showToast, update],
+  );
+
   const handleConfirmRemove = useCallback(async () => {
     if (!pendingDeleteItem) return;
 
@@ -237,6 +254,15 @@ export default function BacklogScreen() {
     }
     setPendingDeleteItem(null);
   }, [clearError, deleteBacklogItem, pendingDeleteItem, showToast, t]);
+
+  const sortOptions = useMemo<PickerOption[]>(
+    () =>
+      Object.values(BacklogSortEnum).map((value) => ({
+        label: t(`backlog.sort.${value}`),
+        value,
+      })),
+    [t],
+  );
 
   const contentState = useMemo(
     () => ({
@@ -277,16 +303,25 @@ export default function BacklogScreen() {
           <GradientUnderline />
         </View>
 
-        <SearchFilterToolbar
-          value={search}
-          onChangeText={setSearch}
-          onClear={() => setSearch('')}
-          placeholder={t('backlog.searchPlaceholder')}
-          onFilterPress={handleOpenFilters}
-          filterAccessibilityLabel={t('home.filtersButton')}
-          activeCount={activeFilterCount}
-          isFilterActive={isFilterSheetOpen}
-        />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+          <View style={{ flex: 1 }}>
+            <SearchFilterToolbar
+              value={search}
+              onChangeText={setSearch}
+              onClear={() => setSearch('')}
+              placeholder={t('backlog.searchPlaceholder')}
+              onFilterPress={handleOpenFilters}
+              filterAccessibilityLabel={t('home.filtersButton')}
+              activeCount={activeFilterCount}
+              isFilterActive={isFilterSheetOpen}
+            />
+          </View>
+          <SortIconButton
+            onPress={() => setIsSortSheetOpen(true)}
+            accessibilityLabel={t('backlog.sort.label')}
+            isActive={sortOrder !== BacklogSortEnum.NEWEST}
+          />
+        </View>
       </View>
 
       <BacklogScreenContent
@@ -302,6 +337,7 @@ export default function BacklogScreen() {
         onQuickStatusChange={handleQuickStatusChange}
         onRefetch={handleRefetch}
         onRequestRemove={handleRequestRemove}
+        onRatingChange={handleRatingChange}
         isUpdatingStatus={isMutating && activeMutation === 'update'}
         isUpdatingPlayNext={isMutating && activeMutation === 'update'}
         removeLabel={t('gameDetail.confirmRemove.confirm')}
@@ -327,6 +363,15 @@ export default function BacklogScreen() {
         onChange={setDraftFilters}
         onApply={handleApplyFilters}
         onReset={handleResetFilters}
+      />
+
+      <PickerModal
+        isVisible={isSortSheetOpen}
+        onClose={() => setIsSortSheetOpen(false)}
+        title={t('backlog.sort.title')}
+        options={sortOptions}
+        value={sortOrder}
+        onChange={(v) => setSortOrder(v as BacklogSortEnum)}
       />
 
       <ConfirmModal
