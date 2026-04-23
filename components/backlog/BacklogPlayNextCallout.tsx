@@ -61,7 +61,7 @@ export const BacklogPlayNextCallout = memo(function BacklogPlayNextCallout({
     >
      <FontAwesome5 name="bolt" size={16} color={colors.primary['200']} solid />
     </View>
-    <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+    <View style={{ flex: 1, minWidth: 0, gap: spacing.xs }}>
      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
       <Text
        style={{

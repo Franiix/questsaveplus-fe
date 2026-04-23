@@ -151,3 +151,8 @@ export const typography = {
 export const opacity = {
  disabled: 0.5, // stato disabilitato per tutti i componenti interattivi
 } as const;
+
+export const layout = {
+ screenContentTopPadding: 84, // ScreenHeader height + safe area inset
+ screenBottomPadding: 110,    // tab bar height + clearance
+} as const;

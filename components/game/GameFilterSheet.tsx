@@ -11,6 +11,29 @@ import type {
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 
+const SECTION_LABEL_STYLE = {
+ color: colors.text.primary,
+ fontSize: typography.size.sm,
+ fontFamily: typography.font.semibold,
+} as const;
+
+function FilterSectionLabel({ children }: { children: string }) {
+ return <Text style={SECTION_LABEL_STYLE}>{children}</Text>;
+}
+
+function getSelectPlaceholder(
+ isLoading: boolean,
+ isError: boolean,
+ isEmpty: boolean,
+ defaultLabel: string,
+ t: ReturnType<typeof useTranslation>['t'],
+): string {
+ if (isLoading) return t('common.loadingOptions');
+ if (isError) return t('common.errorLoadingOptions');
+ if (isEmpty) return t('common.noOptionsAvailable');
+ return defaultLabel;
+}
+
 const PLATFORM_GROUP_ORDER: Record<string, number> = {
  'platformFamilies.playstation': 0,
  'platformFamilies.xbox': 1,
@@ -152,28 +175,12 @@ export function GameFilterSheet({
    <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 420 }}>
    <View style={{ gap: spacing.lg }}>
       <View style={{ gap: spacing.sm }}>
-      <Text
-       style={{
-        color: colors.text.primary,
-        fontSize: typography.size.sm,
-        fontFamily: typography.font.semibold,
-       }}
-      >
-        {genresTitle}
-      </Text>
+       <FilterSectionLabel>{genresTitle}</FilterSectionLabel>
        <SearchableSelectInput
         options={genreOptions}
         value={value.genre}
         onChange={(genre) => onChange({ ...value, genre })}
-       placeholder={
-         genresLoading
-          ? t('common.loadingOptions')
-          : genresError
-            ? t('common.errorLoadingOptions')
-            : genres.length === 0
-              ? t('common.noOptionsAvailable')
-              : genrePlaceholder
-        }
+        placeholder={getSelectPlaceholder(genresLoading, genresError, genres.length === 0, genrePlaceholder, t)}
         title={genresTitle}
         searchPlaceholder={t('common.searchOptions')}
         accessibilityLabel={genresTitle}
@@ -186,29 +193,13 @@ export function GameFilterSheet({
       </View>
 
       <View style={{ gap: spacing.sm }}>
-       <Text
-        style={{
-         color: colors.text.primary,
-         fontSize: typography.size.sm,
-         fontFamily: typography.font.semibold,
-        }}
-       >
-        {t('home.developersTitle')}
-       </Text>
+       <FilterSectionLabel>{t('home.developersTitle')}</FilterSectionLabel>
        <SearchableSelectInput
         options={developerOptions}
         suggestedOptions={suggestedDeveloperOptions}
         value={value.developer}
         onChange={(developer) => onChange({ ...value, developer })}
-        placeholder={
-         developersLoading
-          ? t('common.loadingOptions')
-          : developersError
-            ? t('common.errorLoadingOptions')
-            : developers.length === 0
-              ? t('common.noOptionsAvailable')
-              : developerPlaceholder
-        }
+        placeholder={getSelectPlaceholder(developersLoading, developersError, developers.length === 0, developerPlaceholder, t)}
         title={t('home.developersTitle')}
         searchPlaceholder={t('common.searchOptions')}
         accessibilityLabel={t('home.developersTitle')}
@@ -223,29 +214,13 @@ export function GameFilterSheet({
       </View>
 
       <View style={{ gap: spacing.sm }}>
-       <Text
-        style={{
-         color: colors.text.primary,
-         fontSize: typography.size.sm,
-         fontFamily: typography.font.semibold,
-        }}
-       >
-        {t('home.publishersTitle')}
-       </Text>
+       <FilterSectionLabel>{t('home.publishersTitle')}</FilterSectionLabel>
        <SearchableSelectInput
         options={publisherOptions}
         suggestedOptions={suggestedPublisherOptions}
         value={value.publisher}
         onChange={(publisher) => onChange({ ...value, publisher })}
-        placeholder={
-         publishersLoading
-          ? t('common.loadingOptions')
-          : publishersError
-            ? t('common.errorLoadingOptions')
-            : publishers.length === 0
-              ? t('common.noOptionsAvailable')
-              : publisherPlaceholder
-        }
+        placeholder={getSelectPlaceholder(publishersLoading, publishersError, publishers.length === 0, publisherPlaceholder, t)}
         title={t('home.publishersTitle')}
         searchPlaceholder={t('common.searchOptions')}
         accessibilityLabel={t('home.publishersTitle')}
@@ -260,29 +235,13 @@ export function GameFilterSheet({
       </View>
 
       <View style={{ gap: spacing.sm }}>
-       <Text
-        style={{
-         color: colors.text.primary,
-         fontSize: typography.size.sm,
-         fontFamily: typography.font.semibold,
-        }}
-       >
-       {platformsTitle}
-       </Text>
+       <FilterSectionLabel>{platformsTitle}</FilterSectionLabel>
        <SearchableSelectInput
         options={platformOptions}
         suggestedOptions={suggestedPlatformOptions}
         value={value.platform}
         onChange={(platform) => onChange({ ...value, platform })}
-        placeholder={
-         platformsLoading
-          ? t('common.loadingOptions')
-          : platformsError
-            ? t('common.errorLoadingOptions')
-            : platforms.length === 0
-              ? t('common.noOptionsAvailable')
-              : platformPlaceholder
-        }
+        placeholder={getSelectPlaceholder(platformsLoading, platformsError, platforms.length === 0, platformPlaceholder, t)}
        title={platformsTitle}
        searchPlaceholder={t('common.searchOptions')}
        accessibilityLabel={platformsTitle}

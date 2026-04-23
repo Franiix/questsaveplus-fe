@@ -11,7 +11,7 @@ import { ScreenHeader } from '@/components/base/layout/ScreenHeader';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
 import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { getLegalDocumentUrl, type LegalDocumentKey } from '@/shared/config/legal';
-import { colors, spacing, typography } from '@/shared/theme/tokens';
+import { colors, layout, spacing, typography } from '@/shared/theme/tokens';
 
 type CreditLink = {
  key: string;
@@ -196,8 +196,8 @@ export default function CreditsScreen() {
     showsVerticalScrollIndicator={false}
     contentContainerStyle={{
      paddingHorizontal: spacing.md,
-     paddingTop: 84,
-     paddingBottom: 110,
+     paddingTop: layout.screenContentTopPadding,
+     paddingBottom: layout.screenBottomPadding,
      gap: spacing.md,
     }}
    >

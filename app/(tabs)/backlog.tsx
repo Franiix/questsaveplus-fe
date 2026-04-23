@@ -1,9 +1,9 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
+import { GradientUnderline } from '@/components/base/display/GradientUnderline';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { SearchFilterToolbar } from '@/components/base/layout/SearchFilterToolbar';
 import { ScreenHeader } from '@/components/base/layout/ScreenHeader';
@@ -22,7 +22,7 @@ import { useCatalogPublishers } from '@/hooks/useCatalogPublishers';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
-import { colors, spacing, typography } from '@/shared/theme/tokens';
+import { colors, layout, spacing, typography } from '@/shared/theme/tokens';
 import { createEmptyGameDiscoveryFilters } from '@/shared/utils/gameDiscoveryFilters';
 import {
  shouldLoadBacklogMetadata,
@@ -258,7 +258,7 @@ export default function BacklogScreen() {
       <View
         style={{
           paddingHorizontal: HORIZONTAL_PADDING,
-          paddingTop: 84,
+          paddingTop: layout.screenContentTopPadding,
           paddingBottom: spacing.sm,
           gap: spacing.sm,
         }}
@@ -274,12 +274,7 @@ export default function BacklogScreen() {
           >
             {t('backlog.title')}
           </Text>
-          <LinearGradient
-            colors={[colors.primary.DEFAULT, 'transparent']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{ height: 2, width: 52, borderRadius: 1 }}
-          />
+          <GradientUnderline />
         </View>
 
         <SearchFilterToolbar

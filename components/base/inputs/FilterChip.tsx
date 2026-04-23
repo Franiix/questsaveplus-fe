@@ -101,7 +101,7 @@ export function FilterChip({ label, isSelected, onPress, isDisabled = false, col
      <Text style={CHIP_LABEL_STYLE}>{label}</Text>
      {typeof count === 'number' ? (
       <View style={[COUNT_BADGE_STYLE_BASE, { backgroundColor: 'rgba(255,255,255,0.22)' }]}>
-       <Text style={{ color: '#FFFFFF', fontSize: 10, fontFamily: typography.font.semibold, lineHeight: 14 }}>
+       <Text style={{ color: '#FFFFFF', fontSize: typography.size['2xs'], fontFamily: typography.font.semibold, lineHeight: 14 }}>
         {count}
        </Text>
       </View>
@@ -113,7 +113,7 @@ export function FilterChip({ label, isSelected, onPress, isDisabled = false, col
      <Text style={CHIP_LABEL_STYLE}>{label}</Text>
      {typeof count === 'number' ? (
       <View style={[COUNT_BADGE_STYLE_BASE, { backgroundColor: `${iconColor}22` }]}>
-       <Text style={{ color: iconColor, fontSize: 10, fontFamily: typography.font.semibold, lineHeight: 14 }}>
+       <Text style={{ color: iconColor, fontSize: typography.size['2xs'], fontFamily: typography.font.semibold, lineHeight: 14 }}>
         {count}
        </Text>
       </View>

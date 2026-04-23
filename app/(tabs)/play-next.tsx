@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GradientUnderline } from '@/components/base/display/GradientUnderline';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
 import { EmptyState } from '@/components/base/feedback/EmptyState';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
@@ -25,8 +26,7 @@ import { useCatalogPublishers } from '@/hooks/useCatalogPublishers';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
-import { LinearGradient } from 'expo-linear-gradient';
-import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
+import { borderRadius, colors, layout, spacing, typography } from '@/shared/theme/tokens';
 import {
  createBacklogScreenViewModel,
  getPlayNextItems,
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
  listContent: {
   paddingHorizontal: HORIZONTAL_PADDING,
   paddingTop: spacing.sm,
-  paddingBottom: 110,
+  paddingBottom: layout.screenBottomPadding,
   gap: spacing.sm,
  },
 });
@@ -265,7 +265,6 @@ export default function PlayNextScreen() {
      quickActionsMode="play-only"
      playNextPinLabel={t('backlog.playNext.pinAction')}
      playNextUnpinLabel={t('backlog.playNext.unpinAction')}
-     showPlayNextRank
      removeLabel={t('gameDetail.confirmRemove.confirm')}
      labelMap={labelMap}
      colorMap={colorMap}
@@ -296,7 +295,7 @@ export default function PlayNextScreen() {
    <View
     style={{
      paddingHorizontal: HORIZONTAL_PADDING,
-     paddingTop: 84,
+     paddingTop: layout.screenContentTopPadding,
      paddingBottom: spacing.sm,
      gap: spacing.md,
     }}
@@ -336,12 +335,7 @@ export default function PlayNextScreen() {
        </View>
       ) : null}
      </View>
-     <LinearGradient
-      colors={[colors.primary.DEFAULT, 'transparent']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
-      style={{ height: 2, width: 52, borderRadius: 1 }}
-     />
+     <GradientUnderline />
      <Text
       style={{
        color: colors.text.secondary,

@@ -14,7 +14,7 @@ import type {
  BacklogStatusIconMap,
  BacklogStatusLabelMap,
 } from '@/shared/models/backlog/BacklogScreenContent.model';
-import { spacing } from '@/shared/theme/tokens';
+import { layout, spacing } from '@/shared/theme/tokens';
 
 type BacklogScreenContentProps = {
  colorMap: BacklogStatusColorMap;
@@ -41,7 +41,7 @@ const listContentStyle = StyleSheet.create({
  container: {
   paddingHorizontal: HORIZONTAL_PADDING,
   paddingTop: spacing.sm,
-  paddingBottom: 110,
+  paddingBottom: layout.screenBottomPadding,
   gap: spacing.sm,
  },
 });
@@ -79,7 +79,6 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
     isUpdatingPlayNext={isUpdatingPlayNext}
     playNextPinLabel={t('backlog.playNext.pinAction')}
     playNextUnpinLabel={t('backlog.playNext.unpinAction')}
-    showPlayNextRank
     removeLabel={removeLabel}
     labelMap={labelMap}
     colorMap={colorMap}

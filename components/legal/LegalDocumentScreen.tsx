@@ -6,7 +6,7 @@ import { AppBackground } from '@/components/base/layout/AppBackground';
 import { ScreenHeader } from '@/components/base/layout/ScreenHeader';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
 import type { LegalDocument } from '@/shared/models/LegalDocument.model';
-import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
+import { borderRadius, colors, layout, spacing, typography } from '@/shared/theme/tokens';
 
 type LegalDocumentScreenProps = {
  document: LegalDocument;
@@ -23,8 +23,8 @@ export function LegalDocumentScreen({ document }: LegalDocumentScreenProps) {
     showsVerticalScrollIndicator={false}
     contentContainerStyle={{
      paddingHorizontal: spacing.md,
-     paddingTop: 84,
-     paddingBottom: 110,
+     paddingTop: layout.screenContentTopPadding,
+     paddingBottom: layout.screenBottomPadding,
      gap: spacing.md,
     }}
    >

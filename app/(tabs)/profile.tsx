@@ -15,11 +15,44 @@ import { ProfileStatsCard } from '@/components/profile/ProfileStatsCard';
 import { useDeferredInteractionGate } from '@/hooks/useDeferredInteractionGate';
 import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
-import { colors, spacing } from '@/shared/theme/tokens';
+import { borderRadius, colors, layout, spacing, typography } from '@/shared/theme/tokens';
 import { formatDate } from '@/shared/utils/date';
 import { useAuthStore } from '@/stores/auth.store';
 import { useBacklogStore } from '@/stores/backlog.store';
 import { useProfileStore } from '@/stores/profile.store';
+
+const PILL_BUTTON_STYLE = {
+ flexDirection: 'row' as const,
+ alignItems: 'center' as const,
+ gap: spacing.sm,
+ paddingVertical: spacing.xs,
+ paddingHorizontal: spacing.sm,
+ borderRadius: borderRadius.full,
+ backgroundColor: 'rgba(255,255,255,0.02)',
+};
+
+function ProfilePillButton({
+ onPress,
+ icon,
+ iconColor,
+ label,
+ labelColor,
+}: {
+ onPress: () => void;
+ icon: React.ComponentProps<typeof FontAwesome5>['name'];
+ iconColor: string;
+ label: string;
+ labelColor: string;
+}) {
+ return (
+  <Pressable onPress={onPress} style={PILL_BUTTON_STYLE}>
+   <FontAwesome5 name={icon} size={13} color={iconColor} solid />
+   <Text style={{ color: labelColor, fontSize: typography.size.sm, fontFamily: typography.font.semibold }}>
+    {label}
+   </Text>
+  </Pressable>
+ );
+}
 
 export default function ProfileScreen() {
   const { t, i18n } = useTranslation();
@@ -99,7 +132,7 @@ export default function ProfileScreen() {
       <ScreenHeader title={t('tabs.profile')} onBack={handleBackPress} />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 110 }}
+        contentContainerStyle={{ paddingBottom: layout.screenBottomPadding }}
       >
         <ProfileHero
           topInset={insets.top}
@@ -214,67 +247,35 @@ export default function ProfileScreen() {
             gap: spacing.md,
           }}
         >
-          <Pressable
+          <ProfilePillButton
             onPress={() => router.push('/(tabs)/credits')}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: spacing.sm,
-              paddingVertical: spacing.xs,
-              paddingHorizontal: spacing.sm,
-              borderRadius: 999,
-              backgroundColor: 'rgba(255,255,255,0.02)',
-            }}
-          >
-            <FontAwesome5 name="info-circle" size={13} color={colors.text.secondary} solid />
-            <Text
-              style={{
-                color: colors.text.secondary,
-                fontSize: 13,
-                fontWeight: '600',
-              }}
-            >
-              {t('profile.infoButton')}
-            </Text>
-          </Pressable>
+            icon="info-circle"
+            iconColor={colors.text.secondary}
+            label={t('profile.infoButton')}
+            labelColor={colors.text.secondary}
+          />
           <Text
             style={{
               marginTop: -spacing.sm,
               color: colors.text.disabled,
-              fontSize: 11,
+              fontSize: typography.size.xs,
               textAlign: 'center',
             }}
           >
             {t('profile.infoSubtitle')}
           </Text>
-          <Pressable
+          <ProfilePillButton
             onPress={() => setIsDeleteModalVisible(true)}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: spacing.sm,
-              paddingVertical: spacing.xs,
-              paddingHorizontal: spacing.sm,
-              borderRadius: 999,
-              backgroundColor: 'rgba(255,255,255,0.02)',
-            }}
-          >
-            <FontAwesome5 name="trash-alt" size={13} color={colors.error} solid />
-            <Text
-              style={{
-                color: colors.error,
-                fontSize: 13,
-                fontWeight: '600',
-              }}
-            >
-              {t('profile.deleteAccount.trigger')}
-            </Text>
-          </Pressable>
+            icon="trash-alt"
+            iconColor={colors.error}
+            label={t('profile.deleteAccount.trigger')}
+            labelColor={colors.error}
+          />
           <Text
             style={{
               marginTop: spacing.xs,
               color: colors.text.disabled,
-              fontSize: 11,
+              fontSize: typography.size.xs,
               textAlign: 'center',
             }}
           >
