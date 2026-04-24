@@ -5,6 +5,8 @@ import { Card } from '@/components/base/display/Card';
 import { ChipGroup } from '@/components/base/inputs/ChipGroup';
 import { DatePickerInput } from '@/components/base/inputs/DatePickerInput';
 import { RatingStepper } from '@/components/base/inputs/RatingStepper';
+import { SearchableMultiSelectInput } from '@/components/base/inputs/SearchableMultiSelectInput';
+import type { SearchableSelectOption } from '@/components/base/inputs/SearchableSelectInput';
 import { TextAreaInput } from '@/components/base/inputs/TextAreaInput';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
@@ -31,8 +33,11 @@ type GameBacklogPanelProps = {
  localCompletedAt?: string | null;
  localAbandonedAt?: string | null;
  localResumedAt?: string | null;
+ localPlatformPlayed?: string[] | null;
  showNotes?: boolean;
  hasPendingChanges: boolean;
+ availablePlatformValues?: string[];
+ platformOptions?: SearchableSelectOption[];
  statusOptions: readonly StatusOption[];
  onStatusChange: (value: string) => void;
  onRatingChange: (rating: number) => void;
@@ -42,6 +47,7 @@ type GameBacklogPanelProps = {
  onCompletedAtChange?: (value: string | null) => void;
  onAbandonedAtChange?: (value: string | null) => void;
  onResumedAtChange?: (value: string | null) => void;
+ onPlatformPlayedChange?: (value: string[] | null) => void;
  onAdd: () => void;
  onUpdate: () => void;
  onRemove: () => void;
@@ -93,8 +99,11 @@ export function GameBacklogPanel({
  localCompletedAt,
  localAbandonedAt,
  localResumedAt,
+ localPlatformPlayed,
  showNotes = false,
  hasPendingChanges,
+ availablePlatformValues = [],
+ platformOptions = [],
  statusOptions,
  onStatusChange,
  onRatingChange,
@@ -104,6 +113,7 @@ export function GameBacklogPanel({
  onCompletedAtChange,
  onAbandonedAtChange,
  onResumedAtChange,
+ onPlatformPlayedChange,
  onAdd,
  onUpdate,
  onRemove,
@@ -120,6 +130,12 @@ export function GameBacklogPanel({
  const showResumedAt =
   SHOW_RESUMED_AT_STATUSES.has(selectedStatus) &&
   (Boolean(localResumedAt) || Boolean(localAbandonedAt));
+ const showPlatformPlayed = Boolean(localPlatformPlayed?.length) || platformOptions.length > 0;
+ const unavailablePlatforms =
+  localPlatformPlayed?.filter(
+   (selectedValue) => !availablePlatformValues.includes(selectedValue),
+  ) ?? [];
+ const isPlatformPlayedUnavailable = unavailablePlatforms.length > 0;
  const isDisabled = isBacklogLoading || isMutating;
 
  return (
@@ -205,6 +221,37 @@ export function GameBacklogPanel({
        isDisabled={isDisabled}
        accessibilityLabel={t('backlog.resumedAtLabel')}
       />
+     </View>
+    ) : null}
+
+    {isInBacklog && showPlatformPlayed && onPlatformPlayedChange ? (
+     <View>
+      <SectionLabel>{t('backlog.platformPlayedLabel')}</SectionLabel>
+      <SearchableMultiSelectInput
+       options={platformOptions}
+       value={localPlatformPlayed ?? []}
+       onChange={(value) => onPlatformPlayedChange(value.length > 0 ? value : null)}
+       placeholder={t('backlog.platformSelection.placeholder')}
+       title={t('backlog.platformSelection.title')}
+       searchPlaceholder={t('backlog.platformSelection.placeholder')}
+       accessibilityLabel={t('backlog.platformPlayedLabel')}
+       emptyLabel={t('backlog.platformSelection.unavailable')}
+       isDisabled={isDisabled || platformOptions.length === 0}
+      />
+      {isPlatformPlayedUnavailable ? (
+       <Text
+        style={{
+         marginTop: spacing.xs,
+         color: colors.error,
+         fontSize: typography.size.xs,
+         lineHeight: Math.ceil(typography.size.xs * typography.lineHeight.normal),
+        }}
+       >
+        {t('backlog.platformSelection.noLongerAvailable', {
+         platforms: unavailablePlatforms.join(', '),
+        })}
+       </Text>
+      ) : null}
      </View>
     ) : null}
 

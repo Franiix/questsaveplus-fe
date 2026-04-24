@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { SearchableSelectOption } from '@/components/base/inputs/SearchableSelectInput';
 import { useBacklogStatusPresentation } from '@/hooks/useBacklogStatusPresentation';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
+import type { CatalogPlatform } from '@/shared/models/Catalog.model';
 import { formatDate } from '@/shared/utils/date';
 import { useAuthStore } from '@/stores/auth.store';
 import { useBacklogStore } from '@/stores/backlog.store';
@@ -11,6 +13,7 @@ type BacklogGame = {
  id: number;
  name: string;
  background_image: string | null;
+ platforms: CatalogPlatform[];
 };
 
 type UseGameBacklogControllerOptions = {
@@ -41,6 +44,45 @@ const RESUMABLE_STATUSES = new Set<BacklogStatusEnum>([
  BacklogStatusEnum.ONGOING,
  BacklogStatusEnum.COMPLETED,
 ]);
+
+function createPlatformOptions(platforms: CatalogPlatform[]): SearchableSelectOption[] {
+ const seen = new Set<string>();
+ const options: SearchableSelectOption[] = [];
+
+ for (const platform of platforms) {
+  const label = platform.name.trim();
+  const value = platform.slug?.trim() || platform.externalId.trim() || label;
+  const dedupeKey = `${value}::${label}`.toLowerCase();
+  if (!label || seen.has(dedupeKey)) continue;
+  seen.add(dedupeKey);
+  options.push({
+   label,
+   value: label,
+   searchText: [platform.slug, platform.name].filter(Boolean).join(' '),
+  });
+ }
+
+ return options.sort((left, right) => left.label.localeCompare(right.label));
+}
+
+function ensureSelectedPlatformOptions(
+ options: SearchableSelectOption[],
+ selectedValues: string[] | null,
+): SearchableSelectOption[] {
+ if (!selectedValues?.length) return options;
+
+ const missing = selectedValues
+  .map((value) => value.trim())
+  .filter(Boolean)
+  .filter((value) => !options.some((option) => option.value === value))
+  .map((value) => ({
+   label: value,
+   value,
+   searchText: value,
+  }));
+
+ return missing.length > 0 ? [...options, ...missing] : options;
+}
 
 export function useGameBacklogController({
  game,
@@ -75,6 +117,9 @@ export function useGameBacklogController({
  const [localCompletedAt, setLocalCompletedAt] = useState<string | null>(null);
  const [localAbandonedAt, setLocalAbandonedAt] = useState<string | null>(null);
  const [localResumedAt, setLocalResumedAt] = useState<string | null>(null);
+ const [localPlatformPlayed, setLocalPlatformPlayed] = useState<string[] | null>(null);
+ const [pendingPlatformPlayed, setPendingPlatformPlayed] = useState<string[]>([]);
+ const [isPlatformModalOpen, setIsPlatformModalOpen] = useState(false);
  const [pendingDateWarning, setPendingDateWarning] = useState<PendingDateWarning | null>(null);
  const [pendingResetAbandoned, setPendingResetAbandoned] = useState(false);
 
@@ -93,7 +138,14 @@ export function useGameBacklogController({
    localStartedAt !== (backlogItem.started_at ?? null) ||
    localCompletedAt !== (backlogItem.completed_at ?? null) ||
    localAbandonedAt !== (backlogItem.abandoned_at ?? null) ||
-   localResumedAt !== (backlogItem.resumed_at ?? null));
+   localResumedAt !== (backlogItem.resumed_at ?? null) ||
+   JSON.stringify(localPlatformPlayed ?? []) !== JSON.stringify(backlogItem.platform_played ?? []));
+ const availablePlatformOptions = createPlatformOptions(game?.platforms ?? []);
+ const platformOptions = ensureSelectedPlatformOptions(
+  availablePlatformOptions,
+  localPlatformPlayed ?? backlogItem?.platform_played ?? null,
+ );
+ const availablePlatformValues = availablePlatformOptions.map((option) => option.value);
 
  useEffect(() => {
   if (!userId) {
@@ -118,6 +170,7 @@ export function useGameBacklogController({
    setLocalCompletedAt(null);
    setLocalAbandonedAt(null);
    setLocalResumedAt(null);
+   setLocalPlatformPlayed(null);
    return;
   }
 
@@ -128,6 +181,7 @@ export function useGameBacklogController({
   setLocalCompletedAt(backlogItem.completed_at ?? null);
   setLocalAbandonedAt(backlogItem.abandoned_at ?? null);
   setLocalResumedAt(backlogItem.resumed_at ?? null);
+  setLocalPlatformPlayed(backlogItem.platform_played ?? null);
  }, [backlogItem]);
 
  useEffect(() => {
@@ -151,6 +205,18 @@ export function useGameBacklogController({
  async function handleAddToBacklog() {
   if (!userId || !game) return;
 
+  if (platformOptions.length === 0) {
+   showToast(t('backlog.platformSelection.unavailable'), 'error');
+   return;
+  }
+
+  setPendingPlatformPlayed([]);
+  setIsPlatformModalOpen(true);
+ }
+
+ async function confirmAddToBacklog() {
+  if (!userId || !game || pendingPlatformPlayed.length === 0) return;
+
   const now = new Date().toISOString();
   const isResumableStatus = RESUMABLE_STATUSES.has(selectedStatus);
   const isCompleted = selectedStatus === BacklogStatusEnum.COMPLETED;
@@ -162,13 +228,20 @@ export function useGameBacklogController({
    game_cover_url: game.background_image ?? undefined,
    status: selectedStatus,
    personal_rating: selectedRating > 0 ? selectedRating : undefined,
+   platform_played: pendingPlatformPlayed,
    started_at: isResumableStatus ? now : undefined,
    completed_at: isCompleted ? now : undefined,
   });
 
   if (created) {
+   setIsPlatformModalOpen(false);
    showToast(t('gameDetail.addSuccess'), 'success');
   }
+ }
+
+ function dismissAddToBacklogPlatformModal() {
+  setIsPlatformModalOpen(false);
+  setPendingPlatformPlayed([]);
  }
 
  async function handleUpdateBacklog() {
@@ -270,6 +343,7 @@ export function useGameBacklogController({
     status: selectedStatus,
     personal_rating: selectedRating > 0 ? selectedRating : null,
     notes: localNotes.trim().length > 0 ? localNotes : null,
+    platform_played: localPlatformPlayed?.length ? localPlatformPlayed : null,
     ...(shouldUnpin ? { is_play_next: false, play_next_priority: null } : {}),
     ...dateFields,
    });
@@ -417,6 +491,11 @@ export function useGameBacklogController({
   localCompletedAt,
   localAbandonedAt,
   localResumedAt,
+  localPlatformPlayed,
+  availablePlatformValues,
+  platformOptions,
+  pendingPlatformPlayed,
+  isPlatformModalOpen,
   statusOptions,
   hasPendingChanges,
   pendingDateWarning,
@@ -426,9 +505,13 @@ export function useGameBacklogController({
   setLocalCompletedAt,
   setLocalAbandonedAt,
   setLocalResumedAt,
+  setLocalPlatformPlayed,
   handleStatusChange,
   handleRatingChange,
   handleAddToBacklog,
+  confirmAddToBacklog,
+  dismissAddToBacklogPlatformModal,
+  setPendingPlatformPlayed,
   handleUpdateBacklog,
   handleRemoveFromBacklog,
   confirmPendingDateWarning,

@@ -227,10 +227,19 @@
   abandonedAt: 'Abbandonato il {{date}}',
   resumedAt: 'Ripreso il {{date}}',
   addedAtLabel: 'Data di aggiunta',
+  platformPlayedLabel: 'Piattaforme di gioco',
   startedAtLabel: 'Data di inizio',
   completedAtLabel: 'Data di completamento',
   abandonedAtLabel: 'Data di abbandono',
   resumedAtLabel: 'Data di ripresa',
+  platformSelection: {
+   title: 'Scegli piattaforme',
+   message: 'Seleziona le piattaforme su cui vuoi inserire questo gioco nel backlog.',
+   placeholder: 'Seleziona piattaforme',
+   unavailable: 'Al momento non sono disponibili piattaforme per questo gioco.',
+   noLongerAvailable:
+    'Queste piattaforme salvate non risultano piu disponibili nel catalogo: {{platforms}}.',
+  },
   dateChange: {
    title: 'Aggiornamento date',
    bodyPlaying:

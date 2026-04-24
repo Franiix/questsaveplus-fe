@@ -1,4 +1,5 @@
 import { View } from 'react-native';
+import type { SearchableSelectOption } from '@/components/base/inputs/SearchableSelectInput';
 import { GameBacklogPanel } from '@/components/game/GameBacklogPanel';
 import { GameMetaSection } from '@/components/game/GameMetaSection';
 import { GameSummaryHeader } from '@/components/game/GameSummaryHeader';
@@ -54,8 +55,11 @@ type GameDetailOverviewSectionProps = {
   onCompletedAtChange: (value: string | null) => void;
   onAbandonedAtChange: (value: string | null) => void;
   onResumedAtChange: (value: string | null) => void;
+  onPlatformPlayedChange: (value: string[] | null) => void;
   selectedRating: number;
   selectedStatus: BacklogStatusEnum;
+  availablePlatformValues: string[];
+  platformOptions: SearchableSelectOption[];
   statusOptions: readonly StatusOption[];
   addedAt?: string | null;
   updatedAt?: string | null;
@@ -63,6 +67,7 @@ type GameDetailOverviewSectionProps = {
   localCompletedAt?: string | null;
   localAbandonedAt?: string | null;
   localResumedAt?: string | null;
+  localPlatformPlayed?: string[] | null;
  };
  game: Pick<CatalogGameDetail, 'name' | 'platforms'>;
  onDeveloperPress?: (() => void) | null;
@@ -137,12 +142,16 @@ export function GameDetailOverviewSection({
      onCompletedAtChange={backlogController.onCompletedAtChange}
      onAbandonedAtChange={backlogController.onAbandonedAtChange}
      onResumedAtChange={backlogController.onResumedAtChange}
+     onPlatformPlayedChange={backlogController.onPlatformPlayedChange}
      addedAt={backlogController.addedAt}
      updatedAt={backlogController.updatedAt}
      localStartedAt={backlogController.localStartedAt}
      localCompletedAt={backlogController.localCompletedAt}
      localAbandonedAt={backlogController.localAbandonedAt}
      localResumedAt={backlogController.localResumedAt}
+     localPlatformPlayed={backlogController.localPlatformPlayed}
+     availablePlatformValues={backlogController.availablePlatformValues}
+     platformOptions={backlogController.platformOptions}
     />
    </View>
   </>

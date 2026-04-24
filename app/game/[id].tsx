@@ -15,6 +15,7 @@ import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { RetryState } from '@/components/base/feedback/RetryState';
 import { DatePickerInput } from '@/components/base/inputs/DatePickerInput';
+import { SearchableMultiSelectInput } from '@/components/base/inputs/SearchableMultiSelectInput';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { GameDetailContentSections } from '@/components/game/GameDetailContentSections';
 import { GameDetailOverviewSection } from '@/components/game/GameDetailOverviewSection';
@@ -131,6 +132,11 @@ export default function GameDetailScreen() {
   localCompletedAt,
   localAbandonedAt,
   localResumedAt,
+  localPlatformPlayed,
+  availablePlatformValues,
+  platformOptions,
+  pendingPlatformPlayed,
+  isPlatformModalOpen,
   statusOptions,
   hasPendingChanges,
   pendingDateWarning,
@@ -140,9 +146,13 @@ export default function GameDetailScreen() {
   setLocalCompletedAt,
   setLocalAbandonedAt,
   setLocalResumedAt,
+  setLocalPlatformPlayed,
   handleStatusChange,
   handleRatingChange,
   handleAddToBacklog,
+  confirmAddToBacklog,
+  dismissAddToBacklogPlatformModal,
+  setPendingPlatformPlayed,
   handleUpdateBacklog,
   handleRemoveFromBacklog,
   confirmPendingDateWarning,
@@ -158,6 +168,7 @@ export default function GameDetailScreen() {
       id: Number(game.gameId ?? game.externalId),
       name: game.name,
       background_image: game.backgroundImage?.url ?? game.coverImage?.url ?? null,
+      platforms: game.parentPlatforms.length > 0 ? game.parentPlatforms : game.platforms,
      }
    : null,
  });
@@ -306,12 +317,16 @@ export default function GameDetailScreen() {
        onCompletedAtChange: setLocalCompletedAt,
        onAbandonedAtChange: setLocalAbandonedAt,
        onResumedAtChange: setLocalResumedAt,
+       onPlatformPlayedChange: setLocalPlatformPlayed,
        addedAt: backlogItem?.added_at ?? null,
        updatedAt: backlogItem?.updated_at ?? null,
        localStartedAt,
        localCompletedAt,
        localAbandonedAt,
        localResumedAt,
+       localPlatformPlayed,
+       availablePlatformValues,
+       platformOptions,
       }}
       onRegisterBacklogOffset={(y) => registerSectionOffset('backlog', y)}
      />
@@ -392,6 +407,27 @@ export default function GameDetailScreen() {
     }}
     onCancel={() => setConfirmRemoveVisible(false)}
    />
+
+   <ConfirmModal
+    visible={isPlatformModalOpen}
+    title={t('backlog.platformSelection.title')}
+    message={t('backlog.platformSelection.message')}
+    confirmLabel={t('gameDetail.addToBacklog')}
+    cancelLabel={t('common.cancel')}
+    onConfirm={() => void confirmAddToBacklog()}
+    onCancel={dismissAddToBacklogPlatformModal}
+   >
+    <SearchableMultiSelectInput
+     options={platformOptions}
+     value={pendingPlatformPlayed}
+     onChange={setPendingPlatformPlayed}
+     placeholder={t('backlog.platformSelection.placeholder')}
+     title={t('backlog.platformSelection.title')}
+     searchPlaceholder={t('backlog.platformSelection.placeholder')}
+     accessibilityLabel={t('backlog.platformPlayedLabel')}
+     emptyLabel={t('backlog.platformSelection.unavailable')}
+    />
+   </ConfirmModal>
 
    <ConfirmModal
     visible={pendingDateWarning !== null}

@@ -227,10 +227,19 @@
   abandonedAt: 'Abandoned on {{date}}',
   resumedAt: 'Resumed on {{date}}',
   addedAtLabel: 'Date added',
+  platformPlayedLabel: 'Platforms played on',
   startedAtLabel: 'Start date',
   completedAtLabel: 'Completion date',
   abandonedAtLabel: 'Abandoned date',
   resumedAtLabel: 'Resume date',
+  platformSelection: {
+   title: 'Choose platforms',
+   message: 'Select the platforms you want to use for this backlog entry.',
+   placeholder: 'Select platforms',
+   unavailable: 'No platforms are currently available for this game.',
+   noLongerAvailable:
+    'These saved platforms are no longer available in the catalog: {{platforms}}.',
+  },
   dateChange: {
    title: 'Date update',
    bodyPlaying: 'Switching to "Playing" will automatically record the start date: {{date}}.',

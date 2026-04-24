@@ -4,6 +4,7 @@ import { ScrollView, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BottomSheet } from '@/components/base/feedback/BottomSheet';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
+import { SearchableMultiSelectInput } from '@/components/base/inputs/SearchableMultiSelectInput';
 import { GameBacklogPanel } from '@/components/game/GameBacklogPanel';
 import { GameHeroBanner } from '@/components/game/GameHeroBanner';
 import { GameSummaryHeader } from '@/components/game/GameSummaryHeader';
@@ -31,11 +32,20 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
   isDeleteMutating,
   selectedStatus,
   selectedRating,
+  localPlatformPlayed,
+  availablePlatformValues,
+  platformOptions,
+  pendingPlatformPlayed,
+  isPlatformModalOpen,
   statusOptions,
   hasPendingChanges,
+  setLocalPlatformPlayed,
   handleStatusChange,
   handleRatingChange,
   handleAddToBacklog,
+  confirmAddToBacklog,
+  dismissAddToBacklogPlatformModal,
+  setPendingPlatformPlayed,
   handleUpdateBacklog,
   handleRemoveFromBacklog,
  } = useGameBacklogController({
@@ -44,6 +54,7 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
       id: Number(game.gameId ?? game.externalId),
       name: game.name,
       background_image: game.backgroundImage?.url ?? game.coverImage?.url ?? null,
+      platforms: game.platforms,
      }
    : null,
   isEnabled: isOpen,
@@ -100,10 +111,14 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
      isDeleteMutating={isDeleteMutating}
      selectedStatus={selectedStatus}
      selectedRating={selectedRating}
+     localPlatformPlayed={localPlatformPlayed}
      hasPendingChanges={hasPendingChanges}
+     availablePlatformValues={availablePlatformValues}
+     platformOptions={platformOptions}
      statusOptions={statusOptions}
      onStatusChange={handleStatusChange}
      onRatingChange={handleRatingChange}
+     onPlatformPlayedChange={setLocalPlatformPlayed}
      onAdd={() => void handleAddToBacklog()}
      onUpdate={() => void handleUpdateBacklog()}
      onRemove={() => setConfirmRemoveVisible(true)}
@@ -123,6 +138,27 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
     }}
     onCancel={() => setConfirmRemoveVisible(false)}
    />
+
+   <ConfirmModal
+    visible={isPlatformModalOpen}
+    title={t('backlog.platformSelection.title')}
+    message={t('backlog.platformSelection.message')}
+    confirmLabel={t('gameDetail.addToBacklog')}
+    cancelLabel={t('common.cancel')}
+    onConfirm={() => void confirmAddToBacklog()}
+    onCancel={dismissAddToBacklogPlatformModal}
+   >
+    <SearchableMultiSelectInput
+     options={platformOptions}
+     value={pendingPlatformPlayed}
+     onChange={setPendingPlatformPlayed}
+     placeholder={t('backlog.platformSelection.placeholder')}
+     title={t('backlog.platformSelection.title')}
+     searchPlaceholder={t('backlog.platformSelection.placeholder')}
+     accessibilityLabel={t('backlog.platformPlayedLabel')}
+     emptyLabel={t('backlog.platformSelection.unavailable')}
+    />
+   </ConfirmModal>
   </BottomSheet>
  );
 }

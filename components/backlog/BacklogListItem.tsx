@@ -7,6 +7,7 @@ import { BacklogCardTitle } from '@/components/backlog/BacklogCardTitle';
 import { BacklogQuickActions } from '@/components/backlog/BacklogQuickActions';
 import { CardCoverWithScrim } from '@/components/backlog/CardCoverWithScrim';
 import { CardLeadingControl } from '@/components/backlog/CardLeadingControl';
+import { PlatformIcon, platformNameToKey } from '@/components/base/display/PlatformIcon';
 import { StatusBadge } from '@/components/base/display/StatusBadge';
 import { BottomSheet } from '@/components/base/feedback/BottomSheet';
 import { ActionIconButton } from '@/components/base/inputs/ActionIconButton';
@@ -377,20 +378,66 @@ export const BacklogListItem = memo(function BacklogListItem({
       <View
        style={{
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'space-between',
         gap: spacing.sm,
        }}
       >
-       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-        <StatusBadge
-         value={item.status}
-         colorMap={colorMap}
-         labelMap={labelMap}
-         iconMap={iconMap}
-        />
-        {item.notes ? (
-         <FontAwesome5 name="sticky-note" size={10} color={colors.text.tertiary} solid />
+       <View style={{ flex: 1, minWidth: 0, gap: spacing.xs }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+         <StatusBadge
+          value={item.status}
+          colorMap={colorMap}
+          labelMap={labelMap}
+          iconMap={iconMap}
+         />
+         {item.notes ? (
+          <FontAwesome5 name="sticky-note" size={10} color={colors.text.tertiary} solid />
+         ) : null}
+        </View>
+        {item.platform_played?.length ? (
+         <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
+          {item.platform_played.slice(0, 3).map((platform) =>
+           platformNameToKey(platform) ? (
+            <View
+             key={platform}
+             style={{
+              paddingHorizontal: spacing.xs,
+              paddingVertical: 4,
+              borderRadius: borderRadius.full,
+              borderWidth: 1,
+              borderColor: 'rgba(255,255,255,0.08)',
+              backgroundColor: 'rgba(255,255,255,0.04)',
+             }}
+            >
+             <PlatformIcon slug={platform} size={10} color={colors.text.tertiary} />
+            </View>
+           ) : (
+            <Text
+             key={platform}
+             style={{
+              color: colors.text.tertiary,
+              fontSize: typography.size['2xs'],
+              fontFamily: typography.font.medium,
+             }}
+             numberOfLines={1}
+            >
+             {platform}
+            </Text>
+           ),
+          )}
+          {item.platform_played.length > 3 ? (
+           <Text
+            style={{
+             color: colors.text.tertiary,
+             fontSize: typography.size['2xs'],
+             fontFamily: typography.font.medium,
+            }}
+           >
+            +{item.platform_played.length - 3}
+           </Text>
+          ) : null}
+         </View>
         ) : null}
        </View>
        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
