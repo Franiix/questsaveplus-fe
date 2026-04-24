@@ -209,6 +209,10 @@ export default function BacklogScreen() {
   router.push('/(tabs)/play-next');
  }, [router]);
 
+ const handleOpenHome = useCallback(() => {
+  router.push('/(tabs)');
+ }, [router]);
+
  const handleRequestRemove = useCallback((item: BacklogItemEntity) => {
   setPendingDeleteItem(item);
  }, []);
@@ -536,6 +540,7 @@ export default function BacklogScreen() {
    isReadingList,
    playNextCount: playNextItems.length,
    statusCounts,
+   totalItems: backlogItems.length,
   }),
   [
    activeFilter,
@@ -545,6 +550,7 @@ export default function BacklogScreen() {
    isReadingList,
    playNextItems.length,
    statusCounts,
+   backlogItems.length,
   ],
  );
 
@@ -604,6 +610,7 @@ export default function BacklogScreen() {
     onItemPress={handleItemPress}
     onItemPressIn={handleItemPressIn}
     onOpenPlayNext={handleOpenPlayNext}
+    onOpenHome={handleOpenHome}
     onTogglePlayNext={handleTogglePlayNext}
     onToggleArchive={handleToggleArchive}
     onQuickStatusChange={handleQuickStatusChange}
@@ -615,6 +622,7 @@ export default function BacklogScreen() {
     isUpdatingArchive={isMutating && activeMutation === 'update'}
     removeLabel={t('gameDetail.confirmRemove.confirm')}
     retryLabel={t('home.errorRetry')}
+    emptyActionLabel={t('backlog.emptyAll.action')}
    />
 
    <GameFilterSheet

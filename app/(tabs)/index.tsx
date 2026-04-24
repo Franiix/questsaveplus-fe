@@ -104,7 +104,6 @@ export default function HomeScreen() {
   () => sortOptions.map((option) => ({ label: option.label, value: option.key })),
   [sortOptions],
  );
-
  useEffect(() => {
   if (!deferredHomeSideEffectsEnabled) {
    return;

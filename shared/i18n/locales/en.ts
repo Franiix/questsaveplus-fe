@@ -164,6 +164,8 @@
   stats: {
    title: 'Snapshot',
    subtitle: 'A quick read of your current play rhythm and what you still want to pick up.',
+   emptyTitle: 'Ready to begin?',
+   emptySubtitle: 'Add your first game and start shaping your backlog, Play Next, and archive.',
    total: 'Backlog',
    wishlist: 'Wishlist',
    wantToPlay: 'Want to play',
@@ -189,7 +191,7 @@
   },
  },
  backlog: {
-  title: 'My Backlog',
+  title: 'Backlog',
   searchPlaceholder: 'Search your backlog...',
   filterAll: 'All',
   status: {
@@ -201,8 +203,9 @@
    ABANDONED: 'Abandoned',
   },
   emptyAll: {
-   title: 'No games saved',
-   subtitle: 'Go hunting. Add games and start stacking your backlog.',
+   title: 'Backlog is empty',
+   subtitle: 'Discover games from Home and add your first title.',
+   action: 'Go to Home',
   },
   emptyFiltered: {
    title: 'No match for this filter',
@@ -245,7 +248,9 @@
    restoreModalMessage:
     'The game will return to the backlog and become editable again, including status, dates, and backlog details.',
    emptyTitle: 'Archive is empty',
-   emptySubtitle: 'Games you archive will show up here.',
+   emptySubtitle: 'Archive games from the backlog to keep them here without losing them.',
+   emptyAction: 'Go to backlog',
+   searchPlaceholder: 'Search Archive...',
   },
   addedOn: 'Added on {{date}}',
   startedAt: 'Started on {{date}}',

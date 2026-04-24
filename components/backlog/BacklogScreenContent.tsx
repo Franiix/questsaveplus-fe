@@ -28,6 +28,7 @@ type BacklogScreenContentProps = {
  onOpenPlayNext: () => void;
  onTogglePlayNext: (item: BacklogItemEntity) => void;
  onToggleArchive: (item: BacklogItemEntity) => void;
+ onOpenHome: () => void;
  onRefetch: () => void;
  onRequestRemove: (item: BacklogItemEntity) => void;
  onRatingChange: (item: BacklogItemEntity, rating: number) => void;
@@ -36,6 +37,7 @@ type BacklogScreenContentProps = {
  isUpdatingArchive?: boolean;
  removeLabel: string;
  retryLabel: string;
+ emptyActionLabel: string;
 };
 
 const HORIZONTAL_PADDING = spacing.md;
@@ -61,6 +63,7 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
  onOpenPlayNext,
  onTogglePlayNext,
  onToggleArchive,
+ onOpenHome,
  onRefetch,
  onRequestRemove,
  onRatingChange,
@@ -69,8 +72,10 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
  isUpdatingArchive = false,
  removeLabel,
  retryLabel,
+ emptyActionLabel,
 }: BacklogScreenContentProps) {
  const { t } = useTranslation();
+ const isCompletelyEmpty = !state.hasAppliedFilters && state.totalItems === 0;
 
  const renderItem = useCallback(
   ({ item }: { item: BacklogItemEntity }) => (
@@ -132,6 +137,19 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
   );
  }
 
+ if (isCompletelyEmpty) {
+  return (
+   <View style={{ flex: 1 }}>
+    <EmptyState
+     icon="bookmark"
+     title={t('backlog.emptyAll.title')}
+     subtitle={t('backlog.emptyAll.subtitle')}
+     action={{ label: emptyActionLabel, onPress: onOpenHome }}
+    />
+   </View>
+  );
+ }
+
  return (
   <>
    <View style={{ marginBottom: spacing.xs }}>
@@ -146,7 +164,7 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
    {state.filteredItems.length === 0 ? (
     <View style={{ paddingTop: spacing.md }}>
      <EmptyState
-      icon="gamepad"
+      icon={state.hasAppliedFilters ? 'filter' : 'bookmark'}
       title={
        state.hasAppliedFilters ? t('backlog.emptyFiltered.title') : t('backlog.emptyAll.title')
       }

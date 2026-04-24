@@ -8,6 +8,7 @@ type HomeSectionParams = {
  dates: string;
  ordering: string;
  enabled?: boolean;
+ search?: string;
  genres?: string;
  tags?: string;
  categories?: string;
@@ -23,6 +24,7 @@ export function useHomeSectionGames({
  dates,
  ordering,
  enabled = true,
+ search,
  genres,
  tags,
  categories,
@@ -33,13 +35,16 @@ export function useHomeSectionGames({
  maxPages,
 }: HomeSectionParams) {
  const catalogSignature = getCatalogQuerySignature();
+ const effectiveOrdering = search ? undefined : ordering;
+
  return useInfiniteQuery<CatalogPage<CatalogGame>>({
   queryKey: [
    'home-section-games',
    catalogSignature,
    queryKey,
    dates,
-   ordering,
+   effectiveOrdering,
+   search,
    genres,
    tags,
    categories,
@@ -52,7 +57,8 @@ export function useHomeSectionGames({
    searchCatalogGames({
     page: typeof pageParam === 'number' ? pageParam : 1,
     pageSize,
-    ordering,
+    search,
+    ordering: effectiveOrdering,
     dates,
     genres,
     tags,

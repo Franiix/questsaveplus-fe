@@ -55,6 +55,10 @@ export function GameCarouselSection({
 
  const keyExtractor = useCallback((item: GameCardItem, index: number) => `${item.id}-${index}`, []);
 
+ if (!isLoading && !isError && games.length === 0) {
+  return null;
+ }
+
  return (
   <View style={{ gap: spacing.sm, marginBottom: spacing.lg }}>
    <SectionTitle title={title} style={{ paddingHorizontal: horizontalPadding }} />
@@ -100,7 +104,7 @@ export function GameCarouselSection({
      renderItem={renderItem}
      keyExtractor={keyExtractor}
      onEndReached={() => {
-      if (hasNextPage && !isFetchingNextPage) {
+      if (games.length > 0 && hasNextPage && !isFetchingNextPage) {
        onEndReached?.();
       }
      }}

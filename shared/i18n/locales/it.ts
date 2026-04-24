@@ -164,6 +164,8 @@
   stats: {
    title: 'Snapshot',
    subtitle: 'Panorama rapido del tuo ritmo di gioco e di quello che vuoi recuperare.',
+   emptyTitle: 'Pronto a iniziare?',
+   emptySubtitle: 'Aggiungi il tuo primo gioco e costruisci backlog, Play Next e archivio.',
    total: 'Backlog',
    wishlist: 'Wishlist',
    wantToPlay: 'Da giocare',
@@ -189,7 +191,7 @@
   },
  },
  backlog: {
-  title: 'Il mio Backlog',
+  title: 'Backlog',
   searchPlaceholder: 'Cerca nel backlog...',
   filterAll: 'Tutti',
   status: {
@@ -201,8 +203,9 @@
    ABANDONED: 'Abbandonato',
   },
   emptyAll: {
-   title: 'Nessun gioco salvato',
-   subtitle: 'Fai hunting. Aggiungi giochi e inizia a fare stack.',
+   title: 'Il backlog è vuoto',
+   subtitle: 'Scopri nuovi giochi dalla Home e aggiungi il tuo primo titolo.',
+   action: 'Vai alla Home',
   },
   emptyFiltered: {
    title: 'Zero match per questo filtro',
@@ -245,7 +248,9 @@
    restoreModalMessage:
     'Il gioco tornerà nel backlog e sarà di nuovo modificabile in stato, date e dettagli.',
    emptyTitle: 'Archivio vuoto',
-   emptySubtitle: 'I giochi che archivi li ritrovi qui.',
+   emptySubtitle: 'Archivia i giochi dal backlog per ritrovarli qui senza perderli.',
+   emptyAction: 'Vai al backlog',
+   searchPlaceholder: "Cerca nell'archivio...",
   },
   addedOn: 'Aggiunto il {{date}}',
   startedAt: 'Iniziato il {{date}}',

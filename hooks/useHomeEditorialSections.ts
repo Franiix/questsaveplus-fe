@@ -108,14 +108,6 @@ export function useHomeEditorialSections() {
   enabled: deferredSectionsEnabled,
   genres: adventureGenreId,
  });
- // Horror: IGDB theme ID 19.
- const horrorQuery = useHomeSectionGames({
-  queryKey: 'horror-games',
-  dates: `2000-01-01,${formatHomeEditorialDate(today)}`,
-  ordering: '-added',
-  enabled: deferredSectionsEnabled,
-  tags: '19',
- });
 
  // --- Game lists ---
 
@@ -184,15 +176,6 @@ export function useHomeEditorialSections() {
    ),
   [storyDrivenQuery.data],
  );
- const horrorGames = useMemo(
-  () =>
-   sortGamesByEditorialScore(
-    (horrorQuery.data?.pages.flatMap((page) => page.items) ?? []).filter(
-     (game) => (game.ratingsCount ?? 0) >= 15,
-    ),
-   ),
-  [horrorQuery.data],
- );
 
  // --- Section view models ---
 
@@ -244,7 +227,6 @@ export function useHomeEditorialSections() {
     indieWatchQuery,
    ),
    createHomeSectionViewModel('coop-games', t('home.localCoopGames'), coopGames, coopGamesQuery),
-   createHomeSectionViewModel('horror-games', t('home.horrorGames'), horrorGames, horrorQuery),
   ],
   [
    allTimeTopGames,
@@ -255,8 +237,6 @@ export function useHomeEditorialSections() {
    classicsQuery,
    coopGames,
    coopGamesQuery,
-   horrorGames,
-   horrorQuery,
    indieWatchGames,
    indieWatchQuery,
    shortAndSweetGames,

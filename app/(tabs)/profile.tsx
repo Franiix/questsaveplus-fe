@@ -5,6 +5,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card } from '@/components/base/display/Card';
 import { InfoRow } from '@/components/base/display/InfoRow';
+import { EmptyState } from '@/components/base/feedback/EmptyState';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { ScreenHeader } from '@/components/base/layout/ScreenHeader';
@@ -154,20 +155,39 @@ export default function ProfileScreen() {
       zIndex: 1,
      }}
     >
-     <ProfileStatsCard
-      stats={stats}
-      labels={{
-       total: t('profile.stats.total'),
-       wishlist: t('profile.stats.wishlist'),
-       wantToPlay: t('profile.stats.wantToPlay'),
-       playing: t('profile.stats.playing'),
-       ongoing: t('profile.stats.ongoing'),
-       completed: t('profile.stats.completed'),
-       abandoned: t('profile.stats.abandoned'),
-       title: t('profile.stats.title'),
-       subtitle: t('profile.stats.subtitle'),
-      }}
-     />
+     {stats.total === 0 ? (
+      <Card
+       variant="outlined"
+       style={{
+        padding: spacing.md,
+        backgroundColor: 'rgba(16,18,30,0.9)',
+        borderColor: 'rgba(255,255,255,0.08)',
+        borderRadius: 24,
+       }}
+      >
+       <EmptyState
+        icon="gamepad"
+        title={t('profile.stats.emptyTitle')}
+        subtitle={t('profile.stats.emptySubtitle')}
+        style={{ flex: 0, paddingHorizontal: spacing.md, paddingVertical: spacing.lg }}
+       />
+      </Card>
+     ) : (
+      <ProfileStatsCard
+       stats={stats}
+       labels={{
+        total: t('profile.stats.total'),
+        wishlist: t('profile.stats.wishlist'),
+        wantToPlay: t('profile.stats.wantToPlay'),
+        playing: t('profile.stats.playing'),
+        ongoing: t('profile.stats.ongoing'),
+        completed: t('profile.stats.completed'),
+        abandoned: t('profile.stats.abandoned'),
+        title: t('profile.stats.title'),
+        subtitle: t('profile.stats.subtitle'),
+       }}
+      />
+     )}
     </View>
 
     <Card
