@@ -7,6 +7,7 @@ type FilterIconButtonProps = {
  accessibilityLabel: string;
  isActive?: boolean;
  badgeCount?: number;
+ isDisabled?: boolean;
 };
 
 export function FilterIconButton({
@@ -14,10 +15,12 @@ export function FilterIconButton({
  accessibilityLabel,
  isActive = false,
  badgeCount = 0,
+ isDisabled = false,
 }: FilterIconButtonProps) {
  return (
   <Pressable
    onPress={onPress}
+   disabled={isDisabled}
    accessibilityRole="button"
    accessibilityLabel={accessibilityLabel}
    style={({ pressed }) => ({
@@ -30,12 +33,15 @@ export function FilterIconButton({
      isActive || pressed ? `${colors.primary.DEFAULT}18` : colors.background.elevated,
     alignItems: 'center',
     justifyContent: 'center',
+    opacity: isDisabled ? 0.5 : 1,
    })}
   >
    <FontAwesome5
     name="sliders-h"
     size={18}
-    color={isActive ? colors.primary.DEFAULT : colors.text.secondary}
+    color={
+     isDisabled ? colors.text.tertiary : isActive ? colors.primary.DEFAULT : colors.text.secondary
+    }
     solid
    />
    {badgeCount > 0 ? (

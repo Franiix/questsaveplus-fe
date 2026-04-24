@@ -192,6 +192,7 @@
  },
  backlog: {
   title: 'Backlog',
+  description: 'La tua libreria di giochi salvati, da organizzare stato per stato.',
   searchPlaceholder: 'Cerca nel backlog...',
   filterAll: 'Tutti',
   status: {

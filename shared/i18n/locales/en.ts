@@ -192,6 +192,7 @@
  },
  backlog: {
   title: 'Backlog',
+  description: 'Your saved game library, organized one status at a time.',
   searchPlaceholder: 'Search your backlog...',
   filterAll: 'All',
   status: {

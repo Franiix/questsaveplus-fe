@@ -119,6 +119,7 @@ export default function BacklogArchiveScreen() {
   search,
   sortOrder,
  });
+ const isArchiveToolbarDisabled = archivedBacklogItems.length === 0;
  const archivedItems = filteredItems;
  const statusCounts = useMemo(
   () =>
@@ -270,12 +271,14 @@ export default function BacklogArchiveScreen() {
        filterAccessibilityLabel={t('home.filtersButton')}
        activeCount={activeFilterCount}
        isFilterActive={isFilterSheetOpen}
+       isDisabled={isArchiveToolbarDisabled}
       />
      </View>
      <SortIconButton
       onPress={() => setIsSortSheetOpen(true)}
       accessibilityLabel={t('backlog.sort.label')}
       isActive={sortOrder !== BacklogSortEnum.NEWEST}
+      isDisabled={isArchiveToolbarDisabled}
      />
     </View>
    </View>

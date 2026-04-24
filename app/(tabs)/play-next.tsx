@@ -151,6 +151,7 @@ export default function PlayNextScreen() {
    }),
   [appliedFilters, backlogMetadata, playNextItems, playNextSortOrder, search],
  );
+ const isPlayNextToolbarDisabled = playNextItems.length === 0;
  const canReorder =
   !hasAppliedFilters && !isReordering && playNextSortOrder === BacklogSortEnum.PRIORITY;
  const sortOptions = useMemo<PickerOption[]>(
@@ -484,12 +485,14 @@ export default function PlayNextScreen() {
        filterAccessibilityLabel={t('home.filtersButton')}
        activeCount={activeFilterCount}
        isFilterActive={isFilterSheetOpen}
+       isDisabled={isPlayNextToolbarDisabled}
       />
      </View>
      <SortIconButton
       onPress={() => setIsSortSheetOpen(true)}
       accessibilityLabel={t('backlog.sort.label')}
       isActive={playNextSortOrder !== BacklogSortEnum.PRIORITY}
+      isDisabled={isPlayNextToolbarDisabled}
      />
     </View>
     {playNextItems.length > 1 ? (

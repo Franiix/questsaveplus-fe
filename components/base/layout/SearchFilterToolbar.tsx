@@ -13,6 +13,7 @@ type SearchFilterToolbarProps = {
  isLoading?: boolean;
  activeCount?: number;
  isFilterActive?: boolean;
+ isDisabled?: boolean;
 };
 
 export function SearchFilterToolbar({
@@ -25,6 +26,7 @@ export function SearchFilterToolbar({
  isLoading = false,
  activeCount = 0,
  isFilterActive = false,
+ isDisabled = false,
 }: SearchFilterToolbarProps) {
  const hasActiveCount = activeCount > 0;
 
@@ -37,6 +39,7 @@ export function SearchFilterToolbar({
      onClear={onClear}
      placeholder={placeholder}
      isLoading={isLoading}
+     isDisabled={isDisabled}
     />
    </View>
 
@@ -45,6 +48,7 @@ export function SearchFilterToolbar({
     accessibilityLabel={filterAccessibilityLabel}
     isActive={isFilterActive || hasActiveCount}
     badgeCount={activeCount}
+    isDisabled={isDisabled}
    />
   </View>
  );

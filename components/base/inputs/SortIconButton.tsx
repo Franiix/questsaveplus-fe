@@ -6,16 +6,19 @@ type SortIconButtonProps = {
  onPress: () => void;
  accessibilityLabel: string;
  isActive?: boolean;
+ isDisabled?: boolean;
 };
 
 export function SortIconButton({
  onPress,
  accessibilityLabel,
  isActive = false,
+ isDisabled = false,
 }: SortIconButtonProps) {
  return (
   <Pressable
    onPress={onPress}
+   disabled={isDisabled}
    accessibilityRole="button"
    accessibilityLabel={accessibilityLabel}
    style={({ pressed }) => ({
@@ -28,12 +31,15 @@ export function SortIconButton({
      isActive || pressed ? `${colors.primary.DEFAULT}18` : colors.background.elevated,
     alignItems: 'center',
     justifyContent: 'center',
+    opacity: isDisabled ? 0.5 : 1,
    })}
   >
    <FontAwesome5
     name="sort-amount-down"
     size={18}
-    color={isActive ? colors.primary.DEFAULT : colors.text.secondary}
+    color={
+     isDisabled ? colors.text.tertiary : isActive ? colors.primary.DEFAULT : colors.text.secondary
+    }
     solid
    />
   </Pressable>

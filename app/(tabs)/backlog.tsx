@@ -128,6 +128,7 @@ export default function BacklogScreen() {
    search,
    sortOrder,
   });
+ const isBacklogToolbarDisabled = backlogItems.length === 0;
 
  const statusCounts = useMemo(
   () =>
@@ -579,6 +580,15 @@ export default function BacklogScreen() {
      </Text>
      <GradientUnderline />
     </View>
+    <Text
+     style={{
+      color: colors.text.secondary,
+      fontSize: typography.size.sm,
+      lineHeight: Math.ceil(typography.size.sm * typography.lineHeight.normal),
+     }}
+    >
+     {t('backlog.description')}
+    </Text>
 
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
      <View style={{ flex: 1 }}>
@@ -591,12 +601,14 @@ export default function BacklogScreen() {
        filterAccessibilityLabel={t('home.filtersButton')}
        activeCount={activeFilterCount}
        isFilterActive={isFilterSheetOpen}
+       isDisabled={isBacklogToolbarDisabled}
       />
      </View>
      <SortIconButton
       onPress={() => setIsSortSheetOpen(true)}
       accessibilityLabel={t('backlog.sort.label')}
       isActive={sortOrder !== BacklogSortEnum.NEWEST}
+      isDisabled={isBacklogToolbarDisabled}
      />
     </View>
    </View>
