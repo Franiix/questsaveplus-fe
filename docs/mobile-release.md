@@ -49,7 +49,8 @@ Formato:
 
 ```json
 {
-  "latestVersion": "0.0.5",
+  "latestVersion": "0.0.6",
+  "releaseAtRome": "2026-04-24T00:00:00+02:00",
   "iosUrl": "https://apps.apple.com/it/app/questsave/id6762209970",
   "androidUrl": "https://play.google.com/store/apps/details?id=com.franiix.questsaveplus"
 }
@@ -58,8 +59,9 @@ Formato:
 Regola pratica:
 
 - aggiorna `latestVersion` ogni volta che una nuova release e davvero online
+- imposta `releaseAtRome` con data e ora di Roma in formato ISO 8601 con offset, ad esempio `2026-04-24T18:30:00+02:00`
 - lascia gli URL store stabili
-- se `latestVersion` e maggiore della versione locale, l'app mostra il badge update nella home
+- se `releaseAtRome` e stata raggiunta e `latestVersion` e maggiore della versione locale, l'app mostra il badge update nella home
 
 ## Prima del rilascio: test release locale obbligatorio
 

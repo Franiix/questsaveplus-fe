@@ -21,6 +21,16 @@ function isAppUpdateManifest(value: unknown): value is AppUpdateManifest {
  return typeof Reflect.get(value, 'latestVersion') === 'string';
 }
 
+function hasReleaseWindowStarted(manifest: AppUpdateManifest, now = Date.now()) {
+ const releaseAtRome = manifest.releaseAtRome?.trim();
+ if (!releaseAtRome) return true;
+
+ const releaseTime = Date.parse(releaseAtRome);
+ if (Number.isNaN(releaseTime)) return false;
+
+ return now >= releaseTime;
+}
+
 export function useAppUpdateAvailability() {
  return useAppUpdateAvailabilityWithOptions();
 }
@@ -69,7 +79,8 @@ export function useAppUpdateAvailabilityWithOptions(enabled = true) {
     }
 
     const latestVersion = json.latestVersion.trim();
-    const isUpdateAvailable = compareSemanticVersions(currentVersion, latestVersion) < 0;
+    const isUpdateAvailable =
+     hasReleaseWindowStarted(json) && compareSemanticVersions(currentVersion, latestVersion) < 0;
 
     setState({
      isChecking: false,

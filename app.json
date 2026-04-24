@@ -3,7 +3,7 @@
 		"name": "QuestSave+",
 		"slug": "questsave-plus",
 		"description": "Discover games powered by IGDB and track your personal backlog across mobile devices.",
-		"version": "0.0.8r",
+		"version": "0.0.8",
 		"orientation": "portrait",
 		"icon": "./assets/images/icon.png",
 		"scheme": "questsave",

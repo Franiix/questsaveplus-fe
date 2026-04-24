@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 
 type AppUpdateManifest = {
  latestVersion: string;
+ releaseAtRome?: string | null;
  iosUrl?: string | null;
  androidUrl?: string | null;
 };
