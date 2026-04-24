@@ -31,7 +31,12 @@ export function useHomeEditorialSections() {
  const endOfYear = useMemo(() => new Date(today.getFullYear(), 11, 31), [today]);
  const classicStartDate = useMemo(() => new Date(1990, 0, 1), []);
  const classicEndDate = useMemo(() => new Date(2012, 11, 31), []);
+
  const indieGenreId = useMemo(() => getGenreExternalIdBySlug(genres, 'indie'), [genres]);
+ const arcadeGenreId = useMemo(() => getGenreExternalIdBySlug(genres, 'arcade'), [genres]);
+ const adventureGenreId = useMemo(() => getGenreExternalIdBySlug(genres, 'adventure'), [genres]);
+
+ // --- Existing queries ---
 
  const trendingQuery = useHomeSectionGames({
   queryKey: 'trending',
@@ -87,6 +92,33 @@ export function useHomeEditorialSections() {
   gameModes: '4',
  });
 
+ // --- New mood queries ---
+
+ const shortAndSweetQuery = useHomeSectionGames({
+  queryKey: 'short-and-sweet',
+  dates: `2010-01-01,${formatHomeEditorialDate(today)}`,
+  ordering: '-added',
+  enabled: deferredSectionsEnabled,
+  genres: arcadeGenreId,
+ });
+ const storyDrivenQuery = useHomeSectionGames({
+  queryKey: 'story-driven',
+  dates: `2005-01-01,${formatHomeEditorialDate(today)}`,
+  ordering: '-added',
+  enabled: deferredSectionsEnabled,
+  genres: adventureGenreId,
+ });
+ // Horror: IGDB theme ID 19.
+ const horrorQuery = useHomeSectionGames({
+  queryKey: 'horror-games',
+  dates: `2000-01-01,${formatHomeEditorialDate(today)}`,
+  ordering: '-added',
+  enabled: deferredSectionsEnabled,
+  tags: '19',
+ });
+
+ // --- Game lists ---
+
  const trendingGames = useMemo(
   () => trendingQuery.data?.pages.flatMap((page) => page.items) ?? [],
   [trendingQuery.data],
@@ -134,6 +166,35 @@ export function useHomeEditorialSections() {
   () => coopGamesQuery.data?.pages.flatMap((page) => page.items) ?? [],
   [coopGamesQuery.data],
  );
+ const shortAndSweetGames = useMemo(
+  () =>
+   sortGamesByEditorialScore(
+    (shortAndSweetQuery.data?.pages.flatMap((page) => page.items) ?? []).filter(
+     (game) => (game.ratingsCount ?? 0) >= 15,
+    ),
+   ),
+  [shortAndSweetQuery.data],
+ );
+ const storyDrivenGames = useMemo(
+  () =>
+   sortGamesByEditorialScore(
+    (storyDrivenQuery.data?.pages.flatMap((page) => page.items) ?? []).filter(
+     (game) => (game.ratingsCount ?? 0) >= 20,
+    ),
+   ),
+  [storyDrivenQuery.data],
+ );
+ const horrorGames = useMemo(
+  () =>
+   sortGamesByEditorialScore(
+    (horrorQuery.data?.pages.flatMap((page) => page.items) ?? []).filter(
+     (game) => (game.ratingsCount ?? 0) >= 15,
+    ),
+   ),
+  [horrorQuery.data],
+ );
+
+ // --- Section view models ---
 
  const primarySections = useMemo<HomeSectionViewModel[]>(
   () => [
@@ -157,7 +218,19 @@ export function useHomeEditorialSections() {
     bestOfYearGames,
     bestOfYearQuery,
    ),
+   createHomeSectionViewModel(
+    'short-and-sweet',
+    t('home.shortAndSweet'),
+    shortAndSweetGames,
+    shortAndSweetQuery,
+   ),
    createHomeSectionViewModel('classics', t('home.classicMustPlays'), classicGames, classicsQuery),
+   createHomeSectionViewModel(
+    'story-driven',
+    t('home.storyDriven'),
+    storyDrivenGames,
+    storyDrivenQuery,
+   ),
    createHomeSectionViewModel(
     'all-time-top-250',
     t('home.allTimeTop250'),
@@ -171,6 +244,7 @@ export function useHomeEditorialSections() {
     indieWatchQuery,
    ),
    createHomeSectionViewModel('coop-games', t('home.localCoopGames'), coopGames, coopGamesQuery),
+   createHomeSectionViewModel('horror-games', t('home.horrorGames'), horrorGames, horrorQuery),
   ],
   [
    allTimeTopGames,
@@ -181,8 +255,14 @@ export function useHomeEditorialSections() {
    classicsQuery,
    coopGames,
    coopGamesQuery,
+   horrorGames,
+   horrorQuery,
    indieWatchGames,
    indieWatchQuery,
+   shortAndSweetGames,
+   shortAndSweetQuery,
+   storyDrivenGames,
+   storyDrivenQuery,
    t,
   ],
  );

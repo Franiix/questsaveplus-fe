@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Switch, Text, View } from 'react-native';
@@ -228,6 +229,7 @@ export default function BacklogScreen() {
      shouldPin ? t('backlog.playNext.pinSuccess') : t('backlog.playNext.unpinSuccess'),
      'success',
     );
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
    } else {
     showToast(updateError, 'error');
    }
@@ -248,6 +250,7 @@ export default function BacklogScreen() {
 
    if (!updateError) {
     showToast(t('backlog.archive.restoreSuccess'), 'success');
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
    } else {
     showToast(updateError, 'error');
    }
@@ -268,6 +271,7 @@ export default function BacklogScreen() {
 
   if (!updateError) {
    showToast(t('backlog.archive.archiveSuccess'), 'success');
+   void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   } else {
    showToast(updateError, 'error');
   }
@@ -339,6 +343,9 @@ export default function BacklogScreen() {
 
    if (!updateError) {
     showToast(t('gameDetail.updateSuccess'), 'success');
+    void (isCompleted && !item.completed_at
+     ? Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+     : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light));
    } else {
     showToast(updateError, 'error');
    }
@@ -487,7 +494,11 @@ export default function BacklogScreen() {
    clearError();
    await update(item.id, { personal_rating: rating });
    const updateError = useBacklogStore.getState().error;
-   if (updateError) showToast(updateError, 'error');
+   if (updateError) {
+    showToast(updateError, 'error');
+   } else {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+   }
   },
   [clearError, showToast, update],
  );
@@ -500,6 +511,7 @@ export default function BacklogScreen() {
   const deleteError = useBacklogStore.getState().error;
   if (!deleteError) {
    showToast(t('gameDetail.removeSuccess'), 'success');
+   void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
   } else {
    showToast(deleteError, 'error');
   }

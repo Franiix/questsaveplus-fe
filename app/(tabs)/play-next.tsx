@@ -1,5 +1,6 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -302,6 +303,7 @@ export default function PlayNextScreen() {
 
   if (!updateError) {
    showToast(t('playNext.playSuccess'), 'success');
+   void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   } else {
    showToast(updateError, 'error');
   }
@@ -320,6 +322,7 @@ export default function PlayNextScreen() {
 
    if (!updateError) {
     showToast(t('backlog.playNext.unpinSuccess'), 'success');
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
    } else {
     showToast(updateError, 'error');
    }
@@ -345,6 +348,7 @@ export default function PlayNextScreen() {
 
    const updateError = useBacklogStore.getState().error;
    showToast(updateError ?? t('playNext.reorderSuccess'), updateError ? 'error' : 'success');
+   if (!updateError) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
    setIsReordering(false);
   },
   [clearError, showToast, t, update],

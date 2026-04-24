@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { SearchableSelectOption } from '@/components/base/inputs/SearchableSelectInput';
@@ -237,6 +238,7 @@ export function useGameBacklogController({
   if (created) {
    setIsPlatformModalOpen(false);
    showToast(t('gameDetail.addSuccess'), 'success');
+   void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }
  }
 
@@ -351,6 +353,9 @@ export function useGameBacklogController({
 
    if (updated) {
     showToast(t('gameDetail.updateSuccess'), 'success');
+    void (isCompleted && !currentCompletedAt
+     ? Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+     : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium));
    }
   };
 
@@ -474,6 +479,7 @@ export function useGameBacklogController({
   if (!useBacklogStore.getState().error) {
    showToast(t('gameDetail.removeSuccess'), 'success');
    onRemoveSuccess?.();
+   void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
   }
  }
 
@@ -483,6 +489,7 @@ export function useGameBacklogController({
   const restored = await update(backlogItem.id, { is_archived: false });
   if (restored) {
    showToast(t('backlog.archive.restoreSuccess'), 'success');
+   void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   }
  }
 

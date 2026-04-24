@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
@@ -120,6 +121,7 @@ export default function PlayNextReorderScreen() {
   setIsApplying(false);
 
   if (!updateError) {
+   void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
    router.back();
   }
  }, [clearError, entries, playNextItems, router, showToast, t, update]);
