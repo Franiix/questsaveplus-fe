@@ -37,6 +37,7 @@ type GameDetailOverviewViewModel = {
 type GameDetailOverviewSectionProps = {
  backlogController: {
   hasPendingChanges: boolean;
+  isArchived?: boolean;
   isBacklogLoading: boolean;
   isCreateMutating: boolean;
   isDeleteMutating: boolean;
@@ -49,6 +50,7 @@ type GameDetailOverviewSectionProps = {
   onNotesFocus: () => void;
   onRatingChange: (rating: number) => void;
   onRemove: () => void;
+  onRestoreFromArchive?: () => void;
   onStatusChange: (value: string) => void;
   onUpdate: () => void;
   onStartedAtChange: (value: string | null) => void;
@@ -120,6 +122,7 @@ export function GameDetailOverviewSection({
    >
     <GameBacklogPanel
      isInBacklog={backlogController.isInBacklog}
+     isArchived={backlogController.isArchived}
      isBacklogLoading={backlogController.isBacklogLoading}
      isMutating={backlogController.isMutating}
      isCreateMutating={backlogController.isCreateMutating}
@@ -138,6 +141,7 @@ export function GameDetailOverviewSection({
      onAdd={backlogController.onAdd}
      onUpdate={backlogController.onUpdate}
      onRemove={backlogController.onRemove}
+     onRestoreFromArchive={backlogController.onRestoreFromArchive}
      onStartedAtChange={backlogController.onStartedAtChange}
      onCompletedAtChange={backlogController.onCompletedAtChange}
      onAbandonedAtChange={backlogController.onAbandonedAtChange}

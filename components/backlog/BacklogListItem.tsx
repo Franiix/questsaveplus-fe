@@ -35,6 +35,7 @@ export type BacklogListItemProps = {
  onRequestRemove: (item: BacklogItemEntity) => void;
  onQuickStatusChange: (item: BacklogItemEntity, status: BacklogStatusEnum) => void;
  onTogglePlayNext?: (item: BacklogItemEntity) => void;
+ onToggleArchive?: (item: BacklogItemEntity) => void;
  onPrimaryAction?: (item: BacklogItemEntity) => void;
  removeLabel: string;
  labelMap: BacklogStatusLabelMap;
@@ -42,8 +43,11 @@ export type BacklogListItemProps = {
  iconMap: BacklogStatusIconMap;
  isUpdatingStatus?: boolean;
  isUpdatingPlayNext?: boolean;
+ isUpdatingArchive?: boolean;
  playNextPinLabel?: string;
  playNextUnpinLabel?: string;
+ archiveLabel?: string;
+ restoreArchiveLabel?: string;
  dragHintLabel?: string;
  isDragActive?: boolean;
  primaryActionLabel?: string;
@@ -62,6 +66,7 @@ export const BacklogListItem = memo(function BacklogListItem({
  onRequestRemove,
  onQuickStatusChange,
  onTogglePlayNext,
+ onToggleArchive,
  onPrimaryAction,
  removeLabel,
  labelMap,
@@ -69,8 +74,11 @@ export const BacklogListItem = memo(function BacklogListItem({
  iconMap,
  isUpdatingStatus = false,
  isUpdatingPlayNext = false,
+ isUpdatingArchive = false,
  playNextPinLabel = 'Add to Play Next',
  playNextUnpinLabel = 'Remove from Play Next',
+ archiveLabel = 'Archive',
+ restoreArchiveLabel = 'Restore',
  dragHintLabel,
  isDragActive = false,
  primaryActionLabel,
@@ -91,13 +99,14 @@ export const BacklogListItem = memo(function BacklogListItem({
  const showPinInQuickActions = quickActionsMode === 'default' && canTogglePlayNext;
  const quickPrimaryCount = showPinInQuickActions ? 2 : 3;
  const { secondaryActions } = getBacklogQuickStatusGroups(item.status, quickPrimaryCount);
- const isSwipeEnabled = quickActionsMode === 'default';
+ const isSwipeEnabled = quickActionsMode !== 'play-only';
 
  const showLeadingControl =
   (quickActionsMode === 'play-only' && typeof effectiveOrdinal === 'number') ||
   (quickActionsMode === 'default' && isPlayNext && typeof effectiveOrdinal === 'number');
 
  const showTrailingPinButton = quickActionsMode === 'hidden' && canTogglePlayNext;
+ const canToggleArchive = Boolean(onToggleArchive);
 
  const pinAuxiliaryAction = showPinInQuickActions
   ? {
@@ -169,6 +178,40 @@ export const BacklogListItem = memo(function BacklogListItem({
       </Text>
      </Pressable>
     ) : null}
+    {canToggleArchive ? (
+     <Pressable
+      onPress={() => onToggleArchive?.(item)}
+      style={{
+       width: SWIPE_ACTION_WIDTH,
+       borderRadius: borderRadius.lg,
+       borderWidth: 1,
+       borderColor: `${colors.primary['200']}55`,
+       backgroundColor: `${colors.primary.DEFAULT}1e`,
+       alignItems: 'center',
+       justifyContent: 'center',
+       gap: spacing.xs,
+       opacity: isUpdatingArchive ? 0.7 : 1,
+      }}
+      disabled={isUpdatingArchive}
+     >
+      <FontAwesome5
+       name={item.is_archived ? 'box-open' : 'archive'}
+       size={16}
+       color={colors.primary['200']}
+       solid
+      />
+      <Text
+       style={{
+        color: colors.text.primary,
+        fontSize: typography.size.sm,
+        fontFamily: typography.font.semibold,
+        textAlign: 'center',
+       }}
+      >
+       {item.is_archived ? restoreArchiveLabel : archiveLabel}
+      </Text>
+     </Pressable>
+    ) : null}
     <Pressable
      onPress={() => onRequestRemove(item)}
      style={{
@@ -196,6 +239,7 @@ export const BacklogListItem = memo(function BacklogListItem({
  }
 
  function renderLeftActions() {
+  if (quickActionsMode === 'hidden') return null;
   if (secondaryActions.length === 0) return null;
 
   return (

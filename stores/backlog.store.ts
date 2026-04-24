@@ -4,7 +4,7 @@ import type { CreateBacklogItemDto, UpdateBacklogItemDto } from '@/shared/dto/Ba
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import { type BacklogItemModel, toBacklogItemModel } from '@/shared/models/BacklogItem.model';
 
-type BacklogListTarget = 'backlogItems' | 'recentBacklogItems';
+type BacklogListTarget = 'backlogItems' | 'recentBacklogItems' | 'archivedBacklogItems';
 type BacklogMutationKind = 'create' | 'update' | 'delete' | null;
 
 type ReadAllBacklogOptions = {
@@ -12,12 +12,14 @@ type ReadAllBacklogOptions = {
  ascending?: boolean;
  limit?: number;
  target?: BacklogListTarget;
+ includeArchived?: boolean;
 };
 
 interface BacklogState {
  backlog: BacklogItemModel | null;
  backlogItems: BacklogItemModel[];
  recentBacklogItems: BacklogItemModel[];
+ archivedBacklogItems: BacklogItemModel[];
  isFetching: boolean;
  isReadingCurrent: boolean;
  isReadingList: boolean;
@@ -44,6 +46,7 @@ export const useBacklogStore = create<BacklogState>(
   backlog: null,
   backlogItems: [],
   recentBacklogItems: [],
+  archivedBacklogItems: [],
   isFetching: false,
   isReadingCurrent: false,
   isReadingList: false,
@@ -82,19 +85,21 @@ export const useBacklogStore = create<BacklogState>(
 
   readAll: async (userId, options) => {
    const target = options?.target ?? 'backlogItems';
-   const readFlag =
-    target === 'recentBacklogItems'
-     ? ({ isReadingRecent: true } as const)
-     : ({ isReadingList: true } as const);
+   const isRecentTarget = target === 'recentBacklogItems';
+   const readFlag = isRecentTarget
+    ? ({ isReadingRecent: true } as const)
+    : ({ isReadingList: true } as const);
 
    set({ isFetching: true, error: null, ...readFlag });
 
    const orderBy = options?.orderBy ?? 'updated_at';
+   const includeArchived = options?.includeArchived ?? false;
 
    let query = supabase
     .from('backlog_items')
     .select('*')
     .eq('user_id', userId)
+    .eq('is_archived', includeArchived)
     .order(orderBy, { ascending: options?.ascending ?? false });
 
    if (options?.limit) {
@@ -108,6 +113,7 @@ export const useBacklogStore = create<BacklogState>(
      .from('backlog_items')
      .select('*')
      .eq('user_id', userId)
+     .eq('is_archived', includeArchived)
      .order('added_at', { ascending: options?.ascending ?? false });
 
     if (options?.limit) {
@@ -119,12 +125,11 @@ export const useBacklogStore = create<BacklogState>(
 
    if (error) {
     set((state) => ({
-     isFetching:
-      target === 'recentBacklogItems'
-       ? state.isReadingCurrent || state.isReadingList
-       : state.isReadingCurrent || state.isReadingRecent,
-     isReadingList: target === 'backlogItems' ? false : state.isReadingList,
-     isReadingRecent: target === 'recentBacklogItems' ? false : state.isReadingRecent,
+     isFetching: isRecentTarget
+      ? state.isReadingCurrent || state.isReadingList
+      : state.isReadingCurrent || state.isReadingRecent,
+     isReadingList: isRecentTarget ? state.isReadingList : false,
+     isReadingRecent: isRecentTarget ? false : state.isReadingRecent,
      error: error.message,
     }));
     return [];
@@ -133,12 +138,11 @@ export const useBacklogStore = create<BacklogState>(
    const items = mapBacklogItems(data);
    set((state) => ({
     [target]: items,
-    isFetching:
-     target === 'recentBacklogItems'
-      ? state.isReadingCurrent || state.isReadingList
-      : state.isReadingCurrent || state.isReadingRecent,
-    isReadingList: target === 'backlogItems' ? false : state.isReadingList,
-    isReadingRecent: target === 'recentBacklogItems' ? false : state.isReadingRecent,
+    isFetching: isRecentTarget
+     ? state.isReadingCurrent || state.isReadingList
+     : state.isReadingCurrent || state.isReadingRecent,
+    isReadingList: isRecentTarget ? state.isReadingList : false,
+    isReadingRecent: isRecentTarget ? false : state.isReadingRecent,
    }));
    return items;
   },
@@ -164,6 +168,7 @@ export const useBacklogStore = create<BacklogState>(
     backlog,
     backlogItems,
     recentBacklogItems,
+    archivedBacklogItems: get().archivedBacklogItems.filter((item) => item.id !== backlog.id),
     isMutating: false,
     activeMutation: null,
    });
@@ -187,12 +192,22 @@ export const useBacklogStore = create<BacklogState>(
    }
 
    const backlog = toBacklogItemModel(data);
-   const updateItem = (item: BacklogItemModel) => (item.id === backlog.id ? backlog : item);
+   const removeById = (items: BacklogItemModel[]) => items.filter((item) => item.id !== backlog.id);
+   const nextBacklogItems = backlog.is_archived
+    ? removeById(get().backlogItems)
+    : [backlog, ...removeById(get().backlogItems)];
+   const nextArchivedBacklogItems = backlog.is_archived
+    ? [backlog, ...removeById(get().archivedBacklogItems)]
+    : removeById(get().archivedBacklogItems);
+   const nextRecentBacklogItems = backlog.is_archived
+    ? removeById(get().recentBacklogItems)
+    : get().recentBacklogItems.map((item) => (item.id === backlog.id ? backlog : item));
 
    set({
     backlog: get().backlog?.id === backlog.id ? backlog : get().backlog,
-    backlogItems: get().backlogItems.map(updateItem),
-    recentBacklogItems: get().recentBacklogItems.map(updateItem),
+    backlogItems: nextBacklogItems,
+    archivedBacklogItems: nextArchivedBacklogItems,
+    recentBacklogItems: nextRecentBacklogItems,
     isMutating: false,
     activeMutation: null,
    });
@@ -214,6 +229,7 @@ export const useBacklogStore = create<BacklogState>(
     backlog: get().backlog?.id === id ? null : get().backlog,
     backlogItems: get().backlogItems.filter((item) => item.id !== id),
     recentBacklogItems: get().recentBacklogItems.filter((item) => item.id !== id),
+    archivedBacklogItems: get().archivedBacklogItems.filter((item) => item.id !== id),
     isMutating: false,
     activeMutation: null,
    });
@@ -222,6 +238,7 @@ export const useBacklogStore = create<BacklogState>(
   clearCurrentBacklog: () =>
    set((state) => ({
     backlog: null,
+    archivedBacklogItems: state.archivedBacklogItems,
     error: null,
     isFetching: state.isReadingList || state.isReadingRecent,
     isReadingCurrent: false,
@@ -234,6 +251,7 @@ export const useBacklogStore = create<BacklogState>(
     backlog: null,
     backlogItems: [],
     recentBacklogItems: [],
+    archivedBacklogItems: [],
     error: null,
     isFetching: false,
     isReadingCurrent: false,

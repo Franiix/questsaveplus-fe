@@ -126,6 +126,7 @@ export function useGameBacklogController({
  const userId = session?.user?.id ?? null;
  const backlogItem = backlog?.game_id === game?.id ? backlog : null;
  const isInBacklog = !!backlogItem;
+ const isArchived = backlogItem?.is_archived === true;
  const isBacklogLoading = isReadingCurrent;
  const isCreateMutating = activeMutation === 'create';
  const isUpdateMutating = activeMutation === 'update';
@@ -476,11 +477,21 @@ export function useGameBacklogController({
   }
  }
 
+ async function handleRestoreFromArchive() {
+  if (!backlogItem) return;
+
+  const restored = await update(backlogItem.id, { is_archived: false });
+  if (restored) {
+   showToast(t('backlog.archive.restoreSuccess'), 'success');
+  }
+ }
+
  return {
   backlogItem,
   isBacklogLoading,
   isMutating,
   isInBacklog,
+  isArchived,
   isCreateMutating,
   isUpdateMutating,
   isDeleteMutating,
@@ -514,6 +525,7 @@ export function useGameBacklogController({
   setPendingPlatformPlayed,
   handleUpdateBacklog,
   handleRemoveFromBacklog,
+  handleRestoreFromArchive,
   confirmPendingDateWarning,
   dismissPendingDateWarning,
   togglePendingResetAbandoned,

@@ -19,6 +19,7 @@ function createBacklogItem(
   personal_rating: null,
   notes: null,
   platform_played: null,
+  is_archived: false,
   added_at: '2026-04-23T00:00:00.000Z',
   updated_at: '2026-04-23T00:00:00.000Z',
   started_at: null,

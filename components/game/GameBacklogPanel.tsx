@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { Card } from '@/components/base/display/Card';
+import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { ChipGroup } from '@/components/base/inputs/ChipGroup';
 import { DatePickerInput } from '@/components/base/inputs/DatePickerInput';
 import { RatingStepper } from '@/components/base/inputs/RatingStepper';
@@ -21,6 +22,7 @@ type StatusOption = {
 
 type GameBacklogPanelProps = {
  isInBacklog: boolean;
+ isArchived?: boolean;
  isBacklogLoading: boolean;
  isMutating: boolean;
  isCreateMutating: boolean;
@@ -51,6 +53,7 @@ type GameBacklogPanelProps = {
  onAdd: () => void;
  onUpdate: () => void;
  onRemove: () => void;
+ onRestoreFromArchive?: () => void;
  addedAt?: string | null;
  updatedAt?: string | null;
 };
@@ -87,6 +90,7 @@ const SHOW_RESUMED_AT_STATUSES = new Set<BacklogStatusEnum>([
 
 export function GameBacklogPanel({
  isInBacklog,
+ isArchived = false,
  isBacklogLoading,
  isMutating,
  isCreateMutating,
@@ -117,10 +121,38 @@ export function GameBacklogPanel({
  onAdd,
  onUpdate,
  onRemove,
+ onRestoreFromArchive,
  addedAt,
  updatedAt,
 }: GameBacklogPanelProps) {
  const { t, i18n } = useTranslation();
+
+ if (isBacklogLoading) {
+  return (
+   <Card
+    variant="outlined"
+    style={{
+     padding: spacing.md,
+     minHeight: 164,
+     alignItems: 'center',
+     justifyContent: 'center',
+    }}
+   >
+    <View style={{ gap: spacing.sm, alignItems: 'center' }}>
+     <LoadingSpinner />
+     <Text
+      style={{
+       color: colors.text.secondary,
+       fontSize: typography.size.sm,
+       textAlign: 'center',
+      }}
+     >
+      {t('backlog.panelLoading')}
+     </Text>
+    </View>
+   </Card>
+  );
+ }
 
  const showStartedAt = SHOW_STARTED_AT_STATUSES.has(selectedStatus) || Boolean(localStartedAt);
  const showCompletedAt =
@@ -137,6 +169,41 @@ export function GameBacklogPanel({
   ) ?? [];
  const isPlatformPlayedUnavailable = unavailablePlatforms.length > 0;
  const isDisabled = isBacklogLoading || isMutating;
+
+ if (isInBacklog && isArchived) {
+  return (
+   <Card
+    variant="outlined"
+    style={{
+     padding: spacing.md,
+    }}
+   >
+    <View style={{ gap: spacing.md }}>
+     <View style={{ gap: spacing.xs }}>
+      <SectionLabel>{t('backlog.archive.title')}</SectionLabel>
+      <Text
+       style={{
+        color: colors.text.secondary,
+        fontSize: typography.size.sm,
+        lineHeight: Math.ceil(typography.size.sm * typography.lineHeight.relaxed),
+       }}
+      >
+       {t('backlog.archive.readOnlyDescription')}
+      </Text>
+     </View>
+
+     <BaseButton
+      label={t('backlog.archive.restoreAction')}
+      variant="outlined"
+      onPress={onRestoreFromArchive}
+      isLoading={isUpdateMutating}
+      isDisabled={isDisabled || !onRestoreFromArchive}
+      fullWidth
+     />
+    </View>
+   </Card>
+  );
+ }
 
  return (
   <Card

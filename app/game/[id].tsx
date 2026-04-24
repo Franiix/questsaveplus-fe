@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
  Animated,
@@ -122,6 +122,7 @@ export default function GameDetailScreen() {
   isBacklogLoading,
   isMutating,
   isInBacklog,
+  isArchived,
   isCreateMutating,
   isUpdateMutating,
   isDeleteMutating,
@@ -155,6 +156,7 @@ export default function GameDetailScreen() {
   setPendingPlatformPlayed,
   handleUpdateBacklog,
   handleRemoveFromBacklog,
+  handleRestoreFromArchive,
   confirmPendingDateWarning,
   dismissPendingDateWarning,
   togglePendingResetAbandoned,
@@ -172,6 +174,7 @@ export default function GameDetailScreen() {
      }
    : null,
  });
+ const [confirmRestoreVisible, setConfirmRestoreVisible] = useState(false);
 
  const viewModel = useGameDetailViewModel({
   additions,
@@ -296,6 +299,7 @@ export default function GameDetailScreen() {
       onPublisherPress={primaryPublisher ? handlePublisherPress : null}
       backlogController={{
        isInBacklog,
+       isArchived,
        isBacklogLoading,
        isMutating,
        isCreateMutating,
@@ -313,6 +317,7 @@ export default function GameDetailScreen() {
        onAdd: () => void handleAddToBacklog(),
        onUpdate: () => void handleUpdateBacklog(),
        onRemove: () => setConfirmRemoveVisible(true),
+       onRestoreFromArchive: () => setConfirmRestoreVisible(true),
        onStartedAtChange: setLocalStartedAt,
        onCompletedAtChange: setLocalCompletedAt,
        onAbandonedAtChange: setLocalAbandonedAt,
@@ -406,6 +411,19 @@ export default function GameDetailScreen() {
      void handleRemoveFromBacklog();
     }}
     onCancel={() => setConfirmRemoveVisible(false)}
+   />
+
+   <ConfirmModal
+    visible={confirmRestoreVisible}
+    title={t('backlog.archive.restoreModalTitle')}
+    message={t('backlog.archive.restoreModalMessage')}
+    confirmLabel={t('backlog.archive.restoreAction')}
+    cancelLabel={t('common.cancel')}
+    onConfirm={() => {
+     setConfirmRestoreVisible(false);
+     void handleRestoreFromArchive();
+    }}
+    onCancel={() => setConfirmRestoreVisible(false)}
    />
 
    <ConfirmModal

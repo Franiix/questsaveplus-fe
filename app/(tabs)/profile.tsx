@@ -236,6 +236,12 @@ export default function ProfileScreen() {
       onPress={() => router.push('/profile/change-password')}
      />
      <BaseButton
+      label={t('backlog.archive.open')}
+      variant="outlined"
+      fullWidth
+      onPress={() => router.push('../backlog-archive')}
+     />
+     <BaseButton
       label={t('profile.logoutButton')}
       variant="outlined"
       fullWidth

@@ -23,7 +23,8 @@
  },
  tabs: {
   home: 'Homepage',
-  backlog: 'My Backlog',
+  backlog: 'Backlog',
+  archive: 'Archive',
   playNext: 'Play Next',
   profile: 'Profile',
   credits: 'Info',
@@ -221,12 +222,33 @@
    pinSuccess: 'Game added to Play Next',
    unpinSuccess: 'Game removed from Play Next',
   },
+  archive: {
+   title: 'Archive',
+   open: 'Open archive',
+   action: 'Archive',
+   restoreAction: 'Restore',
+   archiveSuccess: 'Game archived',
+   restoreSuccess: 'Game restored from archive',
+   description:
+    'Archived games stay saved, but you cannot edit their status until you move them back into the backlog.',
+   readOnlyDescription:
+    'This entry is read-only here: move it out of the archive to edit its backlog details again.',
+   archiveModalTitle: 'Archive this game?',
+   archiveModalMessage:
+    'Once it is in the archive, you will no longer be able to edit status, dates, or backlog details until you move it back.',
+   restoreModalTitle: 'Remove this game from the archive?',
+   restoreModalMessage:
+    'The game will return to the backlog and become editable again, including status, dates, and backlog details.',
+   emptyTitle: 'Archive is empty',
+   emptySubtitle: 'Games you archive will show up here.',
+  },
   addedOn: 'Added on {{date}}',
   startedAt: 'Started on {{date}}',
   completedAt: 'Completed on {{date}}',
   abandonedAt: 'Abandoned on {{date}}',
   resumedAt: 'Resumed on {{date}}',
   addedAtLabel: 'Date added',
+  panelLoading: 'Loading backlog data...',
   platformPlayedLabel: 'Platforms played on',
   startedAtLabel: 'Start date',
   completedAtLabel: 'Completion date',

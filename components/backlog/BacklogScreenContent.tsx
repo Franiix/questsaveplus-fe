@@ -27,11 +27,13 @@ type BacklogScreenContentProps = {
  onQuickStatusChange: (item: BacklogItemEntity, status: BacklogStatusEnum) => void;
  onOpenPlayNext: () => void;
  onTogglePlayNext: (item: BacklogItemEntity) => void;
+ onToggleArchive: (item: BacklogItemEntity) => void;
  onRefetch: () => void;
  onRequestRemove: (item: BacklogItemEntity) => void;
  onRatingChange: (item: BacklogItemEntity, rating: number) => void;
  isUpdatingStatus?: boolean;
  isUpdatingPlayNext?: boolean;
+ isUpdatingArchive?: boolean;
  removeLabel: string;
  retryLabel: string;
 };
@@ -58,11 +60,13 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
  onQuickStatusChange,
  onOpenPlayNext,
  onTogglePlayNext,
+ onToggleArchive,
  onRefetch,
  onRequestRemove,
  onRatingChange,
  isUpdatingStatus = false,
  isUpdatingPlayNext = false,
+ isUpdatingArchive = false,
  removeLabel,
  retryLabel,
 }: BacklogScreenContentProps) {
@@ -76,11 +80,15 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
     onPressIn={onItemPressIn}
     onQuickStatusChange={onQuickStatusChange}
     onTogglePlayNext={onTogglePlayNext}
+    onToggleArchive={onToggleArchive}
     onRequestRemove={onRequestRemove}
     isUpdatingStatus={isUpdatingStatus}
     isUpdatingPlayNext={isUpdatingPlayNext}
+    isUpdatingArchive={isUpdatingArchive}
     playNextPinLabel={t('backlog.playNext.pinAction')}
     playNextUnpinLabel={t('backlog.playNext.unpinAction')}
+    archiveLabel={t('backlog.archive.action')}
+    restoreArchiveLabel={t('backlog.archive.restoreAction')}
     removeLabel={removeLabel}
     labelMap={labelMap}
     colorMap={colorMap}
@@ -94,10 +102,12 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
    onItemPressIn,
    onQuickStatusChange,
    onTogglePlayNext,
+   onToggleArchive,
    onRequestRemove,
    onRatingChange,
    isUpdatingStatus,
    isUpdatingPlayNext,
+   isUpdatingArchive,
    removeLabel,
    labelMap,
    colorMap,

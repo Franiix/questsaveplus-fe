@@ -62,6 +62,7 @@ export default function BacklogScreen() {
  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
  const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
  const [pendingDeleteItem, setPendingDeleteItem] = useState<BacklogItemEntity | null>(null);
+ const [pendingArchiveItem, setPendingArchiveItem] = useState<BacklogItemEntity | null>(null);
  const [pendingQuickChange, setPendingQuickChange] = useState<{
   item: BacklogItemEntity;
   status: BacklogStatusEnum;
@@ -207,6 +208,10 @@ export default function BacklogScreen() {
   router.push('/(tabs)/play-next');
  }, [router]);
 
+ const handleOpenArchive = useCallback(() => {
+  router.push('../backlog-archive');
+ }, [router]);
+
  const handleRequestRemove = useCallback((item: BacklogItemEntity) => {
   setPendingDeleteItem(item);
  }, []);
@@ -233,6 +238,46 @@ export default function BacklogScreen() {
   },
   [clearError, getNextPlayNextPriority, showToast, t, update],
  );
+
+ const handleToggleArchive = useCallback(
+  async (item: BacklogItemEntity) => {
+   if (!item.is_archived) {
+    setPendingArchiveItem(item);
+    return;
+   }
+
+   clearError();
+   await update(item.id, { is_archived: false });
+   const updateError = useBacklogStore.getState().error;
+
+   if (!updateError) {
+    showToast(t('backlog.archive.restoreSuccess'), 'success');
+   } else {
+    showToast(updateError, 'error');
+   }
+  },
+  [clearError, showToast, t, update],
+ );
+
+ const handleConfirmArchive = useCallback(async () => {
+  if (!pendingArchiveItem) return;
+
+  clearError();
+  await update(pendingArchiveItem.id, {
+   is_archived: true,
+   is_play_next: false,
+   play_next_priority: null,
+  });
+  const updateError = useBacklogStore.getState().error;
+
+  if (!updateError) {
+   showToast(t('backlog.archive.archiveSuccess'), 'success');
+  } else {
+   showToast(updateError, 'error');
+  }
+
+  setPendingArchiveItem(null);
+ }, [clearError, pendingArchiveItem, showToast, t, update]);
 
  const doQuickStatusUpdate = useCallback(
   async (
@@ -498,7 +543,15 @@ export default function BacklogScreen() {
  return (
   <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
    <AppBackground />
-   <ScreenHeader title={t('tabs.backlog')} onBack={handleBackPress} />
+   <ScreenHeader
+    title={t('tabs.backlog')}
+    onBack={handleBackPress}
+    rightAction={{
+     icon: 'archive',
+     onPress: handleOpenArchive,
+     accessibilityLabel: t('backlog.archive.open'),
+    }}
+   />
    <View
     style={{
      paddingHorizontal: HORIZONTAL_PADDING,
@@ -552,12 +605,14 @@ export default function BacklogScreen() {
     onItemPressIn={handleItemPressIn}
     onOpenPlayNext={handleOpenPlayNext}
     onTogglePlayNext={handleTogglePlayNext}
+    onToggleArchive={handleToggleArchive}
     onQuickStatusChange={handleQuickStatusChange}
     onRefetch={handleRefetch}
     onRequestRemove={handleRequestRemove}
     onRatingChange={handleRatingChange}
     isUpdatingStatus={isMutating && activeMutation === 'update'}
     isUpdatingPlayNext={isMutating && activeMutation === 'update'}
+    isUpdatingArchive={isMutating && activeMutation === 'update'}
     removeLabel={t('gameDetail.confirmRemove.confirm')}
     retryLabel={t('home.errorRetry')}
    />
@@ -601,6 +656,16 @@ export default function BacklogScreen() {
     isDestructive
     onConfirm={() => void handleConfirmRemove()}
     onCancel={() => setPendingDeleteItem(null)}
+   />
+
+   <ConfirmModal
+    visible={pendingArchiveItem !== null}
+    title={t('backlog.archive.archiveModalTitle')}
+    message={t('backlog.archive.archiveModalMessage')}
+    confirmLabel={t('backlog.archive.action')}
+    cancelLabel={t('common.cancel')}
+    onConfirm={() => void handleConfirmArchive()}
+    onCancel={() => setPendingArchiveItem(null)}
    />
 
    <ConfirmModal

@@ -23,10 +23,12 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
  const insets = useSafeAreaInsets();
  const { width: screenWidth } = useWindowDimensions();
  const [confirmRemoveVisible, setConfirmRemoveVisible] = useState(false);
+ const [confirmRestoreVisible, setConfirmRestoreVisible] = useState(false);
  const {
   isBacklogLoading,
   isMutating,
   isInBacklog,
+  isArchived,
   isCreateMutating,
   isUpdateMutating,
   isDeleteMutating,
@@ -48,6 +50,7 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
   setPendingPlatformPlayed,
   handleUpdateBacklog,
   handleRemoveFromBacklog,
+  handleRestoreFromArchive,
  } = useGameBacklogController({
   game: game
    ? {
@@ -104,6 +107,7 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
 
     <GameBacklogPanel
      isInBacklog={isInBacklog}
+     isArchived={isArchived}
      isBacklogLoading={isBacklogLoading}
      isMutating={isMutating}
      isCreateMutating={isCreateMutating}
@@ -122,6 +126,7 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
      onAdd={() => void handleAddToBacklog()}
      onUpdate={() => void handleUpdateBacklog()}
      onRemove={() => setConfirmRemoveVisible(true)}
+     onRestoreFromArchive={() => setConfirmRestoreVisible(true)}
     />
    </ScrollView>
 
@@ -159,6 +164,19 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
      emptyLabel={t('backlog.platformSelection.unavailable')}
     />
    </ConfirmModal>
+
+   <ConfirmModal
+    visible={confirmRestoreVisible}
+    title={t('backlog.archive.restoreModalTitle')}
+    message={t('backlog.archive.restoreModalMessage')}
+    confirmLabel={t('backlog.archive.restoreAction')}
+    cancelLabel={t('common.cancel')}
+    onConfirm={() => {
+     setConfirmRestoreVisible(false);
+     void handleRestoreFromArchive();
+    }}
+    onCancel={() => setConfirmRestoreVisible(false)}
+   />
   </BottomSheet>
  );
 }

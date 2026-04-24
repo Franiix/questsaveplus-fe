@@ -23,7 +23,8 @@
  },
  tabs: {
   home: 'Homepage',
-  backlog: 'Il mio Backlog',
+  backlog: 'Backlog',
+  archive: 'Archivio',
   playNext: 'Play Next',
   profile: 'Profilo',
   credits: 'Info',
@@ -221,12 +222,33 @@
    pinSuccess: 'Gioco aggiunto a Play Next',
    unpinSuccess: 'Gioco rimosso da Play Next',
   },
+  archive: {
+   title: 'Archivio',
+   open: 'Apri archivio',
+   action: 'Archivia',
+   restoreAction: 'Ripristina',
+   archiveSuccess: 'Gioco archiviato',
+   restoreSuccess: "Gioco ripristinato dall'archivio",
+   description:
+    'I giochi archiviati restano salvati, ma non puoi modificarne lo stato finché non li rimetti nel backlog.',
+   readOnlyDescription:
+    "Qui il backlog va in sola lettura: per tornare a modificarlo devi prima toglierlo dall'archivio.",
+   archiveModalTitle: 'Archivia questo gioco?',
+   archiveModalMessage:
+    'Una volta in archivio non potrai più modificare stato, date e dettagli backlog finché non lo rimetti nel backlog.',
+   restoreModalTitle: "Togliere il gioco dall'archivio?",
+   restoreModalMessage:
+    'Il gioco tornerà nel backlog e sarà di nuovo modificabile in stato, date e dettagli.',
+   emptyTitle: 'Archivio vuoto',
+   emptySubtitle: 'I giochi che archivi li ritrovi qui.',
+  },
   addedOn: 'Aggiunto il {{date}}',
   startedAt: 'Iniziato il {{date}}',
   completedAt: 'Completato il {{date}}',
   abandonedAt: 'Abbandonato il {{date}}',
   resumedAt: 'Ripreso il {{date}}',
   addedAtLabel: 'Data di aggiunta',
+  panelLoading: 'Carico i dati backlog...',
   platformPlayedLabel: 'Piattaforme di gioco',
   startedAtLabel: 'Data di inizio',
   completedAtLabel: 'Data di completamento',

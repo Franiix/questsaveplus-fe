@@ -11,6 +11,7 @@ export interface CreateBacklogItemDto {
  is_play_next?: boolean;
  play_next_priority?: number | null;
  platform_played?: string[];
+ is_archived?: boolean;
  started_at?: string;
  completed_at?: string;
  abandoned_at?: string;
@@ -27,6 +28,7 @@ export interface UpdateBacklogItemDto {
  is_play_next?: boolean;
  play_next_priority?: number | null;
  platform_played?: string[] | null;
+ is_archived?: boolean;
  started_at?: string | null;
  completed_at?: string | null;
  abandoned_at?: string | null;
