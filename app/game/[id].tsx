@@ -434,6 +434,7 @@ export default function GameDetailScreen() {
     cancelLabel={t('common.cancel')}
     onConfirm={() => void confirmAddToBacklog()}
     onCancel={dismissAddToBacklogPlatformModal}
+    isConfirmDisabled={pendingPlatformPlayed.length === 0}
    >
     <SearchableMultiSelectInput
      options={platformOptions}

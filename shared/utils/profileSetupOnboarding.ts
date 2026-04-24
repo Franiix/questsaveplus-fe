@@ -10,7 +10,7 @@ export async function markProfileSetupOnboardingPending(userId: string) {
  try {
   await SecureStore.deleteItemAsync(buildProfileSetupOnboardingKey(userId));
  } catch {
-  // Non bloccare il flusso di setup: al peggio il carosello ricompare una volta.
+  // Don't block the setup flow; at worst the carousel reappears once.
  }
 }
 
@@ -27,6 +27,6 @@ export async function consumeProfileSetupOnboarding(userId: string) {
  try {
   await SecureStore.setItemAsync(buildProfileSetupOnboardingKey(userId), '1');
  } catch {
-  // Evita crash: se SecureStore fallisce, semplicemente non persistiamo il dismiss.
+  // If SecureStore fails, we simply don't persist the dismiss — no crash.
  }
 }

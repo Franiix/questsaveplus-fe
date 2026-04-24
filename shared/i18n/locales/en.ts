@@ -301,6 +301,7 @@
    message: 'Select the platforms you want to use for this backlog entry.',
    placeholder: 'Select platforms',
    unavailable: 'No platforms are currently available for this game.',
+   required: 'Please select at least one platform to continue.',
    noLongerAvailable:
     'These saved platforms are no longer available in the catalog: {{platforms}}.',
   },

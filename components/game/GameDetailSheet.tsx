@@ -152,6 +152,7 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
     cancelLabel={t('common.cancel')}
     onConfirm={() => void confirmAddToBacklog()}
     onCancel={dismissAddToBacklogPlatformModal}
+    isConfirmDisabled={pendingPlatformPlayed.length === 0}
    >
     <SearchableMultiSelectInput
      options={platformOptions}

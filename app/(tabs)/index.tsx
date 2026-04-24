@@ -1,5 +1,5 @@
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -108,6 +108,7 @@ export default function HomeScreen() {
  const { prefetchGame, prefetchGames } = usePrefetchGameResources();
  const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
  const [isFirstRunOnboardingVisible, setIsFirstRunOnboardingVisible] = useState(false);
+ const onboardingDismissedRef = useRef(false);
  const pickerSortOptions = useMemo<PickerOption[]>(
   () => sortOptions.map((option) => ({ label: option.label, value: option.key })),
   [sortOptions],
@@ -116,7 +117,7 @@ export default function HomeScreen() {
  const checkFirstRunOnboarding = useCallback(() => {
   const userId = session?.user?.id;
 
-  if (!userId) {
+  if (!userId || onboardingDismissedRef.current) {
    setIsFirstRunOnboardingVisible(false);
    return () => undefined;
   }
@@ -176,6 +177,7 @@ export default function HomeScreen() {
  );
  const handleCloseFirstRunOnboarding = useCallback(() => {
   const userId = session?.user?.id;
+  onboardingDismissedRef.current = true;
   setIsFirstRunOnboardingVisible(false);
 
   if (!userId) {

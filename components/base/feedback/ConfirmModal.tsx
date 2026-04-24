@@ -13,6 +13,8 @@ type ConfirmModalProps = {
  cancelLabel?: string;
  /** Se true il bottone di conferma usa colors.error invece del brand. */
  isDestructive?: boolean;
+ /** Se true il bottone di conferma è disabilitato visivamente e non interagibile. */
+ isConfirmDisabled?: boolean;
  /** Contenuto opzionale tra il messaggio e i bottoni (es. input). */
  children?: React.ReactNode;
 };
@@ -32,6 +34,7 @@ export function ConfirmModal({
  confirmLabel,
  cancelLabel,
  isDestructive = false,
+ isConfirmDisabled = false,
  children,
 }: ConfirmModalProps) {
  return (
@@ -101,6 +104,7 @@ export function ConfirmModal({
        onPress={onConfirm}
        fullWidth
        color={isDestructive ? colors.error : undefined}
+       isDisabled={isConfirmDisabled}
       />
       <BaseButton label={cancelLabel} onPress={onCancel} variant="outlined" fullWidth />
      </View>

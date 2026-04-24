@@ -24,7 +24,7 @@ import Animated, {
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 type SlideDescriptor = {
  key: string;
@@ -664,7 +664,7 @@ export function ProfileSetupOnboardingModal({
 
   if (currentIndex >= slides.length - 1) {
    setRocketLaunchTrigger((value) => value + 1);
-   await wait(820);
+   await wait(900);
    setIsAdvancing(false);
    onClose();
    return;

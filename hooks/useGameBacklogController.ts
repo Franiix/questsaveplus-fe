@@ -217,7 +217,12 @@ export function useGameBacklogController({
  }
 
  async function confirmAddToBacklog() {
-  if (!userId || !game || pendingPlatformPlayed.length === 0) return;
+  if (!userId || !game) return;
+
+  if (pendingPlatformPlayed.length === 0) {
+   showToast(t('backlog.platformSelection.required'), 'error');
+   return;
+  }
 
   const now = new Date().toISOString();
   const isResumableStatus = RESUMABLE_STATUSES.has(selectedStatus);

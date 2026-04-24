@@ -300,6 +300,7 @@
    message: 'Seleziona le piattaforme su cui vuoi inserire questo gioco nel backlog.',
    placeholder: 'Seleziona piattaforme',
    unavailable: 'Al momento non sono disponibili piattaforme per questo gioco.',
+   required: 'Seleziona almeno una piattaforma per continuare.',
    noLongerAvailable:
     'Queste piattaforme salvate non risultano piu disponibili nel catalogo: {{platforms}}.',
   },
