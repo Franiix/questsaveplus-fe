@@ -1,4 +1,5 @@
 import { FontAwesome5 } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -6,7 +7,6 @@ import DraggableFlatList, {
  type RenderItemParams,
  ScaleDecorator,
 } from 'react-native-draggable-flatlist';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BacklogListItem } from '@/components/backlog/BacklogListItem';
 import { GradientUnderline } from '@/components/base/display/GradientUnderline';
@@ -54,6 +54,31 @@ const styles = StyleSheet.create({
  },
  itemSeparator: {
   height: spacing.sm,
+ },
+ reorderOverlay: {
+  position: 'absolute',
+  left: 0,
+  right: 0,
+  top: 0,
+  bottom: 0,
+  alignItems: 'center',
+  justifyContent: 'center',
+ },
+ reorderCard: {
+  minWidth: 168,
+  minHeight: 82,
+  borderRadius: borderRadius.xl,
+  borderWidth: 1,
+  borderColor: 'rgba(186,179,255,0.22)',
+  backgroundColor: 'rgba(14,16,28,0.92)',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: spacing.sm,
+  shadowColor: colors.primary.DEFAULT,
+  shadowOffset: { width: 0, height: 12 },
+  shadowOpacity: 0.24,
+  shadowRadius: 22,
+  elevation: 14,
  },
 });
 
@@ -283,41 +308,34 @@ export default function PlayNextScreen() {
    const itemMeta = backlogMetadata?.get(item.game_id) ?? null;
    const reasonKey = getPlayNextReasonKey(item, itemMeta);
    const reasonToPlay = reasonKey ? t(`playNext.reason.${reasonKey}`) : undefined;
-   const longPressGesture = canReorder
-    ? Gesture.LongPress()
-       .minDuration(300)
-       .runOnJS(true)
-       .onStart(() => drag())
-    : Gesture.LongPress().enabled(false);
    return (
     <ScaleDecorator activeScale={1.03}>
-     <GestureDetector gesture={longPressGesture}>
-      <View>
-       <BacklogListItem
-        item={item}
-        onPress={handleItemPress}
-        onPressIn={handleItemPressIn}
-        onQuickStatusChange={handleQuickStatusChange}
-        onTogglePlayNext={handleTogglePlayNext}
-        onPrimaryAction={handleRequestPlay}
-        onRequestRemove={() => {}}
-        isUpdatingStatus={isMutating && activeMutation === 'update'}
-        isUpdatingPlayNext={isMutating && activeMutation === 'update'}
-        isDragActive={isActive}
-        dragHintLabel={canReorder ? t('playNext.dragHint') : undefined}
-        primaryActionLabel={t('playNext.playAction')}
-        playNextOrdinal={item.play_next_priority ?? undefined}
-        quickActionsMode="play-only"
-        playNextPinLabel={t('backlog.playNext.pinAction')}
-        playNextUnpinLabel={t('backlog.playNext.unpinAction')}
-        removeLabel={t('gameDetail.confirmRemove.confirm')}
-        labelMap={labelMap}
-        colorMap={colorMap}
-        iconMap={iconMap}
-        reasonToPlay={reasonToPlay}
-       />
-      </View>
-     </GestureDetector>
+     <BacklogListItem
+      item={item}
+      onPress={handleItemPress}
+      onPressIn={handleItemPressIn}
+      onLongPress={() => {
+       if (canReorder) drag();
+      }}
+      onQuickStatusChange={handleQuickStatusChange}
+      onTogglePlayNext={handleTogglePlayNext}
+      onPrimaryAction={handleRequestPlay}
+      onRequestRemove={() => {}}
+      isUpdatingStatus={isMutating && activeMutation === 'update'}
+      isUpdatingPlayNext={isMutating && activeMutation === 'update'}
+      isDragActive={isActive}
+      dragHintLabel={canReorder ? t('playNext.dragHint') : undefined}
+      primaryActionLabel={t('playNext.playAction')}
+      playNextOrdinal={item.play_next_priority ?? undefined}
+      quickActionsMode="play-only"
+      playNextPinLabel={t('backlog.playNext.pinAction')}
+      playNextUnpinLabel={t('backlog.playNext.unpinAction')}
+      removeLabel={t('gameDetail.confirmRemove.confirm')}
+      labelMap={labelMap}
+      colorMap={colorMap}
+      iconMap={iconMap}
+      reasonToPlay={reasonToPlay}
+     />
     </ScaleDecorator>
    );
   },
@@ -420,31 +438,82 @@ export default function PlayNextScreen() {
     </View>
     {playNextItems.length > 1 ? (
      <Pressable
+      accessibilityRole="button"
       onPress={() => router.push('/play-next-reorder')}
-      style={{ alignSelf: 'flex-start' }}
+      style={({ pressed }) => ({
+       borderRadius: borderRadius.xl,
+       borderWidth: 1,
+       borderColor: pressed ? `${colors.primary.DEFAULT}99` : 'rgba(255,255,255,0.08)',
+       backgroundColor: pressed ? 'rgba(108, 99, 255, 0.2)' : 'rgba(18, 20, 34, 0.82)',
+       transform: [{ scale: pressed ? 0.985 : 1 }],
+       overflow: 'hidden',
+      })}
      >
       <View
-       style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing.xs,
-        minHeight: 38,
-        paddingHorizontal: spacing.md,
-        paddingVertical: spacing.sm,
-        borderRadius: borderRadius.full,
-        backgroundColor: 'rgba(255,255,255,0.06)',
-       }}
+       pointerEvents="none"
+       style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(108, 99, 255, 0.08)' }}
+      />
+      <View
+       style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md }}
       >
-       <FontAwesome5 name="sort-amount-down" size={10} color={colors.primary['100']} solid />
-       <Text
+       <View
         style={{
-         color: colors.primary['100'],
-         fontSize: typography.size.sm,
-         fontFamily: typography.font.semibold,
+         width: 42,
+         height: 42,
+         borderRadius: 21,
+         alignItems: 'center',
+         justifyContent: 'center',
+         backgroundColor: 'rgba(108, 99, 255, 0.2)',
+         borderWidth: 1,
+         borderColor: 'rgba(186, 179, 255, 0.18)',
         }}
        >
-        {t('playNext.manualReorder.button')}
-       </Text>
+        <FontAwesome5 name="exchange-alt" size={16} color={colors.primary['200']} solid />
+       </View>
+       <View style={{ flex: 1, minWidth: 0, gap: spacing.xs }}>
+        <Text
+         style={{
+          color: colors.text.primary,
+          fontSize: typography.size.md,
+          fontFamily: typography.font.semibold,
+         }}
+        >
+         {t('playNext.manualReorder.title')}
+        </Text>
+        <Text
+         numberOfLines={1}
+         style={{
+          color: colors.text.secondary,
+          fontSize: typography.size.sm,
+          lineHeight: Math.ceil(typography.size.sm * typography.lineHeight.normal),
+         }}
+        >
+         {t('playNext.manualReorder.cardSubtitle')}
+        </Text>
+       </View>
+       <View
+        style={{
+         flexDirection: 'row',
+         alignItems: 'center',
+         gap: spacing.xs,
+         minHeight: 38,
+         paddingHorizontal: spacing.md,
+         paddingVertical: spacing.sm,
+         borderRadius: borderRadius.full,
+         backgroundColor: 'rgba(255,255,255,0.06)',
+        }}
+       >
+        <Text
+         style={{
+          color: colors.primary['100'],
+          fontSize: typography.size.sm,
+          fontFamily: typography.font.semibold,
+         }}
+        >
+         {t('playNext.manualReorder.button')}
+        </Text>
+        <FontAwesome5 name="chevron-right" size={10} color={colors.primary['100']} solid />
+       </View>
       </View>
      </Pressable>
     ) : null}
@@ -492,6 +561,28 @@ export default function PlayNextScreen() {
       }}
      />
     )
+   ) : null}
+
+   {isReordering ? (
+    <View pointerEvents="auto" style={styles.reorderOverlay}>
+     <BlurView intensity={52} tint="dark" style={StyleSheet.absoluteFill} />
+     <View
+      pointerEvents="none"
+      style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(7,8,16,0.42)' }]}
+     />
+     <View style={styles.reorderCard}>
+      <LoadingSpinner size="small" />
+      <Text
+       style={{
+        color: colors.text.secondary,
+        fontSize: typography.size.sm,
+        fontFamily: typography.font.semibold,
+       }}
+      >
+       {t('playNext.reorderSaving')}
+      </Text>
+     </View>
+    </View>
    ) : null}
 
    <GameFilterSheet

@@ -1,6 +1,7 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
+import { SortIconButton } from '@/components/base/inputs/SortIconButton';
 import { SearchFilterToolbar } from '@/components/base/layout/SearchFilterToolbar';
 import { AppliedGameFiltersRow } from '@/components/game/AppliedGameFiltersRow';
 import { QuickDiscoveryPresetsRow } from '@/components/game/QuickDiscoveryPresetsRow';
@@ -22,9 +23,13 @@ type HomeScreenHeaderProps = {
  onClearSearch: () => void;
  onFilterPress: () => void;
  onPressUpdate?: () => void;
+ onSortPress?: () => void;
  onSearchChange: (value: string) => void;
  quickDiscoveryPresets: HomeQuickPresetAction[];
  search: string;
+ showSortButton?: boolean;
+ sortAccessibilityLabel?: string;
+ isSortActive?: boolean;
 };
 
 export function HomeScreenHeader({
@@ -41,9 +46,13 @@ export function HomeScreenHeader({
  onClearSearch,
  onFilterPress,
  onPressUpdate,
+ onSortPress,
  onSearchChange,
  quickDiscoveryPresets,
  search,
+ showSortButton = false,
+ sortAccessibilityLabel,
+ isSortActive = false,
 }: HomeScreenHeaderProps) {
  const { t } = useTranslation();
 
@@ -137,17 +146,28 @@ export function HomeScreenHeader({
     ) : null}
    </View>
 
-   <SearchFilterToolbar
-    value={search}
-    onChangeText={onSearchChange}
-    onClear={onClearSearch}
-    placeholder={t('home.searchPlaceholder')}
-    isLoading={isSearchLoading}
-    onFilterPress={onFilterPress}
-    filterAccessibilityLabel={t('home.filtersButton')}
-    activeCount={activeFilterCount}
-    isFilterActive={isFilterActive}
-   />
+   <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+    <View style={{ flex: 1 }}>
+     <SearchFilterToolbar
+      value={search}
+      onChangeText={onSearchChange}
+      onClear={onClearSearch}
+      placeholder={t('home.searchPlaceholder')}
+      isLoading={isSearchLoading}
+      onFilterPress={onFilterPress}
+      filterAccessibilityLabel={t('home.filtersButton')}
+      activeCount={activeFilterCount}
+      isFilterActive={isFilterActive}
+     />
+    </View>
+    {showSortButton && onSortPress ? (
+     <SortIconButton
+      onPress={onSortPress}
+      accessibilityLabel={sortAccessibilityLabel ?? t('backlog.sort.label')}
+      isActive={isSortActive}
+     />
+    ) : null}
+   </View>
 
    <AppliedGameFiltersRow filters={activeFilters} />
 

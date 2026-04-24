@@ -1,10 +1,12 @@
 import type { TFunction } from 'i18next';
+import { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
 import type { CatalogCompany, CatalogGenre, CatalogPlatform } from '@/shared/models/Catalog.model';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import type { HomeAppliedFilterChip } from '@/shared/models/home/HomeAppliedFilterChip.model';
 import type { HomeDiscoveryContextCard } from '@/shared/models/home/HomeDiscoveryContextCard.model';
 import type { HomeDiscoveryEmptyState } from '@/shared/models/home/HomeDiscoveryEmptyState.model';
 import type { HomeFilterDescriptor } from '@/shared/models/home/HomeFilterDescriptor.model';
+import type { HomeOrdering } from '@/shared/models/home/HomeOrdering.model';
 import type { HomeQuickPresetAction } from '@/shared/models/home/HomeQuickPresetAction.model';
 import type { HomeQuickPresetDescriptor } from '@/shared/models/home/HomeQuickPresetDescriptor.model';
 import type { HomeScreenRouteParams } from '@/shared/models/home/HomeScreenRouteParams.model';
@@ -272,20 +274,16 @@ export function createQuickDiscoveryPresets(
  });
 }
 
-export function createHomeSortOptions(debouncedSearch: string, t: TFunction): HomeSortOption[] {
- const options: HomeSortOption[] = [];
+export function createHomeSortOptions(_debouncedSearch: string, t: TFunction): HomeSortOption[] {
+ const orderings: HomeOrdering[] = [
+  BacklogSortEnum.NEWEST,
+  BacklogSortEnum.OLDEST,
+  BacklogSortEnum.TITLE_ASC,
+  BacklogSortEnum.TITLE_DESC,
+  BacklogSortEnum.RATING_DESC,
+ ];
 
- if (debouncedSearch.trim().length > 0) {
-  options.push({ key: 'relevance', label: t('home.sortRelevance') });
- }
-
- options.push(
-  { key: '-rating', label: t('home.sortTopRated') },
-  { key: '-released', label: t('home.sortNewest') },
-  { key: '-added', label: t('home.sortPopular') },
- );
-
- return options;
+ return orderings.map((key) => ({ key, label: t(`backlog.sort.${key}`) }));
 }
 
 export function toAppliedFilterChips(

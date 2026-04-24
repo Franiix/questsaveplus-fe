@@ -252,10 +252,27 @@ export const BacklogListItem = memo(function BacklogListItem({
        : colors.border.DEFAULT,
     borderLeftColor: isDragActive ? colors.primary.DEFAULT : `${colorMap[item.status]}90`,
     overflow: 'hidden',
-    opacity: isLocked ? 0.72 : isDragActive ? 0.92 : 1,
-    transform: [{ scale: isDragActive ? 1.015 : 1 }],
+    opacity: isLocked ? 0.72 : 1,
+    transform: [{ scale: isDragActive ? 1.025 : 1 }],
+    shadowColor: isDragActive ? colors.primary.DEFAULT : colors.background.overlay,
+    shadowOffset: { width: 0, height: isDragActive ? 16 : 0 },
+    shadowOpacity: isDragActive ? 0.34 : 0,
+    shadowRadius: isDragActive ? 24 : 0,
+    elevation: isDragActive ? 18 : 0,
    }}
   >
+   {isDragActive ? (
+    <View
+     pointerEvents="none"
+     style={{
+      position: 'absolute',
+      inset: 0,
+      backgroundColor: 'rgba(108,99,255,0.12)',
+      borderRadius: borderRadius.lg,
+      zIndex: 1,
+     }}
+    />
+   ) : null}
    <Pressable
     onPress={run}
     onPressIn={() => onPressIn?.(item)}

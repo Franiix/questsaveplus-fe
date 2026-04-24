@@ -54,6 +54,7 @@ function resolveActiveTab(segments: string[]): TabKey {
   return 'index';
  }
 
+ if (first === 'play-next-reorder') return 'play-next';
  if (first === 'profile') return 'profile';
  if (first === 'game') return 'index';
  return 'index';

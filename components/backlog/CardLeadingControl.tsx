@@ -60,12 +60,14 @@ export const CardLeadingControl = memo(function CardLeadingControl({
       paddingHorizontal: spacing.xs,
       paddingVertical: 3,
       borderRadius: borderRadius.sm,
-      backgroundColor: `${colors.text.tertiary}18`,
+      backgroundColor: `${colors.primary.DEFAULT}24`,
+      borderWidth: 1,
+      borderColor: `${colors.primary['200']}55`,
       alignItems: 'center',
       justifyContent: 'center',
      }}
     >
-     <FontAwesome5 name="grip-lines" size={13} color={colors.text.secondary} solid />
+     <FontAwesome5 name="grip-lines" size={13} color={colors.primary['100']} solid />
     </View>
    ) : null}
    {canTogglePlayNext ? (

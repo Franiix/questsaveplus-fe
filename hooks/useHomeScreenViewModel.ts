@@ -6,6 +6,8 @@ import { useCatalogPublishers } from '@/hooks/useCatalogPublishers';
 import { useGames } from '@/hooks/useGames';
 import { useHomeDiscoveryContext } from '@/hooks/useHomeDiscoveryContext';
 import { useHomeEditorialSections } from '@/hooks/useHomeEditorialSections';
+import { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
+import type { CatalogGame } from '@/shared/models/Catalog.model';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import type { HomeOrdering } from '@/shared/models/home/HomeOrdering.model';
 import type { HomeScreenRouteParams } from '@/shared/models/home/HomeScreenRouteParams.model';
@@ -28,6 +30,42 @@ type UseHomeScreenViewModelParams = {
  selectedOrdering: HomeOrdering | null;
 };
 
+function toCatalogOrdering(ordering: HomeOrdering) {
+ switch (ordering) {
+  case BacklogSortEnum.NEWEST:
+   return '-released';
+  case BacklogSortEnum.OLDEST:
+   return 'released';
+  case BacklogSortEnum.RATING_DESC:
+   return '-rating';
+  case BacklogSortEnum.TITLE_ASC:
+  case BacklogSortEnum.TITLE_DESC:
+   return undefined;
+ }
+}
+
+function getReleaseTimestamp(game: CatalogGame) {
+ const timestamp = game.releasedAt ? Date.parse(game.releasedAt) : Number.NaN;
+ return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function sortCatalogGames(games: CatalogGame[], ordering: HomeOrdering) {
+ const sorted = [...games];
+
+ switch (ordering) {
+  case BacklogSortEnum.NEWEST:
+   return sorted.sort((left, right) => getReleaseTimestamp(right) - getReleaseTimestamp(left));
+  case BacklogSortEnum.OLDEST:
+   return sorted.sort((left, right) => getReleaseTimestamp(left) - getReleaseTimestamp(right));
+  case BacklogSortEnum.TITLE_ASC:
+   return sorted.sort((left, right) => left.name.localeCompare(right.name));
+  case BacklogSortEnum.TITLE_DESC:
+   return sorted.sort((left, right) => right.name.localeCompare(left.name));
+  case BacklogSortEnum.RATING_DESC:
+   return sorted.sort((left, right) => (right.rating ?? -1) - (left.rating ?? -1));
+ }
+}
+
 export function useHomeScreenViewModel({
  appliedFilters,
  debouncedSearch,
@@ -35,15 +73,10 @@ export function useHomeScreenViewModel({
  params,
  selectedOrdering,
 }: UseHomeScreenViewModelParams) {
- const defaultOrdering = useMemo(() => {
-  if (debouncedSearch.trim().length > 0) {
-   return 'relevance' as const;
-  }
-
-  return '-rating' as const;
- }, [debouncedSearch]);
+ const defaultOrdering = BacklogSortEnum.NEWEST;
  const activeOrdering = selectedOrdering ?? defaultOrdering;
- const orderingParam = activeOrdering === 'relevance' ? undefined : activeOrdering;
+ const hasSearch = debouncedSearch.trim().length > 0;
+ const orderingParam = hasSearch ? undefined : toCatalogOrdering(activeOrdering);
 
  // Le query catalog sparano solo quando il pannello filtri è aperto o ci sono
  // filtri attivi — evita 4 richieste di rete inutili al mount dell'home screen.
@@ -53,7 +86,8 @@ export function useHomeScreenViewModel({
   Boolean(appliedFilters.developer) ||
   Boolean(appliedFilters.publisher);
 
- const catalogEnabled = isFilterSheetOpen || hasCatalogActiveFilters;
+ const catalogEnabled =
+  isFilterSheetOpen || hasCatalogActiveFilters || debouncedSearch.trim().length > 0;
 
  const {
   data: genres = [],
@@ -83,7 +117,10 @@ export function useHomeScreenViewModel({
    ordering: orderingParam,
   });
 
- const games = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
+ const games = useMemo(
+  () => sortCatalogGames(data?.pages.flatMap((page) => page.items) ?? [], activeOrdering),
+  [activeOrdering, data],
+ );
  const {
   activeFilters,
   discoveryContextCard,

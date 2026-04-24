@@ -1,6 +1,8 @@
 import { FontAwesome5 } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useRef } from 'react';
-import { Animated, Easing, Text, View } from 'react-native';
+import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
 
@@ -71,12 +73,23 @@ export function AuthBootScreen({ title, subtitle }: AuthBootScreenProps) {
   <View
    style={{
     flex: 1,
-    backgroundColor: colors.background.primary,
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 999,
+    elevation: 999,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.xl,
    }}
   >
+   <BlurView intensity={72} tint="dark" style={StyleSheet.absoluteFill} />
+   <LinearGradient
+    colors={['rgba(7,8,18,0.82)', 'rgba(8,9,20,0.90)', 'rgba(7,8,16,0.96)']}
+    style={StyleSheet.absoluteFill}
+   />
+   <LinearGradient
+    colors={['rgba(108,99,255,0.16)', 'rgba(108,99,255,0.06)', 'rgba(0,0,0,0)']}
+    style={StyleSheet.absoluteFill}
+   />
    <View
     style={{
      width: 180,

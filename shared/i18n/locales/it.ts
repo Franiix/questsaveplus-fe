@@ -241,9 +241,10 @@
   title: 'Play Next',
   subtitle: 'La tua coda, ordinata per priorità.',
   searchPlaceholder: 'Cerca in Play Next...',
-  reorderHint: 'Tieni premuto per riordinare.',
+  reorderHint: 'Usa Ordina manualmente per cambiare priorità.',
   dragHint: 'Tieni premuto per ordinare',
   reorderSuccess: 'Priorità Play Next aggiornata',
+  reorderSaving: 'Sincronizzo la coda...',
   playAction: 'PLAY',
   playConfirmTitle: 'Avvia questo gioco?',
   playConfirmMessage:
@@ -260,16 +261,24 @@
    waitingLong: 'In attesa da tempo',
   },
   manualReorder: {
-   button: 'Modifica ordinamento',
+   button: 'Modifica',
+   cardSubtitle: 'Riassegna gli slot della coda.',
    title: 'Ordina manualmente',
+   screenHint: 'Assegna ogni slot alla tua build ideale.',
    subtitle: 'Sposta i giochi nelle posizioni che preferisci.',
+   addEntry: 'Aggiungi elemento',
+   fromPositionPlaceholder: 'Da posizione',
+   toPositionPlaceholder: 'A posizione',
    gamePlaceholder: 'Nome del gioco...',
    positionPlaceholder: 'Pos.',
+   positionSelect: 'Seleziona posizione...',
    positionHint: 'Ora: {{name}}',
    addRow: 'Aggiungi',
    apply: 'Applica',
+   save: 'Salva modifiche',
    cancel: 'Annulla',
    noGamesFound: 'Nessun gioco trovato',
+   gamePreviewHint: '{{name}} prenderà il posto di {{position}} scambiandosi di ordine',
   },
  },
  gameDetail: {
@@ -563,7 +572,7 @@
  },
  auth: {
   boot: {
-   loading: 'Sto caricando salvataggio e profilo...',
+   loading: 'Caricamento in corso: sto preparando salvataggio e profilo...',
   },
   login: {
    title: 'Bentornato, giocatore',

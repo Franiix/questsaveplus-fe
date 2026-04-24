@@ -241,9 +241,10 @@
   title: 'Play Next',
   subtitle: 'Your queue, sorted by priority.',
   searchPlaceholder: 'Search Play Next...',
-  reorderHint: 'Long press to reorder.',
+  reorderHint: 'Use manual sort to change priority.',
   dragHint: 'Long press to reorder',
   reorderSuccess: 'Play Next priority updated',
+  reorderSaving: 'Syncing queue...',
   playAction: 'PLAY',
   playConfirmTitle: 'Start this game?',
   playConfirmMessage:
@@ -260,16 +261,24 @@
    waitingLong: 'Waiting a long time',
   },
   manualReorder: {
-   button: 'Edit order',
+   button: 'Edit',
+   cardSubtitle: 'Re-slot the queue.',
    title: 'Sort manually',
+   screenHint: 'Assign each slot to your ideal build.',
    subtitle: 'Move games to your preferred positions.',
+   addEntry: 'Add item',
+   fromPositionPlaceholder: 'From position',
+   toPositionPlaceholder: 'To position',
    gamePlaceholder: 'Game name...',
    positionPlaceholder: 'Pos.',
+   positionSelect: 'Select position...',
    positionHint: 'Now: {{name}}',
    addRow: 'Add',
    apply: 'Apply',
+   save: 'Save changes',
    cancel: 'Cancel',
    noGamesFound: 'No games found',
+   gamePreviewHint: '{{name}} will take {{position}}’s spot and swap order',
   },
  },
  gameDetail: {
@@ -563,7 +572,7 @@
  },
  auth: {
   boot: {
-   loading: 'Loading save file and profile...',
+   loading: 'Loading in progress: preparing save file and profile...',
   },
   login: {
    title: 'Welcome back, player',

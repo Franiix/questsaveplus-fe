@@ -14,7 +14,6 @@ import { EmptyState } from '@/components/base/feedback/EmptyState';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { RetryState } from '@/components/base/feedback/RetryState';
 import { DiscoveryContextCard } from '@/components/game/DiscoveryContextCard';
-import { DiscoverySortBar } from '@/components/game/DiscoverySortBar';
 import { GameCard } from '@/components/game/GameCard';
 import { GameCardSkeleton } from '@/components/game/GameCardSkeleton';
 import { GameCarouselSection } from '@/components/game/GameCarouselSection';
@@ -22,9 +21,7 @@ import { RecentlyAddedRow } from '@/components/game/RecentlyAddedRow';
 import type { CatalogGame } from '@/shared/models/Catalog.model';
 import type { HomeDiscoveryContextCard } from '@/shared/models/home/HomeDiscoveryContextCard.model';
 import type { HomeDiscoveryEmptyState } from '@/shared/models/home/HomeDiscoveryEmptyState.model';
-import type { HomeOrdering } from '@/shared/models/home/HomeOrdering.model';
 import type { HomeSectionViewModel } from '@/shared/models/home/HomeSectionViewModel.model';
-import type { HomeSortOption } from '@/shared/models/home/HomeSortOption.model';
 import { colors, spacing } from '@/shared/theme/tokens';
 
 const NUM_COLUMNS = 2;
@@ -41,7 +38,6 @@ const DISCOVERY_CONTENT_CONTAINER_STYLE = {
 const DISCOVERY_COLUMN_WRAPPER_STYLE = { gap: COLUMN_GAP } as const;
 
 type HomeScreenContentProps = {
- activeOrdering: HomeOrdering;
  areAllSectionsError: boolean;
  cardWidth: number;
  carouselCardWidth: number;
@@ -61,10 +57,8 @@ type HomeScreenContentProps = {
  onResetFilters: () => void;
  onRetryDiscovery: () => void;
  onRetrySections: () => void;
- onSelectOrdering: (ordering: HomeOrdering) => void;
  scrollRequestKey: number;
  screenHeight: number;
- sortOptions: HomeSortOption[];
  uiState: {
   hasActiveFilters: boolean;
   isFetchingNextPage: boolean;
@@ -72,7 +66,6 @@ type HomeScreenContentProps = {
 };
 
 export function HomeScreenContent({
- activeOrdering,
  areAllSectionsError,
  cardWidth,
  carouselCardWidth,
@@ -92,10 +85,8 @@ export function HomeScreenContent({
  onResetFilters,
  onRetryDiscovery,
  onRetrySections,
- onSelectOrdering,
  scrollRequestKey,
  screenHeight,
- sortOptions,
  uiState,
 }: HomeScreenContentProps) {
  const { t } = useTranslation();
@@ -220,9 +211,9 @@ export function HomeScreenContent({
      windowSize={8}
      removeClippedSubviews
      ListHeaderComponent={
-      <View style={{ gap: spacing.md, marginBottom: spacing.md }}>
+      <View style={{ gap: spacing.sm, marginBottom: spacing.md }}>
        {discoveryContextCard ? (
-        <View style={{ marginBottom: spacing.md }}>
+        <View style={{ marginBottom: spacing.xs }}>
          <DiscoveryContextCard
           eyebrow={discoveryOriginLabel ?? undefined}
           title={discoveryContextCard.title}
@@ -233,12 +224,6 @@ export function HomeScreenContent({
          />
         </View>
        ) : null}
-
-       <DiscoverySortBar
-        options={sortOptions}
-        selectedKey={activeOrdering}
-        onSelect={onSelectOrdering}
-       />
       </View>
      }
      ListFooterComponent={discoveryFooter}

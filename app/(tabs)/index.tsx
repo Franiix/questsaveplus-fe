@@ -1,7 +1,9 @@
 import { useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { PickerModal, type PickerOption } from '@/components/base/feedback/PickerModal';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { GameDetailSheet } from '@/components/game/GameDetailSheet';
 import { GameFilterSheet } from '@/components/game/GameFilterSheet';
@@ -13,7 +15,9 @@ import { useHomeScreenState } from '@/hooks/useHomeScreenState';
 import { useHomeScreenViewModel } from '@/hooks/useHomeScreenViewModel';
 import { usePrefetchGameResources } from '@/hooks/usePrefetchGameResources';
 import { useSafeRouter } from '@/hooks/useSafeRouter';
+import { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
 import type { CatalogGame } from '@/shared/models/Catalog.model';
+import type { HomeOrdering } from '@/shared/models/home/HomeOrdering.model';
 import type { HomeScreenRouteParams } from '@/shared/models/home/HomeScreenRouteParams.model';
 import { colors, spacing } from '@/shared/theme/tokens';
 import { toAppliedFilterChips, toQuickPresetActions } from '@/shared/utils/homeDiscovery';
@@ -23,6 +27,7 @@ const COLUMN_GAP = spacing.sm;
 const HORIZONTAL_PADDING = spacing.md;
 
 export default function HomeScreen() {
+ const { t } = useTranslation();
  const params = useLocalSearchParams<HomeScreenRouteParams>();
  const router = useSafeRouter();
  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -94,6 +99,11 @@ export default function HomeScreen() {
   [screenWidth],
  );
  const { prefetchGame, prefetchGames } = usePrefetchGameResources();
+ const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
+ const pickerSortOptions = useMemo<PickerOption[]>(
+  () => sortOptions.map((option) => ({ label: option.label, value: option.key })),
+  [sortOptions],
+ );
 
  useEffect(() => {
   if (!deferredHomeSideEffectsEnabled) {
@@ -153,13 +163,16 @@ export default function HomeScreen() {
     onClearSearch={() => setSearch('')}
     onFilterPress={openFilters}
     onPressUpdate={isUpdateAvailable && canOpenStore ? () => void openStore() : undefined}
+    onSortPress={() => setIsSortSheetOpen(true)}
     onSearchChange={setSearch}
     quickDiscoveryPresets={headerQuickPresets}
     search={search}
+    showSortButton={isDiscoveryMode}
+    sortAccessibilityLabel={t('backlog.sort.label')}
+    isSortActive={activeOrdering !== BacklogSortEnum.NEWEST}
    />
 
    <HomeScreenContent
-    activeOrdering={activeOrdering}
     areAllSectionsError={areAllSectionsError}
     cardWidth={cardWidth}
     carouselCardWidth={carouselCardWidth}
@@ -183,10 +196,8 @@ export default function HomeScreen() {
       section.onRetry();
      });
     }}
-    onSelectOrdering={selectOrdering}
     scrollRequestKey={scrollRequestKey}
     screenHeight={screenHeight}
-    sortOptions={sortOptions}
     uiState={uiState}
    />
 
@@ -211,6 +222,15 @@ export default function HomeScreen() {
     onChange={setDraftFilters}
     onApply={applyFilters}
     onReset={resetFilters}
+   />
+
+   <PickerModal
+    isVisible={isSortSheetOpen}
+    onClose={() => setIsSortSheetOpen(false)}
+    title={t('backlog.sort.title')}
+    options={pickerSortOptions}
+    value={activeOrdering}
+    onChange={(value) => selectOrdering(value as HomeOrdering)}
    />
   </SafeAreaView>
  );

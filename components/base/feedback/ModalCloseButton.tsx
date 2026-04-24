@@ -6,12 +6,19 @@ type ModalCloseButtonProps = {
  label: string;
  onPress: () => void;
  iconName?: React.ComponentProps<typeof FontAwesome5>['name'];
+ isDisabled?: boolean;
 };
 
-export function ModalCloseButton({ label, onPress, iconName = 'times' }: ModalCloseButtonProps) {
+export function ModalCloseButton({
+ label,
+ onPress,
+ iconName = 'times',
+ isDisabled = false,
+}: ModalCloseButtonProps) {
  return (
   <Pressable
    onPress={onPress}
+   disabled={isDisabled}
    style={{
     borderRadius: borderRadius.full,
     borderWidth: 1,
@@ -21,6 +28,7 @@ export function ModalCloseButton({ label, onPress, iconName = 'times' }: ModalCl
     paddingVertical: spacing.sm + 1,
     minHeight: 38,
     justifyContent: 'center',
+    opacity: isDisabled ? 0.45 : 1,
    }}
   >
    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
