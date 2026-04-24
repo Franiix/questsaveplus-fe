@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { colors, typography } from '@/shared/theme/tokens';
 
-type TabKey = 'index' | 'backlog' | 'archive' | 'play-next' | 'profile';
+type TabKey = 'index' | 'backlog' | 'archive' | 'play-next';
 type IconName = React.ComponentProps<typeof FontAwesome5>['name'];
 
 const TAB_ICONS: Record<TabKey, IconName> = {
@@ -16,32 +16,29 @@ const TAB_ICONS: Record<TabKey, IconName> = {
  backlog: 'bookmark',
  archive: 'archive',
  'play-next': 'bolt',
- profile: 'user',
 };
 
 const TAB_LABEL_KEYS: Record<
  TabKey,
- 'tabs.home' | 'tabs.backlog' | 'tabs.archive' | 'tabs.playNext' | 'tabs.profile'
+ 'tabs.home' | 'tabs.backlog' | 'tabs.archive' | 'tabs.playNext'
 > = {
  index: 'tabs.home',
  backlog: 'tabs.backlog',
  archive: 'tabs.archive',
  'play-next': 'tabs.playNext',
- profile: 'tabs.profile',
 };
 
 const TAB_ROUTES: Record<
  TabKey,
- '/(tabs)' | '/(tabs)/backlog' | '/backlog-archive' | '/(tabs)/play-next' | '/(tabs)/profile'
+ '/(tabs)' | '/(tabs)/backlog' | '/backlog-archive' | '/(tabs)/play-next'
 > = {
  index: '/(tabs)',
  backlog: '/(tabs)/backlog',
  archive: '/backlog-archive',
  'play-next': '/(tabs)/play-next',
- profile: '/(tabs)/profile',
 };
 
-const TAB_ORDER: TabKey[] = ['index', 'backlog', 'play-next', 'archive', 'profile'];
+const TAB_ORDER: TabKey[] = ['index', 'backlog', 'play-next', 'archive'];
 const TAB_HEIGHT = 46;
 const HORIZONTAL_INSET = 28;
 const CONTAINER_PADDING = 5;
@@ -52,14 +49,11 @@ function resolveActiveTab(segments: string[]): TabKey {
  if (first === '(tabs)') {
   if (second === 'backlog') return 'backlog';
   if (second === 'play-next') return 'play-next';
-  if (second === 'profile') return 'profile';
-  if (second === 'credits') return 'profile';
   return 'index';
  }
 
  if (first === 'backlog-archive') return 'archive';
  if (first === 'play-next-reorder') return 'play-next';
- if (first === 'profile') return 'profile';
  if (first === 'game') return 'index';
  return 'index';
 }
@@ -72,6 +66,9 @@ export function TabBarCustom() {
  const insets = useSafeAreaInsets();
 
  const hidden = segments[0] === '(auth)' || (segments[0] === 'auth' && segments[1] === 'callback');
+ const isProfileSurface =
+  (segments[0] === '(tabs)' && (segments[1] === 'profile' || segments[1] === 'credits')) ||
+  segments[0] === 'profile';
 
  const activeTab = resolveActiveTab(segments);
  const barWidth = screenWidth - HORIZONTAL_INSET * 2;
@@ -92,7 +89,7 @@ export function TabBarCustom() {
   transform: [{ translateX: bubbleX.value }],
  }));
 
- if (hidden) return null;
+ if (hidden || isProfileSurface) return null;
 
  return (
   <View

@@ -61,7 +61,7 @@ export function HomeScreenHeader({
    style={{
     paddingHorizontal: spacing.md,
     paddingTop: spacing.lg,
-    paddingBottom: spacing.sm,
+    paddingBottom: spacing.md,
     gap: spacing.sm,
    }}
   >
@@ -146,7 +146,7 @@ export function HomeScreenHeader({
     ) : null}
    </View>
 
-   <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+   <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: 2 }}>
     <View style={{ flex: 1 }}>
      <SearchFilterToolbar
       value={search}

@@ -19,6 +19,7 @@ import { AuthBootScreen } from '@/components/auth/AuthBootScreen';
 import { LoadingOverlay } from '@/components/base/feedback/LoadingOverlay';
 import { ToastContainer } from '@/components/base/feedback/ToastNotification';
 import { TabBarCustom } from '@/components/base/navigation/TabBarCustom';
+import { ProfileQuickMenu } from '@/components/profile/ProfileQuickMenu';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import { useAuthStore } from '@/stores/auth.store';
 import { useLoadingOverlayStore } from '@/stores/loadingOverlay.store';
@@ -145,6 +146,7 @@ export default function RootLayout() {
       </Stack>
       <AuthGuard />
       <TabBarCustom />
+      <ProfileQuickMenu />
       <StatusBar style="light" />
       <ToastContainer />
       <GlobalLoadingOverlay />

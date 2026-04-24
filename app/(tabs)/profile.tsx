@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BaseButton } from '@/components/base/display/BaseButton';
 import { Card } from '@/components/base/display/Card';
 import { InfoRow } from '@/components/base/display/InfoRow';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
@@ -68,7 +67,6 @@ export default function ProfileScreen() {
   router.replace('/(tabs)');
  }, [router]);
  const insets = useSafeAreaInsets();
- const signOut = useAuthStore((state) => state.signOut);
  const deleteAccount = useAuthStore((state) => state.deleteAccount);
  const clearAuthError = useAuthStore((state) => state.clearError);
  const authError = useAuthStore((state) => state.error);
@@ -208,74 +206,15 @@ export default function ProfileScreen() {
      />
     </Card>
 
-    <Card
-     variant="outlined"
-     style={{
-      marginHorizontal: spacing.md,
-      marginTop: spacing.sm,
-      padding: spacing.md,
-      gap: spacing.sm,
-     }}
-    >
-     <BaseButton
-      label={t('profile.editButton')}
-      variant="outlined"
-      fullWidth
-      onPress={() => router.push('/profile/edit-profile')}
-     />
-     <BaseButton
-      label={t('profile.changeEmailButton')}
-      variant="outlined"
-      fullWidth
-      onPress={() => router.push('/profile/change-email')}
-     />
-     <BaseButton
-      label={t('profile.changePasswordButton')}
-      variant="outlined"
-      fullWidth
-      onPress={() => router.push('/profile/change-password')}
-     />
-     <BaseButton
-      label={t('backlog.archive.open')}
-      variant="outlined"
-      fullWidth
-      onPress={() => router.push('../backlog-archive')}
-     />
-     <BaseButton
-      label={t('profile.logoutButton')}
-      variant="outlined"
-      fullWidth
-      color={colors.error}
-      onPress={signOut}
-     />
-    </Card>
-
     <View
      style={{
       marginHorizontal: spacing.md,
-      marginTop: spacing.lg,
+      marginTop: spacing.xl,
       marginBottom: spacing['3xl'],
       alignItems: 'center',
       gap: spacing.md,
      }}
     >
-     <ProfilePillButton
-      onPress={() => router.push('/(tabs)/credits')}
-      icon="info-circle"
-      iconColor={colors.text.secondary}
-      label={t('profile.infoButton')}
-      labelColor={colors.text.secondary}
-     />
-     <Text
-      style={{
-       marginTop: -spacing.sm,
-       color: colors.text.disabled,
-       fontSize: typography.size.xs,
-       textAlign: 'center',
-      }}
-     >
-      {t('profile.infoSubtitle')}
-     </Text>
      <ProfilePillButton
       onPress={() => setIsDeleteModalVisible(true)}
       icon="trash-alt"

@@ -208,10 +208,6 @@ export default function BacklogScreen() {
   router.push('/(tabs)/play-next');
  }, [router]);
 
- const handleOpenArchive = useCallback(() => {
-  router.push('../backlog-archive');
- }, [router]);
-
  const handleRequestRemove = useCallback((item: BacklogItemEntity) => {
   setPendingDeleteItem(item);
  }, []);
@@ -543,15 +539,7 @@ export default function BacklogScreen() {
  return (
   <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
    <AppBackground />
-   <ScreenHeader
-    title={t('tabs.backlog')}
-    onBack={handleBackPress}
-    rightAction={{
-     icon: 'archive',
-     onPress: handleOpenArchive,
-     accessibilityLabel: t('backlog.archive.open'),
-    }}
-   />
+   <ScreenHeader title={t('tabs.backlog')} onBack={handleBackPress} />
    <View
     style={{
      paddingHorizontal: HORIZONTAL_PADDING,

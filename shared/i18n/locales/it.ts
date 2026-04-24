@@ -137,10 +137,12 @@
   },
  },
  profile: {
+  detailButton: 'Dettaglio utente',
   editButton: 'Modifica profilo',
   changeEmailButton: 'Cambia email',
   changePasswordButton: 'Cambia password',
   infoButton: 'Info e crediti',
+  quickMenuLabel: 'Apri menu profilo',
   infoSubtitle: 'Fonti dati, documenti legali e riferimenti del progetto.',
   logoutButton: 'Esci',
   heroTagline: 'Profilo giocatore',

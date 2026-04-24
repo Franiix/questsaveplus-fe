@@ -137,10 +137,12 @@
   },
  },
  profile: {
+  detailButton: 'User details',
   editButton: 'Edit profile',
   changeEmailButton: 'Change email',
   changePasswordButton: 'Change password',
   infoButton: 'Info & credits',
+  quickMenuLabel: 'Open profile menu',
   infoSubtitle: 'Data sources, legal documents and project references.',
   logoutButton: 'Sign out',
   heroTagline: 'Player profile',
