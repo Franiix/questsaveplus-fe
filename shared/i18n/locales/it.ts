@@ -118,6 +118,36 @@
   sortNewest: 'Più recenti',
   sortPopular: 'Più popolari',
   updateAvailable: 'Update {{version}}',
+  firstRunOnboarding: {
+   eyebrow: 'Benvenuto in QuestSave+',
+   title: 'Setup completo',
+   subtitle: 'Tre cose rapide e poi sei dentro al flow.',
+   skip: 'Salta',
+   next: 'Avanti',
+   finish: 'Si parte',
+   slides: {
+    backlog: {
+     eyebrow: 'Backlog',
+     title: 'Salva i giochi che vuoi tenere d’occhio',
+     subtitle: 'Organizza tutto per stato, voto, note e piattaforme giocate senza perdere il filo.',
+     chips: ['Status smart', 'Voti rapidi', 'Note e piattaforme'],
+    },
+    playNext: {
+     eyebrow: 'Play Next',
+     title: 'Costruisci la tua coda della prossima run',
+     subtitle:
+      'Pinna i titoli che vuoi giocare subito, riordinali e tieni pronta la prossima sessione.',
+     chips: ['Pin veloci', 'Ordine manuale', 'Focus sulla run'],
+    },
+    archive: {
+     eyebrow: 'Archivio',
+     title: 'Metti via quello che non vuoi più avere in mezzo',
+     subtitle:
+      'Archivia un gioco senza eliminarlo: resta salvato, ma esce dal backlog attivo finché non lo ripristini.',
+     chips: ['Zero caos', 'Tutto salvato', 'Ripristino al volo'],
+    },
+   },
+  },
  },
  editProfile: {
   title: 'Modifica profilo',

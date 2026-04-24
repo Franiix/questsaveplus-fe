@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 import type { CreateProfileDto, UpdateProfileDto } from '@/shared/dto/Profile.dto';
 import { type ProfileModel, toProfileModel } from '@/shared/models/Profile.model';
+import { markProfileSetupOnboardingPending } from '@/shared/utils/profileSetupOnboarding';
 
 type ProfileFetchMode = 'bootstrap' | 'refresh';
 
@@ -115,6 +116,7 @@ export const useProfileStore = create<ProfileState>(
     return;
    }
 
+   await markProfileSetupOnboardingPending(dto.id);
    await get().fetchProfile(dto.id, { force: true, mode: 'refresh' });
   },
 

@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWindowDimensions } from 'react-native';
@@ -9,6 +9,7 @@ import { GameDetailSheet } from '@/components/game/GameDetailSheet';
 import { GameFilterSheet } from '@/components/game/GameFilterSheet';
 import { HomeScreenContent } from '@/components/game/HomeScreenContent';
 import { HomeScreenHeader } from '@/components/game/HomeScreenHeader';
+import { ProfileSetupOnboardingModal } from '@/components/onboarding/ProfileSetupOnboardingModal';
 import { useAppUpdateAvailabilityWithOptions } from '@/hooks/useAppUpdateAvailability';
 import { useDeferredInteractionGate } from '@/hooks/useDeferredInteractionGate';
 import { useHomeScreenState } from '@/hooks/useHomeScreenState';
@@ -21,6 +22,11 @@ import type { HomeOrdering } from '@/shared/models/home/HomeOrdering.model';
 import type { HomeScreenRouteParams } from '@/shared/models/home/HomeScreenRouteParams.model';
 import { colors, spacing } from '@/shared/theme/tokens';
 import { toAppliedFilterChips, toQuickPresetActions } from '@/shared/utils/homeDiscovery';
+import {
+ consumeProfileSetupOnboarding,
+ getProfileSetupOnboardingPending,
+} from '@/shared/utils/profileSetupOnboarding';
+import { useAuthStore } from '@/stores/auth.store';
 
 const NUM_COLUMNS = 2;
 const COLUMN_GAP = spacing.sm;
@@ -30,6 +36,7 @@ export default function HomeScreen() {
  const { t } = useTranslation();
  const params = useLocalSearchParams<HomeScreenRouteParams>();
  const router = useSafeRouter();
+ const session = useAuthStore((state) => state.session);
  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
  const deferredHomeSideEffectsEnabled = useDeferredInteractionGate({ delayMs: 500 });
  const { currentVersion, isUpdateAvailable, latestVersion, canOpenStore, openStore } =
@@ -100,10 +107,36 @@ export default function HomeScreen() {
  );
  const { prefetchGame, prefetchGames } = usePrefetchGameResources();
  const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
+ const [isFirstRunOnboardingVisible, setIsFirstRunOnboardingVisible] = useState(false);
  const pickerSortOptions = useMemo<PickerOption[]>(
   () => sortOptions.map((option) => ({ label: option.label, value: option.key })),
   [sortOptions],
  );
+
+ const checkFirstRunOnboarding = useCallback(() => {
+  const userId = session?.user?.id;
+
+  if (!userId) {
+   setIsFirstRunOnboardingVisible(false);
+   return () => undefined;
+  }
+
+  let isCancelled = false;
+
+  void getProfileSetupOnboardingPending(userId).then((isPending) => {
+   if (!isCancelled) {
+    setIsFirstRunOnboardingVisible(isPending);
+   }
+  });
+
+  return () => {
+   isCancelled = true;
+  };
+ }, [session?.user?.id]);
+
+ useEffect(() => checkFirstRunOnboarding(), [checkFirstRunOnboarding]);
+ useFocusEffect(checkFirstRunOnboarding);
+
  useEffect(() => {
   if (!deferredHomeSideEffectsEnabled) {
    return;
@@ -141,6 +174,16 @@ export default function HomeScreen() {
   () => toQuickPresetActions(quickDiscoveryPresets, applyQuickFilters),
   [applyQuickFilters, quickDiscoveryPresets],
  );
+ const handleCloseFirstRunOnboarding = useCallback(() => {
+  const userId = session?.user?.id;
+  setIsFirstRunOnboardingVisible(false);
+
+  if (!userId) {
+   return;
+  }
+
+  void consumeProfileSetupOnboarding(userId);
+ }, [session?.user?.id]);
 
  return (
   <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
@@ -230,6 +273,11 @@ export default function HomeScreen() {
     options={pickerSortOptions}
     value={activeOrdering}
     onChange={(value) => selectOrdering(value as HomeOrdering)}
+   />
+
+   <ProfileSetupOnboardingModal
+    visible={isFirstRunOnboardingVisible}
+    onClose={handleCloseFirstRunOnboarding}
    />
   </SafeAreaView>
  );

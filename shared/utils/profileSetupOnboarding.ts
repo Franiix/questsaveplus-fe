@@ -1,0 +1,32 @@
+import * as SecureStore from 'expo-secure-store';
+
+const PROFILE_SETUP_ONBOARDING_KEY_PREFIX = 'profile_setup_onboarding_seen:v1:';
+
+function buildProfileSetupOnboardingKey(userId: string) {
+ return `${PROFILE_SETUP_ONBOARDING_KEY_PREFIX}${userId}`;
+}
+
+export async function markProfileSetupOnboardingPending(userId: string) {
+ try {
+  await SecureStore.deleteItemAsync(buildProfileSetupOnboardingKey(userId));
+ } catch {
+  // Non bloccare il flusso di setup: al peggio il carosello ricompare una volta.
+ }
+}
+
+export async function getProfileSetupOnboardingPending(userId: string) {
+ try {
+  const value = await SecureStore.getItemAsync(buildProfileSetupOnboardingKey(userId));
+  return value !== '1';
+ } catch {
+  return true;
+ }
+}
+
+export async function consumeProfileSetupOnboarding(userId: string) {
+ try {
+  await SecureStore.setItemAsync(buildProfileSetupOnboardingKey(userId), '1');
+ } catch {
+  // Evita crash: se SecureStore fallisce, semplicemente non persistiamo il dismiss.
+ }
+}
