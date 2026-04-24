@@ -331,24 +331,49 @@ export const BacklogListItem = memo(function BacklogListItem({
         </Text>
        </View>
       ) : null}
-      {showAddedDate && item.added_at ? (
-       <Text
-        style={{
-         color: colors.text.tertiary,
-         fontSize: typography.size['2xs'],
-         fontFamily: typography.font.regular,
-        }}
-        numberOfLines={1}
-       >
-        {t('backlog.addedOn', {
-         date: formatDate(item.added_at, i18n.language, {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric',
-         }),
-        })}
-       </Text>
-      ) : null}
+      {showAddedDate
+       ? (() => {
+          const isCompleted = item.status === BacklogStatusEnum.COMPLETED;
+          const isAbandoned = item.status === BacklogStatusEnum.ABANDONED;
+          const isActive =
+           item.status === BacklogStatusEnum.PLAYING || item.status === BacklogStatusEnum.ONGOING;
+          const relevantDate = isCompleted
+           ? (item.completed_at ?? item.added_at)
+           : isAbandoned
+             ? (item.abandoned_at ?? item.added_at)
+             : isActive
+               ? (item.resumed_at ?? item.started_at ?? item.added_at)
+               : item.added_at;
+          const relevantKey =
+           isCompleted && item.completed_at
+            ? 'backlog.completedAt'
+            : isAbandoned && item.abandoned_at
+              ? 'backlog.abandonedAt'
+              : isActive && item.resumed_at
+                ? 'backlog.resumedAt'
+                : isActive && item.started_at
+                  ? 'backlog.startedAt'
+                  : 'backlog.addedOn';
+          return relevantDate ? (
+           <Text
+            style={{
+             color: colors.text.tertiary,
+             fontSize: typography.size['2xs'],
+             fontFamily: typography.font.regular,
+            }}
+            numberOfLines={1}
+           >
+            {t(relevantKey, {
+             date: formatDate(relevantDate, i18n.language, {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+             }),
+            })}
+           </Text>
+          ) : null;
+         })()
+       : null}
       <View
        style={{
         flexDirection: 'row',

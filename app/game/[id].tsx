@@ -1,11 +1,20 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Animated, KeyboardAvoidingView, Platform, useWindowDimensions, View } from 'react-native';
+import {
+ Animated,
+ KeyboardAvoidingView,
+ Platform,
+ Switch,
+ Text,
+ useWindowDimensions,
+ View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { RetryState } from '@/components/base/feedback/RetryState';
+import { DatePickerInput } from '@/components/base/inputs/DatePickerInput';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { GameDetailContentSections } from '@/components/game/GameDetailContentSections';
 import { GameDetailOverviewSection } from '@/components/game/GameDetailOverviewSection';
@@ -23,7 +32,7 @@ import { useGameDetailViewModel } from '@/hooks/useGameDetailViewModel';
 import { useGameSeries } from '@/hooks/useGameSeries';
 import { useGameSimilar } from '@/hooks/useGameSimilar';
 import { useRelatedCompanyGames } from '@/hooks/useRelatedCompanyGames';
-import { colors, spacing } from '@/shared/theme/tokens';
+import { colors, spacing, typography } from '@/shared/theme/tokens';
 import { getIgdbNamedItemExternalId } from '@/shared/utils/gameCatalog';
 
 const HERO_HEIGHT = 320;
@@ -118,14 +127,31 @@ export default function GameDetailScreen() {
   selectedStatus,
   selectedRating,
   localNotes,
+  localStartedAt,
+  localCompletedAt,
+  localAbandonedAt,
+  localResumedAt,
   statusOptions,
   hasPendingChanges,
+  pendingDateWarning,
+  pendingResetAbandoned,
   setLocalNotes,
+  setLocalStartedAt,
+  setLocalCompletedAt,
+  setLocalAbandonedAt,
+  setLocalResumedAt,
   handleStatusChange,
   handleRatingChange,
   handleAddToBacklog,
   handleUpdateBacklog,
   handleRemoveFromBacklog,
+  confirmPendingDateWarning,
+  dismissPendingDateWarning,
+  togglePendingResetAbandoned,
+  handlePendingStartedAtChange,
+  handlePendingCompletedAtChange,
+  handlePendingAbandonedAtChange,
+  handlePendingResumedAtChange,
  } = useGameBacklogController({
   game: game
    ? {
@@ -276,7 +302,16 @@ export default function GameDetailScreen() {
        onAdd: () => void handleAddToBacklog(),
        onUpdate: () => void handleUpdateBacklog(),
        onRemove: () => setConfirmRemoveVisible(true),
+       onStartedAtChange: setLocalStartedAt,
+       onCompletedAtChange: setLocalCompletedAt,
+       onAbandonedAtChange: setLocalAbandonedAt,
+       onResumedAtChange: setLocalResumedAt,
        addedAt: backlogItem?.added_at ?? null,
+       updatedAt: backlogItem?.updated_at ?? null,
+       localStartedAt,
+       localCompletedAt,
+       localAbandonedAt,
+       localResumedAt,
       }}
       onRegisterBacklogOffset={(y) => registerSectionOffset('backlog', y)}
      />
@@ -357,6 +392,80 @@ export default function GameDetailScreen() {
     }}
     onCancel={() => setConfirmRemoveVisible(false)}
    />
+
+   <ConfirmModal
+    visible={pendingDateWarning !== null}
+    title={pendingDateWarning?.title ?? ''}
+    message={pendingDateWarning?.body ?? ''}
+    confirmLabel={t('backlog.dateChange.confirm')}
+    cancelLabel={t('common.cancel')}
+    onConfirm={() => void confirmPendingDateWarning()}
+    onCancel={dismissPendingDateWarning}
+   >
+    {pendingDateWarning?.startedAtInput !== undefined ? (
+     <DatePickerInput
+      value={pendingDateWarning.startedAtInput}
+      onChange={handlePendingStartedAtChange}
+      maximumDate={new Date()}
+      accessibilityLabel={t('backlog.startedAtLabel')}
+      placeholder={t('gameDetail.datePlaceholder')}
+     />
+    ) : null}
+    {pendingDateWarning?.completedAtInput !== undefined ? (
+     <DatePickerInput
+      value={pendingDateWarning.completedAtInput}
+      onChange={handlePendingCompletedAtChange}
+      maximumDate={new Date()}
+      accessibilityLabel={t('backlog.completedAtLabel')}
+      placeholder={t('gameDetail.datePlaceholder')}
+     />
+    ) : null}
+    {pendingDateWarning?.resumedAtInput !== undefined ? (
+     <DatePickerInput
+      value={pendingDateWarning.resumedAtInput}
+      onChange={handlePendingResumedAtChange}
+      maximumDate={new Date()}
+      accessibilityLabel={t('backlog.resumedAtLabel')}
+      placeholder={t('gameDetail.datePlaceholder')}
+     />
+    ) : null}
+    {pendingDateWarning?.abandonedAtInput !== undefined ? (
+     <DatePickerInput
+      value={pendingDateWarning.abandonedAtInput}
+      onChange={handlePendingAbandonedAtChange}
+      maximumDate={new Date()}
+      accessibilityLabel={t('backlog.abandonedAtLabel')}
+      placeholder={t('gameDetail.datePlaceholder')}
+     />
+    ) : null}
+    {pendingDateWarning?.showResetAbandonedSwitch ? (
+     <View
+      style={{
+       flexDirection: 'row',
+       alignItems: 'center',
+       justifyContent: 'space-between',
+       paddingVertical: spacing.xs,
+      }}
+     >
+      <Text
+       style={{
+        color: colors.text.primary,
+        fontSize: typography.size.md,
+        flex: 1,
+       }}
+      >
+       {t('backlog.dateChange.resetAbandoned')}
+      </Text>
+      <Switch
+       value={pendingResetAbandoned}
+       onValueChange={togglePendingResetAbandoned}
+       thumbColor={pendingResetAbandoned ? colors.primary.DEFAULT : colors.text.disabled}
+       trackColor={{ false: 'rgba(255,255,255,0.12)', true: `${colors.primary.DEFAULT}80` }}
+       ios_backgroundColor="rgba(255,255,255,0.12)"
+      />
+     </View>
+    ) : null}
+   </ConfirmModal>
   </KeyboardAvoidingView>
  );
 }

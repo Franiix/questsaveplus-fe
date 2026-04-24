@@ -50,10 +50,19 @@ type GameDetailOverviewSectionProps = {
   onRemove: () => void;
   onStatusChange: (value: string) => void;
   onUpdate: () => void;
+  onStartedAtChange: (value: string | null) => void;
+  onCompletedAtChange: (value: string | null) => void;
+  onAbandonedAtChange: (value: string | null) => void;
+  onResumedAtChange: (value: string | null) => void;
   selectedRating: number;
   selectedStatus: BacklogStatusEnum;
   statusOptions: readonly StatusOption[];
   addedAt?: string | null;
+  updatedAt?: string | null;
+  localStartedAt?: string | null;
+  localCompletedAt?: string | null;
+  localAbandonedAt?: string | null;
+  localResumedAt?: string | null;
  };
  game: Pick<CatalogGameDetail, 'name' | 'platforms'>;
  onDeveloperPress?: (() => void) | null;
@@ -124,7 +133,16 @@ export function GameDetailOverviewSection({
      onAdd={backlogController.onAdd}
      onUpdate={backlogController.onUpdate}
      onRemove={backlogController.onRemove}
+     onStartedAtChange={backlogController.onStartedAtChange}
+     onCompletedAtChange={backlogController.onCompletedAtChange}
+     onAbandonedAtChange={backlogController.onAbandonedAtChange}
+     onResumedAtChange={backlogController.onResumedAtChange}
      addedAt={backlogController.addedAt}
+     updatedAt={backlogController.updatedAt}
+     localStartedAt={backlogController.localStartedAt}
+     localCompletedAt={backlogController.localCompletedAt}
+     localAbandonedAt={backlogController.localAbandonedAt}
+     localResumedAt={backlogController.localResumedAt}
     />
    </View>
   </>

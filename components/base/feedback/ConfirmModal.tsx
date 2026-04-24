@@ -13,6 +13,8 @@ type ConfirmModalProps = {
  cancelLabel?: string;
  /** Se true il bottone di conferma usa colors.error invece del brand. */
  isDestructive?: boolean;
+ /** Contenuto opzionale tra il messaggio e i bottoni (es. input). */
+ children?: React.ReactNode;
 };
 
 /**
@@ -30,6 +32,7 @@ export function ConfirmModal({
  confirmLabel,
  cancelLabel,
  isDestructive = false,
+ children,
 }: ConfirmModalProps) {
  return (
   <Modal
@@ -89,6 +92,8 @@ export function ConfirmModal({
      >
       {message}
      </Text>
+
+     {children ?? null}
 
      <View style={{ gap: spacing.sm, marginTop: spacing.xs }}>
       <BaseButton

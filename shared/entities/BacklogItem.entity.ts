@@ -15,4 +15,6 @@ export interface BacklogItemEntity extends BaseEntity {
  updated_at: string; // ISO 8601
  started_at: string | null; // ISO 8601
  completed_at: string | null; // ISO 8601
+ abandoned_at: string | null; // ISO 8601
+ resumed_at: string | null; // ISO 8601
 }

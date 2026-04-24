@@ -22,6 +22,8 @@ function createBacklogItem(
   updated_at: '2026-04-23T00:00:00.000Z',
   started_at: null,
   completed_at: null,
+  abandoned_at: null,
+  resumed_at: null,
   ...overrides,
  };
 }

@@ -222,6 +222,32 @@
    unpinSuccess: 'Game removed from Play Next',
   },
   addedOn: 'Added on {{date}}',
+  startedAt: 'Started on {{date}}',
+  completedAt: 'Completed on {{date}}',
+  abandonedAt: 'Abandoned on {{date}}',
+  resumedAt: 'Resumed on {{date}}',
+  addedAtLabel: 'Date added',
+  startedAtLabel: 'Start date',
+  completedAtLabel: 'Completion date',
+  abandonedAtLabel: 'Abandoned date',
+  resumedAtLabel: 'Resume date',
+  dateChange: {
+   title: 'Date update',
+   bodyPlaying: 'Switching to "Playing" will automatically record the start date: {{date}}.',
+   bodyCompleted:
+    'Switching to "Completed" will automatically record the completion date: {{date}}.',
+   bodyBoth:
+    'Switching to "Completed" will record both the start date and the completion date: {{date}}.',
+   bodyLeavingCompleted: 'Leaving "Completed" will remove the completion date ({{date}}).',
+   bodyAbandoned: 'Do you want to record the date you abandoned this game?',
+   bodyLeavingAbandoned:
+    'You abandoned this game on {{date}}. You can choose to keep or reset the abandoned date.',
+   bodyResumed: 'This game already has an abandoned date. Set when you picked it back up.',
+   bodyToWishlist:
+    'Switching to "Wishlist" will remove all recorded dates (start, completion, abandoned, resumed).',
+   resetAbandoned: 'Reset abandoned date',
+   confirm: 'Save',
+  },
   rateGame: 'Rate this game',
   editRating: 'Edit rating',
   ratingSheetTitle: 'Your rating',
@@ -402,6 +428,8 @@
   },
   yourNotes: 'Your notes',
   notesPlaceholder: 'Add personal notes about this game...',
+  datePlaceholder: 'Select date...',
+  lastModified: 'Last modified: {{date}}',
   esrbRatings: {
    everyone: 'Everyone',
    'everyone-10-plus': 'Everyone 10+',

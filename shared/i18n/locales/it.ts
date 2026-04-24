@@ -222,6 +222,34 @@
    unpinSuccess: 'Gioco rimosso da Play Next',
   },
   addedOn: 'Aggiunto il {{date}}',
+  startedAt: 'Iniziato il {{date}}',
+  completedAt: 'Completato il {{date}}',
+  abandonedAt: 'Abbandonato il {{date}}',
+  resumedAt: 'Ripreso il {{date}}',
+  addedAtLabel: 'Data di aggiunta',
+  startedAtLabel: 'Data di inizio',
+  completedAtLabel: 'Data di completamento',
+  abandonedAtLabel: 'Data di abbandono',
+  resumedAtLabel: 'Data di ripresa',
+  dateChange: {
+   title: 'Aggiornamento date',
+   bodyPlaying:
+    'Passando a «In corso» verrà registrata automaticamente la data di inizio: {{date}}.',
+   bodyCompleted:
+    'Passando a «Completato» verrà registrata automaticamente la data di completamento: {{date}}.',
+   bodyBoth:
+    'Passando a «Completato» verranno registrate la data di inizio e quella di completamento: {{date}}.',
+   bodyLeavingCompleted:
+    'Passando da «Completato» la data di completamento ({{date}}) verrà eliminata.',
+   bodyAbandoned: 'Vuoi registrare la data in cui hai abbandonato questo gioco?',
+   bodyLeavingAbandoned:
+    'Hai abbandonato questo gioco il {{date}}. Puoi scegliere se mantenere o resettare la data di abbandono.',
+   bodyResumed: 'Questo gioco ha gia una data di abbandono. Imposta quando lo hai ripreso.',
+   bodyToWishlist:
+    'Passando a «Wishlist» tutte le date registrate (inizio, completamento, abbandono, ripresa) verranno eliminate.',
+   resetAbandoned: 'Resetta data abbandono',
+   confirm: 'Salva',
+  },
   rateGame: 'Dai un voto',
   editRating: 'Modifica voto',
   ratingSheetTitle: 'Il tuo voto',
@@ -402,6 +430,8 @@
   },
   yourNotes: 'Le tue note',
   notesPlaceholder: 'Aggiungi note personali su questo gioco...',
+  datePlaceholder: 'Seleziona data...',
+  lastModified: 'Ultima modifica: {{date}}',
   esrbRatings: {
    everyone: 'Per tutti',
    'everyone-10-plus': 'Dai 10 anni',

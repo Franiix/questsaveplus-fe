@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, View } from 'react-native';
+import { Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BacklogScreenContent } from '@/components/backlog/BacklogScreenContent';
 import { GradientUnderline } from '@/components/base/display/GradientUnderline';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
 import { PickerModal, type PickerOption } from '@/components/base/feedback/PickerModal';
+import { DatePickerInput } from '@/components/base/inputs/DatePickerInput';
 import { SortIconButton } from '@/components/base/inputs/SortIconButton';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { ScreenHeader } from '@/components/base/layout/ScreenHeader';
@@ -24,10 +25,11 @@ import { usePrefetchGameResources } from '@/hooks/usePrefetchGameResources';
 import { useSafeRouter } from '@/hooks/useSafeRouter';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
-import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
+import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import { colors, layout, spacing, typography } from '@/shared/theme/tokens';
 import { shouldLoadBacklogMetadata } from '@/shared/utils/backlogScreen';
+import { formatDate } from '@/shared/utils/date';
 import { createEmptyGameDiscoveryFilters } from '@/shared/utils/gameDiscoveryFilters';
 import { useAuthStore } from '@/stores/auth.store';
 import { useBacklogStore } from '@/stores/backlog.store';
@@ -36,7 +38,7 @@ import { useToastStore } from '@/stores/toast.store';
 const HORIZONTAL_PADDING = spacing.md;
 
 export default function BacklogScreen() {
- const { t } = useTranslation();
+ const { t, i18n } = useTranslation();
  const { labelMap, colorMap, iconMap } = useBacklogStatusPresentation();
  const router = useSafeRouter();
  const { prefetchGameById } = usePrefetchGameResources();
@@ -60,6 +62,17 @@ export default function BacklogScreen() {
  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
  const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
  const [pendingDeleteItem, setPendingDeleteItem] = useState<BacklogItemEntity | null>(null);
+ const [pendingQuickChange, setPendingQuickChange] = useState<{
+  item: BacklogItemEntity;
+  status: BacklogStatusEnum;
+  body: string;
+  startedAtInput?: Date;
+  completedAtInput?: Date;
+  abandonedAtInput?: Date;
+  resumedAtInput?: Date;
+  showResetAbandonedSwitch?: boolean;
+  resetAbandonedAt?: boolean;
+ } | null>(null);
  const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(
   createEmptyGameDiscoveryFilters,
  );
@@ -221,12 +234,66 @@ export default function BacklogScreen() {
   [clearError, getNextPlayNextPriority, showToast, t, update],
  );
 
- const handleQuickStatusChange = useCallback(
-  async (item: BacklogItemEntity, status: BacklogStatusEnum) => {
-   if (item.status === status) return;
-
+ const doQuickStatusUpdate = useCallback(
+  async (
+   item: BacklogItemEntity,
+   status: BacklogStatusEnum,
+   overrideStartedAt?: string,
+   overrideCompletedAt?: string,
+   overrideAbandonedAt?: string,
+   overrideResumedAt?: string,
+   resetAbandonedAt?: boolean,
+  ) => {
    clearError();
-   await update(item.id, { status });
+
+   const now = new Date().toISOString();
+   const isWishlist = status === BacklogStatusEnum.WISHLIST;
+   const dateFields: {
+    started_at?: string | null;
+    completed_at?: string | null;
+    abandoned_at?: string | null;
+    resumed_at?: string | null;
+   } = {};
+   const isCompleted = status === BacklogStatusEnum.COMPLETED;
+   const isAbandoned = status === BacklogStatusEnum.ABANDONED;
+   const isResumable =
+    status === BacklogStatusEnum.PLAYING ||
+    status === BacklogStatusEnum.ONGOING ||
+    status === BacklogStatusEnum.COMPLETED;
+   const hasAbandonedHistory = Boolean(item.abandoned_at);
+
+   if (isWishlist) {
+    dateFields.started_at = null;
+    dateFields.completed_at = null;
+    dateFields.abandoned_at = null;
+    dateFields.resumed_at = null;
+   } else {
+    if (isResumable && !item.started_at) dateFields.started_at = overrideStartedAt ?? now;
+    if (isCompleted && !item.completed_at) dateFields.completed_at = overrideCompletedAt ?? now;
+    if (isAbandoned && !hasAbandonedHistory) dateFields.abandoned_at = overrideAbandonedAt ?? now;
+    if (
+     isResumable &&
+     hasAbandonedHistory &&
+     (item.status === BacklogStatusEnum.ABANDONED || !item.resumed_at)
+    ) {
+     dateFields.resumed_at = overrideResumedAt ?? now;
+    }
+    if (item.status === BacklogStatusEnum.COMPLETED && !isCompleted) dateFields.completed_at = null;
+    if (resetAbandonedAt) dateFields.abandoned_at = null;
+   }
+
+   const ACTIVE_STATUSES = new Set([
+    BacklogStatusEnum.PLAYING,
+    BacklogStatusEnum.ONGOING,
+    BacklogStatusEnum.COMPLETED,
+    BacklogStatusEnum.ABANDONED,
+   ]);
+   const unpinFields =
+    item.is_play_next === true && ACTIVE_STATUSES.has(status)
+     ? { is_play_next: false as const, play_next_priority: null }
+     : {};
+
+   await update(item.id, { status, ...unpinFields, ...dateFields });
    const updateError = useBacklogStore.getState().error;
 
    if (!updateError) {
@@ -237,6 +304,142 @@ export default function BacklogScreen() {
   },
   [clearError, showToast, t, update],
  );
+
+ const handleQuickStatusChange = useCallback(
+  async (item: BacklogItemEntity, status: BacklogStatusEnum) => {
+   if (item.status === status) return;
+
+   const isCompleted = status === BacklogStatusEnum.COMPLETED;
+   const isAbandoned = status === BacklogStatusEnum.ABANDONED;
+   const isWishlist = status === BacklogStatusEnum.WISHLIST;
+   const isResumable =
+    status === BacklogStatusEnum.PLAYING ||
+    status === BacklogStatusEnum.ONGOING ||
+    status === BacklogStatusEnum.COMPLETED;
+   const hasAbandonedHistory = Boolean(item.abandoned_at);
+   const wouldSetStarted = isResumable && !item.started_at;
+   const wouldSetCompleted = isCompleted && !item.completed_at;
+   const wouldSetResumed =
+    isResumable &&
+    hasAbandonedHistory &&
+    (item.status === BacklogStatusEnum.ABANDONED || !item.resumed_at);
+
+   const hasAnyDates = Boolean(
+    item.started_at || item.completed_at || item.abandoned_at || item.resumed_at,
+   );
+   if (isWishlist && hasAnyDates) {
+    setPendingQuickChange({ item, status, body: t('backlog.dateChange.bodyToWishlist') });
+    return;
+   }
+
+   const isLeavingCompleted =
+    item.status === BacklogStatusEnum.COMPLETED && !isCompleted && Boolean(item.completed_at);
+   if (isLeavingCompleted) {
+    const completedDate = formatDate(item.completed_at ?? new Date().toISOString(), i18n.language, {
+     day: 'numeric',
+     month: 'long',
+     year: 'numeric',
+    });
+    const body = t('backlog.dateChange.bodyLeavingCompleted', { date: completedDate });
+    setPendingQuickChange({ item, status, body });
+    return;
+   }
+
+   const isLeavingAbandoned =
+    item.status === BacklogStatusEnum.ABANDONED && !isWishlist && Boolean(item.abandoned_at);
+   if (isLeavingAbandoned) {
+    const abandonedDate = formatDate(item.abandoned_at ?? new Date().toISOString(), i18n.language, {
+     day: 'numeric',
+     month: 'long',
+     year: 'numeric',
+    });
+    const body = t('backlog.dateChange.bodyLeavingAbandoned', { date: abandonedDate });
+    setPendingQuickChange({
+     item,
+     status,
+     body,
+     startedAtInput: wouldSetStarted ? new Date() : undefined,
+     completedAtInput: wouldSetCompleted ? new Date() : undefined,
+     resumedAtInput: wouldSetResumed ? new Date() : undefined,
+     showResetAbandonedSwitch: true,
+     resetAbandonedAt: false,
+    });
+    return;
+   }
+
+   if (isAbandoned && !hasAbandonedHistory) {
+    const body = t('backlog.dateChange.bodyAbandoned');
+    setPendingQuickChange({ item, status, body, abandonedAtInput: new Date() });
+    return;
+   }
+
+   if (wouldSetStarted || wouldSetCompleted || wouldSetResumed) {
+    const today = formatDate(new Date().toISOString(), i18n.language, {
+     day: 'numeric',
+     month: 'long',
+     year: 'numeric',
+    });
+    let body: string;
+    if (wouldSetResumed) {
+     body = t('backlog.dateChange.bodyResumed');
+    } else if (wouldSetStarted && wouldSetCompleted) {
+     body = t('backlog.dateChange.bodyBoth', { date: today });
+    } else if (wouldSetStarted) {
+     body = t('backlog.dateChange.bodyPlaying', { date: today });
+    } else {
+     body = t('backlog.dateChange.bodyCompleted', { date: today });
+    }
+    setPendingQuickChange({
+     item,
+     status,
+     body,
+     startedAtInput: wouldSetStarted ? new Date() : undefined,
+     completedAtInput: wouldSetCompleted ? new Date() : undefined,
+     resumedAtInput: wouldSetResumed ? new Date() : undefined,
+    });
+    return;
+   }
+
+   await doQuickStatusUpdate(item, status);
+  },
+  [doQuickStatusUpdate, i18n.language, t],
+ );
+
+ const handleConfirmQuickChange = useCallback(async () => {
+  if (!pendingQuickChange) return;
+  await doQuickStatusUpdate(
+   pendingQuickChange.item,
+   pendingQuickChange.status,
+   pendingQuickChange.startedAtInput?.toISOString(),
+   pendingQuickChange.completedAtInput?.toISOString(),
+   pendingQuickChange.abandonedAtInput?.toISOString(),
+   pendingQuickChange.resumedAtInput?.toISOString(),
+   pendingQuickChange.resetAbandonedAt,
+  );
+  setPendingQuickChange(null);
+ }, [doQuickStatusUpdate, pendingQuickChange]);
+
+ const handleQuickStartedAtChange = useCallback((date: Date) => {
+  setPendingQuickChange((prev) => (prev ? { ...prev, startedAtInput: date } : null));
+ }, []);
+
+ const handleQuickCompletedAtChange = useCallback((date: Date) => {
+  setPendingQuickChange((prev) => (prev ? { ...prev, completedAtInput: date } : null));
+ }, []);
+
+ const handleQuickAbandonedAtChange = useCallback((date: Date) => {
+  setPendingQuickChange((prev) => (prev ? { ...prev, abandonedAtInput: date } : null));
+ }, []);
+
+ const handleQuickResumedAtChange = useCallback((date: Date) => {
+  setPendingQuickChange((prev) => (prev ? { ...prev, resumedAtInput: date } : null));
+ }, []);
+
+ const handleQuickResetAbandonedToggle = useCallback(() => {
+  setPendingQuickChange((prev) =>
+   prev ? { ...prev, resetAbandonedAt: !prev.resetAbandonedAt } : null,
+  );
+ }, []);
 
  const handleRatingChange = useCallback(
   async (item: BacklogItemEntity, rating: number) => {
@@ -399,6 +602,82 @@ export default function BacklogScreen() {
     onConfirm={() => void handleConfirmRemove()}
     onCancel={() => setPendingDeleteItem(null)}
    />
+
+   <ConfirmModal
+    visible={pendingQuickChange !== null}
+    title={t('backlog.dateChange.title')}
+    message={pendingQuickChange?.body ?? ''}
+    confirmLabel={t('backlog.dateChange.confirm')}
+    cancelLabel={t('common.cancel')}
+    onConfirm={() => void handleConfirmQuickChange()}
+    onCancel={() => setPendingQuickChange(null)}
+   >
+    {pendingQuickChange?.startedAtInput !== undefined ? (
+     <DatePickerInput
+      value={pendingQuickChange.startedAtInput}
+      onChange={handleQuickStartedAtChange}
+      maximumDate={new Date()}
+      accessibilityLabel={t('backlog.startedAtLabel')}
+      placeholder={t('gameDetail.datePlaceholder')}
+     />
+    ) : null}
+    {pendingQuickChange?.completedAtInput !== undefined ? (
+     <DatePickerInput
+      value={pendingQuickChange.completedAtInput}
+      onChange={handleQuickCompletedAtChange}
+      maximumDate={new Date()}
+      accessibilityLabel={t('backlog.completedAtLabel')}
+      placeholder={t('gameDetail.datePlaceholder')}
+     />
+    ) : null}
+    {pendingQuickChange?.resumedAtInput !== undefined ? (
+     <DatePickerInput
+      value={pendingQuickChange.resumedAtInput}
+      onChange={handleQuickResumedAtChange}
+      maximumDate={new Date()}
+      accessibilityLabel={t('backlog.resumedAtLabel')}
+      placeholder={t('gameDetail.datePlaceholder')}
+     />
+    ) : null}
+    {pendingQuickChange?.abandonedAtInput !== undefined ? (
+     <DatePickerInput
+      value={pendingQuickChange.abandonedAtInput}
+      onChange={handleQuickAbandonedAtChange}
+      maximumDate={new Date()}
+      accessibilityLabel={t('backlog.abandonedAtLabel')}
+      placeholder={t('gameDetail.datePlaceholder')}
+     />
+    ) : null}
+    {pendingQuickChange?.showResetAbandonedSwitch ? (
+     <View
+      style={{
+       flexDirection: 'row',
+       alignItems: 'center',
+       justifyContent: 'space-between',
+       paddingVertical: spacing.xs,
+      }}
+     >
+      <Text
+       style={{
+        color: colors.text.primary,
+        fontSize: typography.size.md,
+        flex: 1,
+       }}
+      >
+       {t('backlog.dateChange.resetAbandoned')}
+      </Text>
+      <Switch
+       value={pendingQuickChange.resetAbandonedAt ?? false}
+       onValueChange={handleQuickResetAbandonedToggle}
+       thumbColor={
+        pendingQuickChange.resetAbandonedAt ? colors.primary.DEFAULT : colors.text.disabled
+       }
+       trackColor={{ false: 'rgba(255,255,255,0.12)', true: `${colors.primary.DEFAULT}80` }}
+       ios_backgroundColor="rgba(255,255,255,0.12)"
+      />
+     </View>
+    ) : null}
+   </ConfirmModal>
   </SafeAreaView>
  );
 }

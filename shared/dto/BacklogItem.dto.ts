@@ -10,6 +10,10 @@ export interface CreateBacklogItemDto {
  notes?: string;
  is_play_next?: boolean;
  play_next_priority?: number | null;
+ started_at?: string;
+ completed_at?: string;
+ abandoned_at?: string;
+ resumed_at?: string;
 }
 
 export interface UpdateBacklogItemDto {
@@ -21,4 +25,8 @@ export interface UpdateBacklogItemDto {
  notes?: string | null;
  is_play_next?: boolean;
  play_next_priority?: number | null;
+ started_at?: string | null;
+ completed_at?: string | null;
+ abandoned_at?: string | null;
+ resumed_at?: string | null;
 }
