@@ -45,10 +45,10 @@ type PendingDateWarning = {
  showResetAbandonedSwitch?: boolean;
  onConfirm: (options?: {
   startedAt?: string;
- completedAt?: string;
- abandonedAt?: string;
- resumedAt?: string;
- resetAbandoned?: boolean;
+  completedAt?: string;
+  abandonedAt?: string;
+  resumedAt?: string;
+  resetAbandoned?: boolean;
  }) => Promise<BacklogStatusEnum | null>;
 };
 
@@ -170,7 +170,7 @@ export function useGameBacklogController({
   releaseStatusKey: game?.releaseStatusKey ?? null,
   firstReleaseDate: game?.firstReleaseDate ?? null,
  } as const;
-const minimumStartedAtDate = getReleaseDate(releaseContext) ?? undefined;
+ const minimumStartedAtDate = getReleaseDate(releaseContext) ?? undefined;
  const resolvedStatusOptions = statusOptions.map((option) => {
   const isReleaseLocked =
    RELEASE_LOCKED_STATUSES.has(option.value) &&
@@ -204,8 +204,8 @@ const minimumStartedAtDate = getReleaseDate(releaseContext) ?? undefined;
 
  useEffect(() => {
   if (!backlogItem) {
-  setSelectedStatus(BacklogStatusEnum.WANT_TO_PLAY);
-  setSelectedRating(0);
+   setSelectedStatus(BacklogStatusEnum.WANT_TO_PLAY);
+   setSelectedRating(0);
    setLocalNotes('');
    setLocalStartedAt(null);
    setLocalCompletedAt(null);
@@ -360,12 +360,11 @@ const minimumStartedAtDate = getReleaseDate(releaseContext) ?? undefined;
     return null;
    }
 
-   const effectiveStartedAt =
-    isGoingToWishlist
-     ? null
-     : localStartedAt ??
-       backlogItem.started_at ??
-       (wouldAutoSetStarted ? (options?.startedAt ?? now) : null);
+   const effectiveStartedAt = isGoingToWishlist
+    ? null
+    : (localStartedAt ??
+      backlogItem.started_at ??
+      (wouldAutoSetStarted ? (options?.startedAt ?? now) : null));
 
    if (isStartedAtBeforeRelease(effectiveStartedAt, releaseContext)) {
     showToast(t('backlog.releaseValidation.startedBeforeRelease'), 'error');

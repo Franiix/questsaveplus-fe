@@ -1,6 +1,6 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import { memo, useEffect } from 'react';
-import { View, useWindowDimensions, type ViewStyle } from 'react-native';
+import { useWindowDimensions, View, type ViewStyle } from 'react-native';
 import Animated, {
  Easing,
  Extrapolation,
@@ -37,7 +37,11 @@ type StatusAnimationProps = {
  archiveMode?: 'archive' | 'restore' | null;
 };
 
-function buildParticles(status: BacklogStatusEnum, width: number, height: number): StatusParticle[] {
+function buildParticles(
+ status: BacklogStatusEnum,
+ width: number,
+ height: number,
+): StatusParticle[] {
  switch (status) {
   case 'COMPLETED':
    return Array.from({ length: 18 }, (_, index) => {
@@ -373,7 +377,12 @@ function StatusIcon({
        ),
       },
       {
-       scale: interpolate(progress.value, [0, 0.18, 0.42, 1], [0.35, 1.32, 1.04, 0.92], Extrapolation.CLAMP),
+       scale: interpolate(
+        progress.value,
+        [0, 0.18, 0.42, 1],
+        [0.35, 1.32, 1.04, 0.92],
+        Extrapolation.CLAMP,
+       ),
       },
      ] as ViewStyle['transform'],
     };
@@ -439,7 +448,12 @@ function StatusIcon({
        ),
       },
       {
-       scale: interpolate(progress.value, [0, 0.2, 0.44, 1], [0.56, 1.18, 0.98, 0.9], Extrapolation.CLAMP),
+       scale: interpolate(
+        progress.value,
+        [0, 0.2, 0.44, 1],
+        [0.56, 1.18, 0.98, 0.9],
+        Extrapolation.CLAMP,
+       ),
       },
      ] as ViewStyle['transform'],
     };
@@ -462,8 +476,8 @@ function StatusIcon({
    ]}
   >
    <FontAwesome5 name={iconName} size={48} color={color} solid />
- </Animated.View>
-);
+  </Animated.View>
+ );
 }
 
 function PinIcon({
@@ -493,7 +507,12 @@ function PinIcon({
     ),
    },
    {
-    scale: interpolate(progress.value, [0, 0.22, 0.5, 1], [0.46, 1.18, 1, 0.9], Extrapolation.CLAMP),
+    scale: interpolate(
+     progress.value,
+     [0, 0.22, 0.5, 1],
+     [0.46, 1.18, 1, 0.9],
+     Extrapolation.CLAMP,
+    ),
    },
    { rotate: '-12deg' },
   ] as ViewStyle['transform'],
@@ -512,7 +531,7 @@ function PinIcon({
      shadowOffset: { width: 0, height: 0 },
     },
     style,
-  ]}
+   ]}
   >
    <FontAwesome5 name={iconName} size={48} color={color} solid />
    {showCloseBadge ? (
@@ -550,49 +569,49 @@ export const BacklogStatusCelebrationOverlay = memo(function BacklogStatusCelebr
 }: StatusAnimationProps) {
  const progress = useSharedValue(0);
  const { width, height } = useWindowDimensions();
- const mode = status ? 'status' : playNextMode ?? archiveMode;
+ const mode = status ? 'status' : (playNextMode ?? archiveMode);
  const overlayColor =
   mode === 'pin'
    ? colors.primary['200']
    : mode === 'unpin'
-    ? colors.text.secondary
-    : mode === 'archive'
-     ? colors.primary['200']
-     : mode === 'restore'
-      ? colors.accent.light
-    : status
-      ? colorMap[status]
-      : null;
+     ? colors.text.secondary
+     : mode === 'archive'
+       ? colors.primary['200']
+       : mode === 'restore'
+         ? colors.accent.light
+         : status
+           ? colorMap[status]
+           : null;
  const overlayIcon =
   mode === 'pin'
    ? 'thumbtack'
    : mode === 'unpin'
-    ? 'thumbtack'
-    : mode === 'archive'
-     ? 'archive'
-     : mode === 'restore'
-      ? 'box-open'
-    : status
-      ? iconMap[status]
-      : null;
+     ? 'thumbtack'
+     : mode === 'archive'
+       ? 'archive'
+       : mode === 'restore'
+         ? 'box-open'
+         : status
+           ? iconMap[status]
+           : null;
  const backdropStyle = useAnimatedStyle<ViewStyle>(() => ({
   position: 'absolute',
   inset: 0,
   opacity: interpolate(progress.value, [0, 0.08, 0.9, 1], [0, 0.18, 0.08, 0], Extrapolation.CLAMP),
   backgroundColor:
    mode === 'pin'
-   ? `${colors.primary.DEFAULT}16`
+    ? `${colors.primary.DEFAULT}16`
     : mode === 'unpin'
-     ? 'rgba(255,255,255,0.08)'
-    : mode === 'archive'
-     ? `${colors.primary.DEFAULT}18`
-     : mode === 'restore'
-      ? `${colors.accent.DEFAULT}16`
-    : status === 'ABANDONED'
-      ? `${colors.error}18`
-      : status
-        ? `${colorMap[status]}14`
-        : 'transparent',
+      ? 'rgba(255,255,255,0.08)'
+      : mode === 'archive'
+        ? `${colors.primary.DEFAULT}18`
+        : mode === 'restore'
+          ? `${colors.accent.DEFAULT}16`
+          : status === 'ABANDONED'
+            ? `${colors.error}18`
+            : status
+              ? `${colorMap[status]}14`
+              : 'transparent',
  }));
 
  useEffect(() => {
@@ -607,8 +626,8 @@ export const BacklogStatusCelebrationOverlay = memo(function BacklogStatusCelebr
     mode === 'pin' || mode === 'unpin' || mode === 'archive' || mode === 'restore'
      ? 1180
      : status === 'COMPLETED'
-      ? 1600
-      : 1250,
+       ? 1600
+       : 1250,
    easing: Easing.out(Easing.cubic),
   });
  }, [archiveTrigger, mode, playNextTrigger, progress, status, trigger]);
@@ -678,114 +697,114 @@ export const BacklogStatusCelebrationOverlay = memo(function BacklogStatusCelebr
       },
      ]
    : mode === 'unpin'
-    ? [
-       {
-        xStart: width * 0.5,
-        yStart: height * 0.42,
-        xEnd: width * 0.36,
-        yEnd: height * 0.56,
-        size: 10,
-        rotate: -28,
-        delay: 0.03,
-        duration: 0.58,
-        shape: 'bar' as const,
-       },
-       {
-        xStart: width * 0.5,
-        yStart: height * 0.42,
-        xEnd: width * 0.64,
-        yEnd: height * 0.56,
-        size: 10,
-        rotate: 28,
-        delay: 0.08,
-        duration: 0.58,
-        shape: 'bar' as const,
-       },
-       {
-        xStart: width * 0.5,
-        yStart: height * 0.42,
-        xEnd: width * 0.5,
-        yEnd: height * 0.64,
-        size: 8,
-        rotate: 0,
-        delay: 0.12,
-        duration: 0.54,
-       shape: 'dot' as const,
-      },
-      ]
-   : mode === 'archive'
-    ? [
-       {
-        xStart: width * 0.34,
-        yStart: height * 0.34,
-        xEnd: width * 0.42,
-        yEnd: height * 0.46,
-        size: 10,
-        rotate: 24,
-        delay: 0.04,
-        duration: 0.56,
-        shape: 'bar' as const,
-       },
-       {
-        xStart: width * 0.66,
-        yStart: height * 0.34,
-        xEnd: width * 0.58,
-        yEnd: height * 0.46,
-        size: 10,
-        rotate: -24,
-        delay: 0.08,
-        duration: 0.56,
-        shape: 'bar' as const,
-       },
-       {
-        xStart: width * 0.5,
-        yStart: height * 0.2,
-        xEnd: width * 0.5,
-        yEnd: height * 0.44,
-        size: 14,
-        rotate: 0,
-        delay: 0.12,
-        duration: 0.62,
-        shape: 'bar' as const,
-       },
-      ]
-   : mode === 'restore'
-    ? [
-       {
-        xStart: width * 0.42,
-        yStart: height * 0.62,
-        xEnd: width * 0.42,
-        yEnd: height * 0.38,
-        size: 10,
-        rotate: -12,
-        delay: 0.04,
-        duration: 0.6,
-        shape: 'bar' as const,
-       },
-       {
-        xStart: width * 0.58,
-        yStart: height * 0.62,
-        xEnd: width * 0.58,
-        yEnd: height * 0.38,
-        size: 10,
-        rotate: 12,
-        delay: 0.08,
-        duration: 0.6,
-        shape: 'bar' as const,
-       },
-       {
-        xStart: width * 0.5,
-        yStart: height * 0.72,
-        xEnd: width * 0.5,
-        yEnd: height * 0.42,
-        size: 14,
-        rotate: 0,
-        delay: 0.12,
-        duration: 0.66,
-        shape: 'dot' as const,
-       },
-      ]
-   : buildParticles(status, width, height);
+     ? [
+        {
+         xStart: width * 0.5,
+         yStart: height * 0.42,
+         xEnd: width * 0.36,
+         yEnd: height * 0.56,
+         size: 10,
+         rotate: -28,
+         delay: 0.03,
+         duration: 0.58,
+         shape: 'bar' as const,
+        },
+        {
+         xStart: width * 0.5,
+         yStart: height * 0.42,
+         xEnd: width * 0.64,
+         yEnd: height * 0.56,
+         size: 10,
+         rotate: 28,
+         delay: 0.08,
+         duration: 0.58,
+         shape: 'bar' as const,
+        },
+        {
+         xStart: width * 0.5,
+         yStart: height * 0.42,
+         xEnd: width * 0.5,
+         yEnd: height * 0.64,
+         size: 8,
+         rotate: 0,
+         delay: 0.12,
+         duration: 0.54,
+         shape: 'dot' as const,
+        },
+       ]
+     : mode === 'archive'
+       ? [
+          {
+           xStart: width * 0.34,
+           yStart: height * 0.34,
+           xEnd: width * 0.42,
+           yEnd: height * 0.46,
+           size: 10,
+           rotate: 24,
+           delay: 0.04,
+           duration: 0.56,
+           shape: 'bar' as const,
+          },
+          {
+           xStart: width * 0.66,
+           yStart: height * 0.34,
+           xEnd: width * 0.58,
+           yEnd: height * 0.46,
+           size: 10,
+           rotate: -24,
+           delay: 0.08,
+           duration: 0.56,
+           shape: 'bar' as const,
+          },
+          {
+           xStart: width * 0.5,
+           yStart: height * 0.2,
+           xEnd: width * 0.5,
+           yEnd: height * 0.44,
+           size: 14,
+           rotate: 0,
+           delay: 0.12,
+           duration: 0.62,
+           shape: 'bar' as const,
+          },
+         ]
+       : mode === 'restore'
+         ? [
+            {
+             xStart: width * 0.42,
+             yStart: height * 0.62,
+             xEnd: width * 0.42,
+             yEnd: height * 0.38,
+             size: 10,
+             rotate: -12,
+             delay: 0.04,
+             duration: 0.6,
+             shape: 'bar' as const,
+            },
+            {
+             xStart: width * 0.58,
+             yStart: height * 0.62,
+             xEnd: width * 0.58,
+             yEnd: height * 0.38,
+             size: 10,
+             rotate: 12,
+             delay: 0.08,
+             duration: 0.6,
+             shape: 'bar' as const,
+            },
+            {
+             xStart: width * 0.5,
+             yStart: height * 0.72,
+             xEnd: width * 0.5,
+             yEnd: height * 0.42,
+             size: 14,
+             rotate: 0,
+             delay: 0.12,
+             duration: 0.66,
+             shape: 'dot' as const,
+            },
+           ]
+         : buildParticles(status, width, height);
 
  return (
   <View
@@ -798,7 +817,7 @@ export const BacklogStatusCelebrationOverlay = memo(function BacklogStatusCelebr
   >
    <Animated.View style={backdropStyle} />
    {particles.map((particle) => (
-   <CelebrationParticle
+    <CelebrationParticle
      key={`${mode}-${particle.xStart}-${particle.yStart}-${particle.xEnd}-${particle.yEnd}`}
      color={overlayColor}
      particle={particle}

@@ -24,10 +24,10 @@ import { GameDetailOverviewSection } from '@/components/game/GameDetailOverviewS
 import { GameDetailRelatedSections } from '@/components/game/GameDetailRelatedSections';
 import { GameHeroBanner } from '@/components/game/GameHeroBanner';
 import { GameStickyHeader } from '@/components/game/GameStickyHeader';
+import { useBacklogStatusPresentation } from '@/hooks/useBacklogStatusPresentation';
 import { useDeferredGameDetailSectionsGate } from '@/hooks/useDeferredGameDetailSectionsGate';
 import { useGameAdditions } from '@/hooks/useGameAdditions';
 import { useGameBacklogController } from '@/hooks/useGameBacklogController';
-import { useBacklogStatusPresentation } from '@/hooks/useBacklogStatusPresentation';
 import { useGameCommunityRating } from '@/hooks/useGameCommunityRating';
 import { useGameDetail } from '@/hooks/useGameDetail';
 import { useGameDetailNavigation } from '@/hooks/useGameDetailNavigation';
@@ -38,7 +38,10 @@ import { useGameSimilar } from '@/hooks/useGameSimilar';
 import { useRelatedCompanyGames } from '@/hooks/useRelatedCompanyGames';
 import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
-import { getGameCatalogReleaseStatusKey, getIgdbNamedItemExternalId } from '@/shared/utils/gameCatalog';
+import {
+ getGameCatalogReleaseStatusKey,
+ getIgdbNamedItemExternalId,
+} from '@/shared/utils/gameCatalog';
 
 const HERO_HEIGHT = 320;
 
@@ -405,8 +408,8 @@ export default function GameDetailScreen() {
        registerSectionOffset={registerSectionOffset}
       />
      ) : null}
-   </View>
-  </Animated.ScrollView>
+    </View>
+   </Animated.ScrollView>
 
    <BacklogStatusCelebrationOverlay
     colorMap={colorMap}

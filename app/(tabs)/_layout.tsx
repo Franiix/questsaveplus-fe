@@ -30,6 +30,12 @@ export default function TabsLayout() {
     }}
    />
    <Tabs.Screen
+    name="social"
+    options={{
+     title: t('tabs.social'),
+    }}
+   />
+   <Tabs.Screen
     name="profile"
     options={{
      title: t('tabs.profile'),

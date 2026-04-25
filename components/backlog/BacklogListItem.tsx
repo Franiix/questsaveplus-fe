@@ -118,7 +118,7 @@ export const BacklogListItem = memo(function BacklogListItem({
  );
  const isSwipeEnabled = quickActionsMode !== 'play-only';
 
-const showLeadingControl =
+ const showLeadingControl =
   (quickActionsMode === 'play-only' && typeof effectiveOrdinal === 'number') ||
   (quickActionsMode === 'default' && isPlayNext && typeof effectiveOrdinal === 'number');
 
@@ -580,7 +580,7 @@ const showLeadingControl =
         colorMap={colorMap}
         iconMap={iconMap}
         labelMap={labelMap}
-       primaryCount={quickPrimaryCount}
+        primaryCount={quickPrimaryCount}
         auxiliaryAction={pinnedCustomActions ? undefined : pinAuxiliaryAction}
         customActions={pinnedCustomActions ?? defaultQuickActions}
         isDisabled={isUpdatingStatus}

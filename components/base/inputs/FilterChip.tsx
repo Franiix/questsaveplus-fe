@@ -71,7 +71,7 @@ export function FilterChip({
 }: FilterChipProps) {
  const selectedColor = colors.primary.DEFAULT;
  const selectedGlow = colors.primary.glow;
- const iconColor = isDisabled ? colors.text.disabled : color ?? '#FFFFFF';
+ const iconColor = isDisabled ? colors.text.disabled : (color ?? '#FFFFFF');
  const containerStyle = ({ pressed }: { pressed: boolean }) => ({
   minHeight: 42,
   borderRadius: borderRadius.full,
@@ -79,10 +79,10 @@ export function FilterChip({
   borderColor: isDisabled
    ? colors.border.subtle
    : isSelected
-    ? colors.primary['300']
-    : color
-     ? `${color}45`
-     : `${selectedColor}40`,
+     ? colors.primary['300']
+     : color
+       ? `${color}45`
+       : `${selectedColor}40`,
   padding: 1,
   alignItems: 'center' as const,
   justifyContent: 'center' as const,
@@ -90,10 +90,10 @@ export function FilterChip({
   shadowColor: isDisabled
    ? 'transparent'
    : isSelected
-    ? selectedGlow
-    : color
-     ? `${color}30`
-     : `${selectedColor}25`,
+     ? selectedGlow
+     : color
+       ? `${color}30`
+       : `${selectedColor}25`,
   shadowOffset: { width: 0, height: isSelected ? 0 : 1 },
   shadowOpacity: isDisabled ? 0 : isSelected ? 0.45 : 0.2,
   shadowRadius: isDisabled ? 0 : isSelected ? 16 : 5,

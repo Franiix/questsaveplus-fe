@@ -3,8 +3,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InteractionManager, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BacklogStatusCelebrationOverlay } from '@/components/backlog/BacklogStatusCelebrationOverlay';
 import { BacklogScreenContent } from '@/components/backlog/BacklogScreenContent';
+import { BacklogStatusCelebrationOverlay } from '@/components/backlog/BacklogStatusCelebrationOverlay';
 import { GradientUnderline } from '@/components/base/display/GradientUnderline';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
 import { PickerModal, type PickerOption } from '@/components/base/feedback/PickerModal';
@@ -30,18 +30,18 @@ import { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import { colors, layout, spacing, typography } from '@/shared/theme/tokens';
+import { calculateBacklogDateFields } from '@/shared/utils/backlogDateFields';
 import {
  isBacklogStatusRateable,
  normalizeBacklogRatingForStatus,
 } from '@/shared/utils/backlogRating';
 import {
+ type BacklogReleaseContext,
  getReleaseDate,
  isBacklogStatusReleaseLocked,
  isStartedAtBeforeRelease,
- type BacklogReleaseContext,
 } from '@/shared/utils/backlogRelease';
 import { shouldLoadBacklogMetadata } from '@/shared/utils/backlogScreen';
-import { calculateBacklogDateFields } from '@/shared/utils/backlogDateFields';
 import { formatDate } from '@/shared/utils/date';
 import { createEmptyGameDiscoveryFilters } from '@/shared/utils/gameDiscoveryFilters';
 import { useAuthStore } from '@/stores/auth.store';
@@ -79,11 +79,11 @@ export default function BacklogScreen() {
  const [pendingQuickChange, setPendingQuickChange] = useState<{
   item: BacklogItemEntity;
   status: BacklogStatusEnum;
- body: string;
- releaseContext?: BacklogReleaseContext;
- minimumStartedAtDate?: Date;
- startedAtInput?: Date;
- completedAtInput?: Date;
+  body: string;
+  releaseContext?: BacklogReleaseContext;
+  minimumStartedAtDate?: Date;
+  startedAtInput?: Date;
+  completedAtInput?: Date;
   abandonedAtInput?: Date;
   resumedAtInput?: Date;
   showResetAbandonedSwitch?: boolean;
@@ -211,12 +211,14 @@ export default function BacklogScreen() {
 
  const getLockedStatusesForItem = useCallback(
   (item: BacklogItemEntity) =>
-   ([
-    BacklogStatusEnum.PLAYING,
-    BacklogStatusEnum.ONGOING,
-    BacklogStatusEnum.COMPLETED,
-    BacklogStatusEnum.ABANDONED,
-   ] as const).filter((status) =>
+   (
+    [
+     BacklogStatusEnum.PLAYING,
+     BacklogStatusEnum.ONGOING,
+     BacklogStatusEnum.COMPLETED,
+     BacklogStatusEnum.ABANDONED,
+    ] as const
+   ).filter((status) =>
     isBacklogStatusReleaseLocked(status, {
      releasedAt: backlogMetadata?.get(item.game_id)?.releasedAt ?? null,
      releaseStatusKey: backlogMetadata?.get(item.game_id)?.releaseStatusKey ?? null,
@@ -329,9 +331,9 @@ export default function BacklogScreen() {
       mode: 'restore',
       trigger: current ? current.trigger + 1 : 1,
      }));
-   });
-   showToast(t('backlog.archive.restoreSuccess'), 'success');
-   void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    });
+    showToast(t('backlog.archive.restoreSuccess'), 'success');
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
    } else {
     showToast(updateError, 'error');
    }
@@ -747,7 +749,7 @@ export default function BacklogScreen() {
     isUpdatingArchive={isMutating && activeMutation === 'update'}
     removeLabel={t('gameDetail.confirmRemove.confirm')}
     retryLabel={t('home.errorRetry')}
-   emptyActionLabel={t('backlog.emptyAll.action')}
+    emptyActionLabel={t('backlog.emptyAll.action')}
    />
 
    <BacklogStatusCelebrationOverlay

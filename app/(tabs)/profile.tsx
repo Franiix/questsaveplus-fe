@@ -1,25 +1,19 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import { useIsFocused } from '@react-navigation/native';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card } from '@/components/base/display/Card';
 import { InfoRow } from '@/components/base/display/InfoRow';
-import { EmptyState } from '@/components/base/feedback/EmptyState';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { AppBackground } from '@/components/base/layout/AppBackground';
 import { ScreenHeader } from '@/components/base/layout/ScreenHeader';
 import { DeleteAccountModal } from '@/components/profile/DeleteAccountModal';
 import { ProfileHero } from '@/components/profile/ProfileHero';
-import { ProfileStatsCard } from '@/components/profile/ProfileStatsCard';
-import { useDeferredInteractionGate } from '@/hooks/useDeferredInteractionGate';
 import { useSafeRouter } from '@/hooks/useSafeRouter';
-import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { borderRadius, colors, layout, spacing, typography } from '@/shared/theme/tokens';
 import { formatDate } from '@/shared/utils/date';
 import { useAuthStore } from '@/stores/auth.store';
-import { useBacklogStore } from '@/stores/backlog.store';
 import { useProfileStore } from '@/stores/profile.store';
 
 const PILL_BUTTON_STYLE = {
@@ -73,20 +67,8 @@ export default function ProfileScreen() {
  const clearAuthError = useAuthStore((state) => state.clearError);
  const authError = useAuthStore((state) => state.error);
  const isAuthMutating = useAuthStore((state) => state.isLoading);
- const session = useAuthStore((state) => state.session);
- const isFocused = useIsFocused();
  const profile = useProfileStore((state) => state.profile);
  const isLoading = useProfileStore((state) => state.isLoading);
- const backlogItems = useBacklogStore((state) => state.backlogItems);
- const readAll = useBacklogStore((state) => state.readAll);
- const clearBacklog = useBacklogStore((state) => state.clearBacklog);
-
- const userId = session?.user?.id;
- const shouldHydrateProfileStats = Boolean(userId) && isFocused && backlogItems.length === 0;
- const deferredStatsLoadEnabled = useDeferredInteractionGate({
-  enabled: shouldHydrateProfileStats,
-  delayMs: 450,
- });
 
  async function handleDeleteAccount(confirmation: string) {
   const deleted = await deleteAccount(confirmation);
@@ -94,43 +76,6 @@ export default function ProfileScreen() {
    setIsDeleteModalVisible(false);
   }
  }
-
- useEffect(() => {
-  if (!userId) {
-   clearBacklog();
-   return;
-  }
-
-  if (!deferredStatsLoadEnabled) {
-   return;
-  }
-
-  void readAll(userId);
- }, [clearBacklog, deferredStatsLoadEnabled, readAll, userId]);
-
- const stats = useMemo(() => {
-  const total = backlogItems.length;
-  const completed = backlogItems.filter(
-   (item) => item.status === BacklogStatusEnum.COMPLETED,
-  ).length;
-  const ratedItems = backlogItems.filter((item) => item.personal_rating !== null);
-  return {
-   total,
-   wishlist: backlogItems.filter((item) => item.status === BacklogStatusEnum.WISHLIST).length,
-   wantToPlay: backlogItems.filter((item) => item.status === BacklogStatusEnum.WANT_TO_PLAY).length,
-   playing: backlogItems.filter((item) => item.status === BacklogStatusEnum.PLAYING).length,
-   ongoing: backlogItems.filter((item) => item.status === BacklogStatusEnum.ONGOING).length,
-   completed,
-   abandoned: backlogItems.filter((item) => item.status === BacklogStatusEnum.ABANDONED).length,
-   completionRate: total > 0 ? Math.round((completed / total) * 100) : null,
-   avgRating:
-    ratedItems.length > 0
-     ? Math.round(
-        (ratedItems.reduce((s, i) => s + i.personal_rating!, 0) / ratedItems.length) * 10,
-       ) / 10
-     : null,
-  };
- }, [backlogItems]);
 
  if (isLoading || !profile) {
   return (
@@ -159,51 +104,6 @@ export default function ProfileScreen() {
      avatarUrl={profile.avatar_url}
      subtitle={t('profile.heroTagline')}
     />
-
-    <View
-     style={{
-      marginHorizontal: spacing.md,
-      marginTop: -spacing.lg,
-      gap: spacing.sm,
-      zIndex: 1,
-     }}
-    >
-     {stats.total === 0 ? (
-      <Card
-       variant="outlined"
-       style={{
-        padding: spacing.md,
-        backgroundColor: 'rgba(16,18,30,0.9)',
-        borderColor: 'rgba(255,255,255,0.08)',
-        borderRadius: 24,
-       }}
-      >
-       <EmptyState
-        icon="gamepad"
-        title={t('profile.stats.emptyTitle')}
-        subtitle={t('profile.stats.emptySubtitle')}
-        style={{ flex: 0, paddingHorizontal: spacing.md, paddingVertical: spacing.lg }}
-       />
-      </Card>
-     ) : (
-      <ProfileStatsCard
-       stats={stats}
-       labels={{
-        total: t('profile.stats.total'),
-        wishlist: t('profile.stats.wishlist'),
-        wantToPlay: t('profile.stats.wantToPlay'),
-        playing: t('profile.stats.playing'),
-        ongoing: t('profile.stats.ongoing'),
-        completed: t('profile.stats.completed'),
-        abandoned: t('profile.stats.abandoned'),
-        completionRate: t('profile.stats.completionRate'),
-        avgRating: t('profile.stats.avgRating'),
-        title: t('profile.stats.title'),
-        subtitle: t('profile.stats.subtitle'),
-       }}
-      />
-     )}
-    </View>
 
     <Card
      variant="outlined"

@@ -1,7 +1,7 @@
+import { useIsFocused } from '@react-navigation/native';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, Text, View } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
 import { ImageWithFallback } from '@/components/base/display/ImageWithFallback';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
 import { useSafeRouter } from '@/hooks/useSafeRouter';
@@ -30,8 +30,7 @@ export function CurrentlyPlayingSection() {
  }, [isFocused, userId, backlogItems.length, isReadingList, readAll]);
 
  const currentlyPlaying = backlogItems.filter(
-  (item) =>
-   item.status === BacklogStatusEnum.PLAYING || item.status === BacklogStatusEnum.ONGOING,
+  (item) => item.status === BacklogStatusEnum.PLAYING || item.status === BacklogStatusEnum.ONGOING,
  );
 
  if (currentlyPlaying.length === 0) return null;

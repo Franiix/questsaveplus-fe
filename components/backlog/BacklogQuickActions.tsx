@@ -67,9 +67,13 @@ const QuickActionButton = memo(function QuickActionButton({
  const backgroundColor = isDisabled
   ? colors.background.surface
   : isActive
-   ? `${color}26`
-   : colors.background.elevated;
- const borderColor = isDisabled ? colors.border.subtle : isActive ? `${color}80` : colors.border.subtle;
+    ? `${color}26`
+    : colors.background.elevated;
+ const borderColor = isDisabled
+  ? colors.border.subtle
+  : isActive
+    ? `${color}80`
+    : colors.border.subtle;
  const iconColor = isDisabled ? colors.text.disabled : color;
 
  return (

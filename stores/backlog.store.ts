@@ -92,8 +92,8 @@ export const useBacklogStore = create<BacklogState>(
    const readFlag = isRecentTarget
     ? ({ isReadingRecent: true } as const)
     : isArchiveTarget
-     ? ({ isReadingArchiveList: true } as const)
-     : ({ isReadingList: true } as const);
+      ? ({ isReadingArchiveList: true } as const)
+      : ({ isReadingList: true } as const);
 
    set({ isFetching: true, error: null, ...readFlag });
 
@@ -133,8 +133,8 @@ export const useBacklogStore = create<BacklogState>(
      isFetching: isRecentTarget
       ? state.isReadingCurrent || state.isReadingList || state.isReadingArchiveList
       : isArchiveTarget
-       ? state.isReadingCurrent || state.isReadingList || state.isReadingRecent
-       : state.isReadingCurrent || state.isReadingRecent || state.isReadingArchiveList,
+        ? state.isReadingCurrent || state.isReadingList || state.isReadingRecent
+        : state.isReadingCurrent || state.isReadingRecent || state.isReadingArchiveList,
      isReadingList: isRecentTarget || isArchiveTarget ? state.isReadingList : false,
      isReadingArchiveList: isArchiveTarget ? false : state.isReadingArchiveList,
      isReadingRecent: isRecentTarget ? false : state.isReadingRecent,
@@ -149,8 +149,8 @@ export const useBacklogStore = create<BacklogState>(
     isFetching: isRecentTarget
      ? state.isReadingCurrent || state.isReadingList || state.isReadingArchiveList
      : isArchiveTarget
-      ? state.isReadingCurrent || state.isReadingList || state.isReadingRecent
-      : state.isReadingCurrent || state.isReadingRecent || state.isReadingArchiveList,
+       ? state.isReadingCurrent || state.isReadingList || state.isReadingRecent
+       : state.isReadingCurrent || state.isReadingRecent || state.isReadingArchiveList,
     isReadingList: isRecentTarget || isArchiveTarget ? state.isReadingList : false,
     isReadingArchiveList: isArchiveTarget ? false : state.isReadingArchiveList,
     isReadingRecent: isRecentTarget ? false : state.isReadingRecent,

@@ -13,7 +13,6 @@ import {
  View,
  type ViewStyle,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
  Easing,
  useAnimatedStyle,
@@ -22,6 +21,7 @@ import Animated, {
  withSpring,
  withTiming,
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BaseButton } from '@/components/base/display/BaseButton';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
 
@@ -261,9 +261,9 @@ function SlideVisualChip({
      borderRadius: borderRadius.full,
      borderWidth: 1,
      borderColor: `${tintColor}44`,
-      backgroundColor: `${tintColor}16`,
-      maxWidth,
-      minWidth: 0,
+     backgroundColor: `${tintColor}16`,
+     maxWidth,
+     minWidth: 0,
     },
     chipStyle,
    ]}
@@ -281,13 +281,13 @@ function SlideVisualChip({
     <FontAwesome5 name={icon} size={11} color={tintColor} solid />
    </View>
    <Text
-     style={{
-      color: colors.text.primary,
-      fontFamily: typography.font.medium,
-      fontSize: typography.size.sm,
-      flexShrink: 1,
-     }}
-     numberOfLines={1}
+    style={{
+     color: colors.text.primary,
+     fontFamily: typography.font.medium,
+     fontSize: typography.size.sm,
+     flexShrink: 1,
+    }}
+    numberOfLines={1}
    >
     {label}
    </Text>
@@ -389,7 +389,7 @@ function OnboardingSlideVisual({
   >
    <Animated.View
     style={[
-      {
+     {
       position: 'absolute',
       width: isCompactWidth ? 148 : 180,
       height: isCompactWidth ? 148 : 180,
@@ -523,10 +523,10 @@ function OnboardingSlideCard({
    <Animated.View
     style={[
      {
-     borderRadius: borderRadius.lg,
-     borderWidth: 1,
-     borderColor: isActive ? `${slide.iconColor}44` : 'rgba(255,255,255,0.08)',
-     backgroundColor: 'rgba(17,19,34,0.86)',
+      borderRadius: borderRadius.lg,
+      borderWidth: 1,
+      borderColor: isActive ? `${slide.iconColor}44` : 'rgba(255,255,255,0.08)',
+      backgroundColor: 'rgba(17,19,34,0.86)',
       padding: isCompactWidth ? spacing.md : spacing.lg,
       minHeight: isCompactHeight ? 320 : 380,
       justifyContent: 'space-between',
@@ -558,7 +558,10 @@ function OnboardingSlideCard({
 
     <Animated.View
      style={[
-      { gap: isCompactHeight ? spacing.xs : spacing.sm, marginTop: isCompactHeight ? spacing.md : spacing.lg },
+      {
+       gap: isCompactHeight ? spacing.xs : spacing.sm,
+       marginTop: isCompactHeight ? spacing.md : spacing.lg,
+      },
       contentStyle,
      ]}
     >
@@ -579,8 +582,7 @@ function OnboardingSlideCard({
        fontFamily: typography.font.bold,
        fontSize: isCompactWidth ? typography.size.xl : typography.size['2xl'],
        lineHeight: Math.ceil(
-        (isCompactWidth ? typography.size.xl : typography.size['2xl']) *
-         typography.lineHeight.snug,
+        (isCompactWidth ? typography.size.xl : typography.size['2xl']) * typography.lineHeight.snug,
        ),
       }}
      >
@@ -592,8 +594,7 @@ function OnboardingSlideCard({
        fontFamily: typography.font.regular,
        fontSize: isCompactHeight ? typography.size.sm : typography.size.md,
        lineHeight: Math.ceil(
-        (isCompactHeight ? typography.size.sm : typography.size.md) *
-         typography.lineHeight.relaxed,
+        (isCompactHeight ? typography.size.sm : typography.size.md) * typography.lineHeight.relaxed,
        ),
       }}
      >
@@ -751,7 +752,7 @@ export function ProfileSetupOnboardingModal({
     >
      <View
       style={{
-        borderRadius: borderRadius.xl,
+       borderRadius: borderRadius.xl,
        overflow: 'hidden',
        borderWidth: 1,
        borderColor: 'rgba(255,255,255,0.10)',

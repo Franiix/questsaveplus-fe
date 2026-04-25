@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSafeRouter } from '@/hooks/useSafeRouter';
 import { colors, typography } from '@/shared/theme/tokens';
 
-type TabKey = 'index' | 'backlog' | 'archive' | 'play-next';
+type TabKey = 'index' | 'backlog' | 'archive' | 'play-next' | 'social';
 type IconName = React.ComponentProps<typeof FontAwesome5>['name'];
 
 const TAB_ICONS: Record<TabKey, IconName> = {
@@ -16,29 +16,32 @@ const TAB_ICONS: Record<TabKey, IconName> = {
  backlog: 'bookmark',
  archive: 'archive',
  'play-next': 'bolt',
+ social: 'users',
 };
 
 const TAB_LABEL_KEYS: Record<
  TabKey,
- 'tabs.home' | 'tabs.backlog' | 'tabs.archive' | 'tabs.playNext'
+ 'tabs.home' | 'tabs.backlog' | 'tabs.archive' | 'tabs.playNext' | 'tabs.social'
 > = {
  index: 'tabs.home',
  backlog: 'tabs.backlog',
  archive: 'tabs.archive',
  'play-next': 'tabs.playNext',
+ social: 'tabs.social',
 };
 
 const TAB_ROUTES: Record<
  TabKey,
- '/(tabs)' | '/(tabs)/backlog' | '/backlog-archive' | '/(tabs)/play-next'
+ '/(tabs)' | '/(tabs)/backlog' | '/backlog-archive' | '/(tabs)/play-next' | '/(tabs)/social'
 > = {
  index: '/(tabs)',
  backlog: '/(tabs)/backlog',
  archive: '/backlog-archive',
  'play-next': '/(tabs)/play-next',
+ social: '/(tabs)/social',
 };
 
-const TAB_ORDER: TabKey[] = ['index', 'backlog', 'play-next', 'archive'];
+const TAB_ORDER: TabKey[] = ['index', 'backlog', 'play-next', 'social', 'archive'];
 const TAB_HEIGHT = 46;
 const HORIZONTAL_INSET = 28;
 const CONTAINER_PADDING = 5;
@@ -49,11 +52,13 @@ function resolveActiveTab(segments: string[]): TabKey {
  if (first === '(tabs)') {
   if (second === 'backlog') return 'backlog';
   if (second === 'play-next') return 'play-next';
+  if (second === 'social') return 'social';
   return 'index';
  }
 
  if (first === 'backlog-archive') return 'archive';
  if (first === 'play-next-reorder') return 'play-next';
+ if (first === 'social') return 'social';
  if (first === 'game') return 'index';
  return 'index';
 }

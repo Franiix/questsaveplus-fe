@@ -15,7 +15,10 @@ const RELEASE_REQUIRED_STATUSES = new Set<BacklogStatusEnum>([
 
 function normalizeReleaseStatusKey(value?: string | null) {
  if (!value) return null;
- return value.trim().toLowerCase().replace(/[\s-]+/g, '_');
+ return value
+  .trim()
+  .toLowerCase()
+  .replace(/[\s-]+/g, '_');
 }
 
 function toUtcDateStartMs(value: Date | string | number) {
@@ -74,4 +77,3 @@ export function isStartedAtBeforeRelease(
 
  return toUtcDateStartMs(startedAt) < toUtcDateStartMs(releaseDate);
 }
-

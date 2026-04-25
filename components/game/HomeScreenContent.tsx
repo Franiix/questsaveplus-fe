@@ -13,10 +13,10 @@ import Animated, {
 import { EmptyState } from '@/components/base/feedback/EmptyState';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { RetryState } from '@/components/base/feedback/RetryState';
+import { CurrentlyPlayingSection } from '@/components/game/CurrentlyPlayingSection';
 import { DiscoveryContextCard } from '@/components/game/DiscoveryContextCard';
 import { GameCard } from '@/components/game/GameCard';
 import { GameCardSkeleton } from '@/components/game/GameCardSkeleton';
-import { CurrentlyPlayingSection } from '@/components/game/CurrentlyPlayingSection';
 import { GameCarouselSection } from '@/components/game/GameCarouselSection';
 import { RecentlyAddedRow } from '@/components/game/RecentlyAddedRow';
 import type { CatalogGame } from '@/shared/models/Catalog.model';

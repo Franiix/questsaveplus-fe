@@ -141,8 +141,6 @@ function StatInfoCard({
 }
 
 export function ProfileStatsCard({ stats, labels }: ProfileStatsCardProps) {
- const showInsights = stats.completionRate !== null || stats.avgRating !== null;
-
  return (
   <Card
    variant="outlined"
@@ -240,32 +238,20 @@ export function ProfileStatsCard({ stats, labels }: ProfileStatsCardProps) {
     />
    </View>
 
-   {showInsights ? (
-    <View style={{ flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm }}>
-     {stats.completionRate !== null ? (
-      <StatInfoCard
-       value={`${stats.completionRate}%`}
-       label={labels.completionRate}
-       color={colors.status.completed}
-       icon="check-circle"
-      />
-     ) : null}
-     {stats.avgRating !== null ? (
-      <StatInfoCard
-       value={`★ ${stats.avgRating}`}
-       label={labels.avgRating}
-       color={colors.warning}
-       icon="star"
-      />
-     ) : null}
-     {stats.completionRate !== null && stats.avgRating === null ? (
-      <View style={{ flex: 1 }} />
-     ) : null}
-     {stats.avgRating !== null && stats.completionRate === null ? (
-      <View style={{ flex: 1 }} />
-     ) : null}
-    </View>
-   ) : null}
+   <View style={{ flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm }}>
+    <StatInfoCard
+     value={`${stats.completionRate ?? 0}%`}
+     label={labels.completionRate}
+     color={colors.status.completed}
+     icon="check-circle"
+    />
+    <StatInfoCard
+     value={`★ ${stats.avgRating ?? 0}`}
+     label={labels.avgRating}
+     color={colors.warning}
+     icon="star"
+    />
+   </View>
   </Card>
  );
 }

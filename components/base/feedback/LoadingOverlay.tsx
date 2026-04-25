@@ -115,12 +115,7 @@ export function LoadingOverlay({
       />
 
       <View style={styles.titleRow}>
-       <Text
-        style={styles.title}
-        numberOfLines={1}
-        adjustsFontSizeToFit
-        minimumFontScale={0.82}
-       >
+       <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.82}>
         QuestSave
        </Text>
        <Animated.Text style={[plusStyle, styles.plus]}>+</Animated.Text>
@@ -171,7 +166,7 @@ const styles = StyleSheet.create({
   fontSize: typography.size.lg,
   letterSpacing: typography.letterSpacing.tight,
   flexShrink: 1,
-  },
+ },
  plus: {
   color: colors.primary.DEFAULT,
   fontFamily: typography.font.black,

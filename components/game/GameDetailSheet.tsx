@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { InteractionManager, ScrollView, Switch, Text, useWindowDimensions, View } from 'react-native';
+import {
+ InteractionManager,
+ ScrollView,
+ Switch,
+ Text,
+ useWindowDimensions,
+ View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BacklogStatusCelebrationOverlay } from '@/components/backlog/BacklogStatusCelebrationOverlay';
 import { BottomSheet } from '@/components/base/feedback/BottomSheet';
@@ -10,10 +17,10 @@ import { SearchableMultiSelectInput } from '@/components/base/inputs/SearchableM
 import { GameBacklogPanel } from '@/components/game/GameBacklogPanel';
 import { GameHeroBanner } from '@/components/game/GameHeroBanner';
 import { GameSummaryHeader } from '@/components/game/GameSummaryHeader';
-import { useGameBacklogController } from '@/hooks/useGameBacklogController';
 import { useBacklogStatusPresentation } from '@/hooks/useBacklogStatusPresentation';
-import type { CatalogGame } from '@/shared/models/Catalog.model';
+import { useGameBacklogController } from '@/hooks/useGameBacklogController';
 import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
+import type { CatalogGame } from '@/shared/models/Catalog.model';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 import { getGameCatalogReleaseStatusKey } from '@/shared/utils/gameCatalog';
 

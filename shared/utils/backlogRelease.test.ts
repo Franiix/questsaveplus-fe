@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
-import { isBacklogStatusReleaseLocked, isStartedAtBeforeRelease } from '@/shared/utils/backlogRelease';
+import {
+ isBacklogStatusReleaseLocked,
+ isStartedAtBeforeRelease,
+} from '@/shared/utils/backlogRelease';
 
 describe('backlogRelease utilities', () => {
  it('blocks active statuses for future release dates', () => {
