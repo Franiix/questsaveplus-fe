@@ -11,6 +11,7 @@ import type { SearchableSelectOption } from '@/components/base/inputs/Searchable
 import { TextAreaInput } from '@/components/base/inputs/TextAreaInput';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
+import { isBacklogStatusRateable } from '@/shared/utils/backlogRating';
 import { formatDate } from '@/shared/utils/date';
 
 type StatusOption = {
@@ -169,6 +170,7 @@ export function GameBacklogPanel({
   ) ?? [];
  const isPlatformPlayedUnavailable = unavailablePlatforms.length > 0;
  const isDisabled = isBacklogLoading || isMutating;
+ const canRateGame = isBacklogStatusRateable(selectedStatus);
 
  if (isInBacklog && isArchived) {
   return (
@@ -322,7 +324,7 @@ export function GameBacklogPanel({
      </View>
     ) : null}
 
-    {isInBacklog ? (
+    {isInBacklog && canRateGame ? (
      <View>
       <SectionLabel>{t('gameDetail.yourRating')}</SectionLabel>
       <RatingStepper

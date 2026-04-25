@@ -13,6 +13,7 @@ import {
  View,
  type ViewStyle,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
  Easing,
  useAnimatedStyle,
@@ -206,12 +207,14 @@ function SlideVisualChip({
  isActive,
  label,
  tintColor,
+ maxWidth,
 }: {
  delayMs: number;
  icon: React.ComponentProps<typeof FontAwesome5>['name'];
  isActive: boolean;
  label: string;
  tintColor: string;
+ maxWidth: number;
 }) {
  const floatY = useSharedValue(isActive ? 0 : 8);
  const glowOpacity = useSharedValue(isActive ? 1 : 0.45);
@@ -258,7 +261,9 @@ function SlideVisualChip({
      borderRadius: borderRadius.full,
      borderWidth: 1,
      borderColor: `${tintColor}44`,
-     backgroundColor: `${tintColor}16`,
+      backgroundColor: `${tintColor}16`,
+      maxWidth,
+      minWidth: 0,
     },
     chipStyle,
    ]}
@@ -276,11 +281,13 @@ function SlideVisualChip({
     <FontAwesome5 name={icon} size={11} color={tintColor} solid />
    </View>
    <Text
-    style={{
-     color: colors.text.primary,
-     fontFamily: typography.font.medium,
-     fontSize: typography.size.sm,
-    }}
+     style={{
+      color: colors.text.primary,
+      fontFamily: typography.font.medium,
+      fontSize: typography.size.sm,
+      flexShrink: 1,
+     }}
+     numberOfLines={1}
    >
     {label}
    </Text>
@@ -322,7 +329,17 @@ function IndicatorDot({ color, isActive }: { color: string; isActive: boolean })
  );
 }
 
-function OnboardingSlideVisual({ isActive, slide }: { isActive: boolean; slide: SlideDescriptor }) {
+function OnboardingSlideVisual({
+ isActive,
+ slide,
+ isCompactWidth,
+ isCompactHeight,
+}: {
+ isActive: boolean;
+ slide: SlideDescriptor;
+ isCompactWidth: boolean;
+ isCompactHeight: boolean;
+}) {
  const orbScale = useSharedValue(isActive ? 1 : 0.92);
  const orbGlow = useSharedValue(isActive ? 0.24 : 0.12);
 
@@ -363,20 +380,20 @@ function OnboardingSlideVisual({ isActive, slide }: { isActive: boolean; slide: 
  return (
   <View
    style={{
-    minHeight: 160,
-    marginTop: spacing.lg,
+    minHeight: isCompactHeight ? 124 : 160,
+    marginTop: isCompactHeight ? spacing.md : spacing.lg,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: spacing.md,
+    gap: isCompactHeight ? spacing.sm : spacing.md,
    }}
   >
    <Animated.View
     style={[
-     {
+      {
       position: 'absolute',
-      width: 180,
-      height: 180,
-      borderRadius: 90,
+      width: isCompactWidth ? 148 : 180,
+      height: isCompactWidth ? 148 : 180,
+      borderRadius: borderRadius.full,
       backgroundColor: slide.iconColor,
      },
      glowStyle,
@@ -386,9 +403,9 @@ function OnboardingSlideVisual({ isActive, slide }: { isActive: boolean; slide: 
    <Animated.View
     style={[
      {
-      width: 116,
-      height: 116,
-      borderRadius: 58,
+      width: isCompactWidth ? 96 : 116,
+      height: isCompactWidth ? 96 : 116,
+      borderRadius: borderRadius.full,
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 1,
@@ -396,7 +413,7 @@ function OnboardingSlideVisual({ isActive, slide }: { isActive: boolean; slide: 
       backgroundColor: `${slide.iconColor}14`,
       shadowColor: slide.iconColor,
       shadowOpacity: 0.28,
-      shadowRadius: 22,
+      shadowRadius: isCompactWidth ? 18 : 22,
       shadowOffset: { width: 0, height: 12 },
       elevation: 12,
      },
@@ -408,44 +425,58 @@ function OnboardingSlideVisual({ isActive, slide }: { isActive: boolean; slide: 
      style={{
       position: 'absolute',
       inset: 0,
-      borderRadius: 58,
+      borderRadius: borderRadius.full,
      }}
     />
-    <FontAwesome5 name={slide.icon} size={34} color={slide.iconColor} solid />
+    <FontAwesome5 name={slide.icon} size={isCompactWidth ? 28 : 34} color={slide.iconColor} solid />
    </Animated.View>
 
-   <View style={{ width: '100%', gap: spacing.sm }}>
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: spacing.sm }}>
-     <SlideVisualChip
-      delayMs={0}
-      icon={slide.chips[0].icon}
-      isActive={isActive}
-      label={slide.chips[0].label}
-      tintColor={slide.iconColor}
-     />
-     <SlideVisualChip
-      delayMs={180}
-      icon={slide.chips[1].icon}
-      isActive={isActive}
-      label={slide.chips[1].label}
-      tintColor={slide.iconColor}
-     />
-    </View>
-    <View style={{ alignItems: 'center' }}>
-     <SlideVisualChip
-      delayMs={360}
-      icon={slide.chips[2].icon}
-      isActive={isActive}
-      label={slide.chips[2].label}
-      tintColor={slide.iconColor}
-     />
-    </View>
+   <View
+    style={{
+     width: '100%',
+     flexDirection: 'row',
+     flexWrap: 'wrap',
+     justifyContent: 'center',
+     columnGap: spacing.sm,
+     rowGap: spacing.sm,
+    }}
+   >
+    <SlideVisualChip
+     delayMs={0}
+     icon={slide.chips[0].icon}
+     isActive={isActive}
+     label={slide.chips[0].label}
+     tintColor={slide.iconColor}
+     maxWidth={isCompactWidth ? 180 : 210}
+    />
+    <SlideVisualChip
+     delayMs={180}
+     icon={slide.chips[1].icon}
+     isActive={isActive}
+     label={slide.chips[1].label}
+     tintColor={slide.iconColor}
+     maxWidth={isCompactWidth ? 180 : 210}
+    />
+    <SlideVisualChip
+     delayMs={360}
+     icon={slide.chips[2].icon}
+     isActive={isActive}
+     label={slide.chips[2].label}
+     tintColor={slide.iconColor}
+     maxWidth={isCompactWidth ? 220 : 240}
+    />
    </View>
   </View>
  );
 }
 
-function OnboardingSlideCard({ cardWidth, isActive, slide }: OnboardingSlideCardProps) {
+function OnboardingSlideCard({
+ cardWidth,
+ isActive,
+ slide,
+ isCompactWidth,
+ isCompactHeight,
+}: OnboardingSlideCardProps & { isCompactWidth: boolean; isCompactHeight: boolean }) {
  const cardScale = useSharedValue(isActive ? 1 : 0.97);
  const cardOpacity = useSharedValue(isActive ? 1 : 0.72);
  const contentOffset = useSharedValue(isActive ? 0 : 18);
@@ -492,12 +523,12 @@ function OnboardingSlideCard({ cardWidth, isActive, slide }: OnboardingSlideCard
    <Animated.View
     style={[
      {
-      borderRadius: borderRadius.lg,
-      borderWidth: 1,
-      borderColor: isActive ? `${slide.iconColor}44` : 'rgba(255,255,255,0.08)',
-      backgroundColor: 'rgba(17,19,34,0.86)',
-      padding: spacing.lg,
-      minHeight: 380,
+     borderRadius: borderRadius.lg,
+     borderWidth: 1,
+     borderColor: isActive ? `${slide.iconColor}44` : 'rgba(255,255,255,0.08)',
+     backgroundColor: 'rgba(17,19,34,0.86)',
+      padding: isCompactWidth ? spacing.md : spacing.lg,
+      minHeight: isCompactHeight ? 320 : 380,
       justifyContent: 'space-between',
       shadowColor: slide.iconColor,
       shadowOpacity: isActive ? 0.18 : 0.08,
@@ -517,10 +548,20 @@ function OnboardingSlideCard({ cardWidth, isActive, slide }: OnboardingSlideCard
      }}
     />
     <Animated.View style={iconStyle}>
-     <OnboardingSlideVisual isActive={isActive} slide={slide} />
+     <OnboardingSlideVisual
+      isActive={isActive}
+      slide={slide}
+      isCompactWidth={isCompactWidth}
+      isCompactHeight={isCompactHeight}
+     />
     </Animated.View>
 
-    <Animated.View style={[{ gap: spacing.sm, marginTop: spacing.lg }, contentStyle]}>
+    <Animated.View
+     style={[
+      { gap: isCompactHeight ? spacing.xs : spacing.sm, marginTop: isCompactHeight ? spacing.md : spacing.lg },
+      contentStyle,
+     ]}
+    >
      <Text
       style={{
        color: slide.iconColor,
@@ -536,8 +577,11 @@ function OnboardingSlideCard({ cardWidth, isActive, slide }: OnboardingSlideCard
       style={{
        color: colors.text.primary,
        fontFamily: typography.font.bold,
-       fontSize: typography.size['2xl'],
-       lineHeight: Math.ceil(typography.size['2xl'] * typography.lineHeight.snug),
+       fontSize: isCompactWidth ? typography.size.xl : typography.size['2xl'],
+       lineHeight: Math.ceil(
+        (isCompactWidth ? typography.size.xl : typography.size['2xl']) *
+         typography.lineHeight.snug,
+       ),
       }}
      >
       {slide.title}
@@ -546,8 +590,11 @@ function OnboardingSlideCard({ cardWidth, isActive, slide }: OnboardingSlideCard
       style={{
        color: colors.text.secondary,
        fontFamily: typography.font.regular,
-       fontSize: typography.size.md,
-       lineHeight: Math.ceil(typography.size.md * typography.lineHeight.relaxed),
+       fontSize: isCompactHeight ? typography.size.sm : typography.size.md,
+       lineHeight: Math.ceil(
+        (isCompactHeight ? typography.size.sm : typography.size.md) *
+         typography.lineHeight.relaxed,
+       ),
       }}
      >
       {slide.subtitle}
@@ -563,13 +610,17 @@ export function ProfileSetupOnboardingModal({
  onClose,
 }: ProfileSetupOnboardingModalProps) {
  const { t } = useTranslation();
- const { width: screenWidth } = useWindowDimensions();
+ const insets = useSafeAreaInsets();
+ const { width: screenWidth, height: screenHeight } = useWindowDimensions();
  const scrollRef = useRef<ScrollView | null>(null);
  const [currentIndex, setCurrentIndex] = useState(0);
  const [buttonBurstTrigger, setButtonBurstTrigger] = useState(0);
  const [rocketLaunchTrigger, setRocketLaunchTrigger] = useState(0);
  const [isAdvancing, setIsAdvancing] = useState(false);
- const cardWidth = Math.max(280, screenWidth - spacing.lg * 2);
+ const isCompactWidth = screenWidth < 390;
+ const isCompactHeight = screenHeight < 820;
+ const horizontalPadding = isCompactWidth ? spacing.md : spacing.lg;
+ const cardWidth = screenWidth - horizontalPadding * 2;
 
  const slides = useMemo<SlideDescriptor[]>(
   () => [
@@ -687,18 +738,20 @@ export function ProfileSetupOnboardingModal({
      style={{ position: 'absolute', inset: 0 }}
     />
 
-    <View
-     style={{
-      flex: 1,
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing['3xl'],
-      paddingBottom: spacing['2xl'],
+    <ScrollView
+     contentContainerStyle={{
+      flexGrow: 1,
+      paddingHorizontal: horizontalPadding,
+      paddingTop: Math.max(insets.top + spacing.md, isCompactHeight ? spacing.lg : spacing['3xl']),
+      paddingBottom: Math.max(insets.bottom + spacing.lg, spacing['2xl']),
       justifyContent: 'center',
      }}
+     showsVerticalScrollIndicator={false}
+     bounces={false}
     >
      <View
       style={{
-       borderRadius: borderRadius.xl,
+        borderRadius: borderRadius.xl,
        overflow: 'hidden',
        borderWidth: 1,
        borderColor: 'rgba(255,255,255,0.10)',
@@ -712,8 +765,8 @@ export function ProfileSetupOnboardingModal({
 
       <View
        style={{
-        paddingHorizontal: spacing.lg,
-        paddingTop: spacing.lg,
+        paddingHorizontal: isCompactWidth ? spacing.md : spacing.lg,
+        paddingTop: isCompactWidth ? spacing.md : spacing.lg,
        }}
       >
        <View style={{ gap: spacing.xs }}>
@@ -732,7 +785,10 @@ export function ProfileSetupOnboardingModal({
          style={{
           color: colors.text.primary,
           fontFamily: typography.font.bold,
-          fontSize: typography.size.xl,
+          fontSize: isCompactWidth ? typography.size.lg : typography.size.xl,
+          lineHeight: Math.ceil(
+           (isCompactWidth ? typography.size.lg : typography.size.xl) * typography.lineHeight.snug,
+          ),
          }}
         >
          {t('home.firstRunOnboarding.title')}
@@ -746,7 +802,7 @@ export function ProfileSetupOnboardingModal({
         fontFamily: typography.font.regular,
         fontSize: typography.size.sm,
         lineHeight: Math.ceil(typography.size.sm * typography.lineHeight.relaxed),
-        paddingHorizontal: spacing.lg,
+        paddingHorizontal: isCompactWidth ? spacing.md : spacing.lg,
         paddingTop: spacing.sm,
        }}
       >
@@ -760,7 +816,7 @@ export function ProfileSetupOnboardingModal({
        showsHorizontalScrollIndicator={false}
        bounces={false}
        onMomentumScrollEnd={handleMomentumEnd}
-       style={{ marginTop: spacing.lg }}
+       style={{ marginTop: isCompactHeight ? spacing.md : spacing.lg }}
       >
        {slides.map((slide, index) => (
         <OnboardingSlideCard
@@ -768,15 +824,17 @@ export function ProfileSetupOnboardingModal({
          cardWidth={cardWidth}
          isActive={index === currentIndex}
          slide={slide}
+         isCompactWidth={isCompactWidth}
+         isCompactHeight={isCompactHeight}
         />
        ))}
       </ScrollView>
 
       <View
        style={{
-        paddingHorizontal: spacing.lg,
-        paddingBottom: spacing.lg,
-        gap: spacing.md,
+        paddingHorizontal: isCompactWidth ? spacing.md : spacing.lg,
+        paddingBottom: isCompactWidth ? spacing.md : spacing.lg,
+        gap: isCompactHeight ? spacing.sm : spacing.md,
        }}
       >
        <View
@@ -816,7 +874,7 @@ export function ProfileSetupOnboardingModal({
        </View>
       </View>
      </View>
-    </View>
+    </ScrollView>
    </View>
   </Modal>
  );

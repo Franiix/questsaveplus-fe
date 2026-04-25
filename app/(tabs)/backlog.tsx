@@ -1,8 +1,9 @@
 import * as Haptics from 'expo-haptics';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Switch, Text, View } from 'react-native';
+import { InteractionManager, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { BacklogStatusCelebrationOverlay } from '@/components/backlog/BacklogStatusCelebrationOverlay';
 import { BacklogScreenContent } from '@/components/backlog/BacklogScreenContent';
 import { GradientUnderline } from '@/components/base/display/GradientUnderline';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
@@ -29,6 +30,10 @@ import { BacklogSortEnum } from '@/shared/enums/BacklogSort.enum';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import { colors, layout, spacing, typography } from '@/shared/theme/tokens';
+import {
+ isBacklogStatusRateable,
+ normalizeBacklogRatingForStatus,
+} from '@/shared/utils/backlogRating';
 import { shouldLoadBacklogMetadata } from '@/shared/utils/backlogScreen';
 import { calculateBacklogDateFields } from '@/shared/utils/backlogDateFields';
 import { formatDate } from '@/shared/utils/date';
@@ -75,6 +80,10 @@ export default function BacklogScreen() {
   resumedAtInput?: Date;
   showResetAbandonedSwitch?: boolean;
   resetAbandonedAt?: boolean;
+ } | null>(null);
+ const [statusCelebration, setStatusCelebration] = useState<{
+  status: BacklogStatusEnum;
+  trigger: number;
  } | null>(null);
  const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(
   createEmptyGameDiscoveryFilters,
@@ -219,6 +228,15 @@ export default function BacklogScreen() {
   setPendingDeleteItem(item);
  }, []);
 
+ const triggerStatusCelebration = useCallback((status: BacklogStatusEnum) => {
+  InteractionManager.runAfterInteractions(() => {
+   setStatusCelebration((current) => ({
+    status,
+    trigger: current ? current.trigger + 1 : 1,
+   }));
+  });
+ }, []);
+
  const handleTogglePlayNext = useCallback(
   async (item: BacklogItemEntity) => {
    const shouldPin = item.is_play_next !== true;
@@ -294,6 +312,7 @@ export default function BacklogScreen() {
    overrideAbandonedAt?: string,
    overrideResumedAt?: string,
    resetAbandonedAt?: boolean,
+   shouldCelebrate = true,
   ) => {
    clearError();
 
@@ -316,19 +335,29 @@ export default function BacklogScreen() {
      ? { is_play_next: false as const, play_next_priority: null }
      : {};
 
-   await update(item.id, { status, ...unpinFields, ...dateFields });
+   await update(item.id, {
+    status,
+    personal_rating: normalizeBacklogRatingForStatus(status, item.personal_rating),
+    ...unpinFields,
+    ...dateFields,
+   });
    const updateError = useBacklogStore.getState().error;
 
    if (!updateError) {
+    if (shouldCelebrate) {
+     triggerStatusCelebration(status);
+    }
     showToast(t('gameDetail.updateSuccess'), 'success');
     void (status === BacklogStatusEnum.COMPLETED && !item.completed_at
      ? Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
      : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light));
+    return true;
    } else {
     showToast(updateError, 'error');
+    return false;
    }
   },
-  [clearError, showToast, t, update],
+  [clearError, showToast, t, triggerStatusCelebration, update],
  );
 
  const handleQuickStatusChange = useCallback(
@@ -433,16 +462,19 @@ export default function BacklogScreen() {
 
  const handleConfirmQuickChange = useCallback(async () => {
   if (!pendingQuickChange) return;
-  await doQuickStatusUpdate(
-   pendingQuickChange.item,
-   pendingQuickChange.status,
-   pendingQuickChange.startedAtInput?.toISOString(),
-   pendingQuickChange.completedAtInput?.toISOString(),
-   pendingQuickChange.abandonedAtInput?.toISOString(),
-   pendingQuickChange.resumedAtInput?.toISOString(),
-   pendingQuickChange.resetAbandonedAt,
-  );
+
+  const currentQuickChange = pendingQuickChange;
   setPendingQuickChange(null);
+
+  await doQuickStatusUpdate(
+   currentQuickChange.item,
+   currentQuickChange.status,
+   currentQuickChange.startedAtInput?.toISOString(),
+   currentQuickChange.completedAtInput?.toISOString(),
+   currentQuickChange.abandonedAtInput?.toISOString(),
+   currentQuickChange.resumedAtInput?.toISOString(),
+   currentQuickChange.resetAbandonedAt,
+  );
  }, [doQuickStatusUpdate, pendingQuickChange]);
 
  const handleQuickStartedAtChange = useCallback((date: Date) => {
@@ -469,6 +501,9 @@ export default function BacklogScreen() {
 
  const handleRatingChange = useCallback(
   async (item: BacklogItemEntity, rating: number) => {
+   if (!isBacklogStatusRateable(item.status)) {
+    return;
+   }
    clearError();
    await update(item.id, { personal_rating: rating });
    const updateError = useBacklogStore.getState().error;
@@ -608,6 +643,13 @@ export default function BacklogScreen() {
     removeLabel={t('gameDetail.confirmRemove.confirm')}
     retryLabel={t('home.errorRetry')}
     emptyActionLabel={t('backlog.emptyAll.action')}
+   />
+
+   <BacklogStatusCelebrationOverlay
+    colorMap={colorMap}
+    iconMap={iconMap}
+    status={statusCelebration?.status ?? null}
+    trigger={statusCelebration?.trigger ?? 0}
    />
 
    <GameFilterSheet

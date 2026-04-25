@@ -330,6 +330,8 @@
   rateGame: 'Rate this game',
   editRating: 'Edit rating',
   ratingSheetTitle: 'Your rating',
+  ratingSheetDescription:
+   'Update the rating quickly: as soon as you tap the stars or use - and +, the value is saved right away.',
   sort: {
    label: 'Sort',
    title: 'Sort by',

@@ -11,7 +11,7 @@ import { PlatformIcon, platformNameToKey } from '@/components/base/display/Platf
 import { StatusBadge } from '@/components/base/display/StatusBadge';
 import { BottomSheet } from '@/components/base/feedback/BottomSheet';
 import { ActionIconButton } from '@/components/base/inputs/ActionIconButton';
-import { StarRatingInput } from '@/components/base/inputs/StarRatingInput';
+import { RatingStepper } from '@/components/base/inputs/RatingStepper';
 import { useSingleAction } from '@/hooks/useSingleAction';
 import { getBacklogQuickStatusGroups } from '@/shared/consts/BacklogQuickStatusActions.const';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
@@ -22,6 +22,10 @@ import type {
  BacklogStatusLabelMap,
 } from '@/shared/models/backlog/BacklogScreenContent.model';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
+import {
+ isBacklogStatusRateable,
+ normalizeBacklogRatingForStatus,
+} from '@/shared/utils/backlogRating';
 import { formatDate } from '@/shared/utils/date';
 
 const SWIPE_ACTION_WIDTH = 104;
@@ -93,6 +97,8 @@ export const BacklogListItem = memo(function BacklogListItem({
  const { isLocked, run } = useSingleAction(() => onPress(item));
  const swipeableRef = useRef<Swipeable | null>(null);
  const isPlayNext = item.is_play_next === true;
+ const resolvedRating = normalizeBacklogRatingForStatus(item.status, item.personal_rating);
+ const canEditRating = Boolean(onRatingChange) && isBacklogStatusRateable(item.status);
  const effectiveOrdinal = playNextOrdinal ?? item.play_next_priority ?? undefined;
  const canTogglePlayNext =
   Boolean(onTogglePlayNext) && (item.status === BacklogStatusEnum.WANT_TO_PLAY || isPlayNext);
@@ -146,7 +152,7 @@ export const BacklogListItem = memo(function BacklogListItem({
    <View
     style={{ flexDirection: 'row', alignItems: 'stretch', gap: spacing.sm, marginLeft: spacing.sm }}
    >
-    {onRatingChange ? (
+    {canEditRating ? (
      <Pressable
       onPress={() => setIsRatingSheetOpen(true)}
       style={{
@@ -161,10 +167,10 @@ export const BacklogListItem = memo(function BacklogListItem({
       }}
      >
       <FontAwesome5
-       name={item.personal_rating !== null ? 'star' : 'star'}
+       name={resolvedRating !== null ? 'star' : 'star'}
        size={16}
        color={colors.warning}
-       solid={item.personal_rating !== null}
+       solid={resolvedRating !== null}
       />
       <Text
        style={{
@@ -174,7 +180,7 @@ export const BacklogListItem = memo(function BacklogListItem({
         textAlign: 'center',
        }}
       >
-       {item.personal_rating !== null ? t('backlog.editRating') : t('backlog.rateGame')}
+       {resolvedRating !== null ? t('backlog.editRating') : t('backlog.rateGame')}
       </Text>
      </Pressable>
     ) : null}
@@ -498,7 +504,7 @@ export const BacklogListItem = memo(function BacklogListItem({
           }}
          />
         ) : null}
-        {item.personal_rating !== null ? (
+        {resolvedRating !== null ? (
          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
           <Text
            style={{
@@ -507,9 +513,7 @@ export const BacklogListItem = memo(function BacklogListItem({
             fontFamily: typography.font.semibold,
            }}
           >
-           {item.personal_rating % 1 === 0
-            ? String(item.personal_rating)
-            : item.personal_rating.toFixed(1)}
+           {resolvedRating % 1 === 0 ? String(resolvedRating) : resolvedRating.toFixed(1)}
           </Text>
           <FontAwesome5 name="star" size={9} color={colors.warning} solid />
          </View>
@@ -572,21 +576,33 @@ export const BacklogListItem = memo(function BacklogListItem({
   </View>
  );
 
- const ratingSheet = onRatingChange ? (
+ const ratingSheet = canEditRating ? (
   <BottomSheet
    isVisible={isRatingSheetOpen}
    onClose={() => setIsRatingSheetOpen(false)}
    title={t('backlog.ratingSheetTitle')}
   >
-   <View style={{ alignItems: 'center', paddingVertical: spacing.md }}>
-    <StarRatingInput
-     value={item.personal_rating ?? undefined}
-     size="lg"
-     onChange={(rating) => {
-      onRatingChange(item, rating);
-      setIsRatingSheetOpen(false);
+   <View style={{ alignItems: 'center', paddingVertical: spacing.md, gap: spacing.md }}>
+    <Text
+     style={{
+      color: colors.text.secondary,
+      fontSize: typography.size.sm,
+      lineHeight: Math.ceil(typography.size.sm * typography.lineHeight.normal),
+      textAlign: 'center',
      }}
-    />
+    >
+     {t('backlog.ratingSheetDescription')}
+    </Text>
+    <View style={{ alignItems: 'center' }}>
+     <RatingStepper
+      value={resolvedRating ?? 0}
+      size="md"
+      onChange={(rating) => {
+       onRatingChange?.(item, rating);
+       setIsRatingSheetOpen(false);
+      }}
+     />
+    </View>
    </View>
   </BottomSheet>
  ) : null;

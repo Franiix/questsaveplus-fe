@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, useWindowDimensions } from 'react-native';
+import { InteractionManager, ScrollView, Switch, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BacklogStatusCelebrationOverlay } from '@/components/backlog/BacklogStatusCelebrationOverlay';
 import { BottomSheet } from '@/components/base/feedback/BottomSheet';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
+import { DatePickerInput } from '@/components/base/inputs/DatePickerInput';
 import { SearchableMultiSelectInput } from '@/components/base/inputs/SearchableMultiSelectInput';
 import { GameBacklogPanel } from '@/components/game/GameBacklogPanel';
 import { GameHeroBanner } from '@/components/game/GameHeroBanner';
 import { GameSummaryHeader } from '@/components/game/GameSummaryHeader';
 import { useGameBacklogController } from '@/hooks/useGameBacklogController';
+import { useBacklogStatusPresentation } from '@/hooks/useBacklogStatusPresentation';
 import type { CatalogGame } from '@/shared/models/Catalog.model';
-import { spacing } from '@/shared/theme/tokens';
+import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
+import { colors, spacing, typography } from '@/shared/theme/tokens';
 
 type GameDetailSheetProps = {
  game: CatalogGame | null;
@@ -20,10 +24,15 @@ type GameDetailSheetProps = {
 
 export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps) {
  const { t } = useTranslation();
+ const { colorMap, iconMap } = useBacklogStatusPresentation();
  const insets = useSafeAreaInsets();
  const { width: screenWidth } = useWindowDimensions();
  const [confirmRemoveVisible, setConfirmRemoveVisible] = useState(false);
  const [confirmRestoreVisible, setConfirmRestoreVisible] = useState(false);
+ const [statusCelebration, setStatusCelebration] = useState<{
+  status: BacklogStatusEnum;
+  trigger: number;
+ } | null>(null);
  const {
   isBacklogLoading,
   isMutating,
@@ -41,6 +50,8 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
   isPlatformModalOpen,
   statusOptions,
   hasPendingChanges,
+  pendingDateWarning,
+  pendingResetAbandoned,
   setLocalPlatformPlayed,
   handleStatusChange,
   handleRatingChange,
@@ -51,6 +62,13 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
   handleUpdateBacklog,
   handleRemoveFromBacklog,
   handleRestoreFromArchive,
+  confirmPendingDateWarning,
+  dismissPendingDateWarning,
+  togglePendingResetAbandoned,
+  handlePendingStartedAtChange,
+  handlePendingCompletedAtChange,
+  handlePendingAbandonedAtChange,
+  handlePendingResumedAtChange,
  } = useGameBacklogController({
   game: game
    ? {
@@ -63,6 +81,15 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
   isEnabled: isOpen,
   onRemoveSuccess: onClose,
  });
+
+ function triggerStatusCelebration(status: BacklogStatusEnum) {
+  InteractionManager.runAfterInteractions(() => {
+   setStatusCelebration((current) => ({
+    status,
+    trigger: current ? current.trigger + 1 : 1,
+   }));
+  });
+ }
 
  if (!game) return null;
 
@@ -124,11 +151,24 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
      onRatingChange={handleRatingChange}
      onPlatformPlayedChange={setLocalPlatformPlayed}
      onAdd={() => void handleAddToBacklog()}
-     onUpdate={() => void handleUpdateBacklog()}
+     onUpdate={() => {
+      void handleUpdateBacklog().then((updatedStatus) => {
+       if (updatedStatus) {
+        triggerStatusCelebration(updatedStatus);
+       }
+      });
+     }}
      onRemove={() => setConfirmRemoveVisible(true)}
      onRestoreFromArchive={() => setConfirmRestoreVisible(true)}
     />
    </ScrollView>
+
+   <BacklogStatusCelebrationOverlay
+    colorMap={colorMap}
+    iconMap={iconMap}
+    status={statusCelebration?.status ?? null}
+    trigger={statusCelebration?.trigger ?? 0}
+   />
 
    <ConfirmModal
     visible={confirmRemoveVisible}
@@ -164,6 +204,86 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
      accessibilityLabel={t('backlog.platformPlayedLabel')}
      emptyLabel={t('backlog.platformSelection.unavailable')}
     />
+   </ConfirmModal>
+
+   <ConfirmModal
+    visible={pendingDateWarning !== null}
+    title={pendingDateWarning?.title ?? ''}
+    message={pendingDateWarning?.body ?? ''}
+    confirmLabel={t('backlog.dateChange.confirm')}
+    cancelLabel={t('common.cancel')}
+    onConfirm={() => {
+     void confirmPendingDateWarning().then((updatedStatus) => {
+      if (updatedStatus) {
+       triggerStatusCelebration(updatedStatus);
+      }
+     });
+    }}
+    onCancel={dismissPendingDateWarning}
+   >
+    {pendingDateWarning?.startedAtInput !== undefined ? (
+     <DatePickerInput
+      value={pendingDateWarning.startedAtInput}
+      onChange={handlePendingStartedAtChange}
+      maximumDate={new Date()}
+      accessibilityLabel={t('backlog.startedAtLabel')}
+      placeholder={t('gameDetail.datePlaceholder')}
+     />
+    ) : null}
+    {pendingDateWarning?.completedAtInput !== undefined ? (
+     <DatePickerInput
+      value={pendingDateWarning.completedAtInput}
+      onChange={handlePendingCompletedAtChange}
+      maximumDate={new Date()}
+      accessibilityLabel={t('backlog.completedAtLabel')}
+      placeholder={t('gameDetail.datePlaceholder')}
+     />
+    ) : null}
+    {pendingDateWarning?.resumedAtInput !== undefined ? (
+     <DatePickerInput
+      value={pendingDateWarning.resumedAtInput}
+      onChange={handlePendingResumedAtChange}
+      maximumDate={new Date()}
+      accessibilityLabel={t('backlog.resumedAtLabel')}
+      placeholder={t('gameDetail.datePlaceholder')}
+     />
+    ) : null}
+    {pendingDateWarning?.abandonedAtInput !== undefined ? (
+     <DatePickerInput
+      value={pendingDateWarning.abandonedAtInput}
+      onChange={handlePendingAbandonedAtChange}
+      maximumDate={new Date()}
+      accessibilityLabel={t('backlog.abandonedAtLabel')}
+      placeholder={t('gameDetail.datePlaceholder')}
+     />
+    ) : null}
+    {pendingDateWarning?.showResetAbandonedSwitch ? (
+     <View
+      style={{
+       flexDirection: 'row',
+       alignItems: 'center',
+       justifyContent: 'space-between',
+       paddingVertical: spacing.xs,
+      }}
+     >
+      <Text
+       style={{
+        color: colors.text.primary,
+        fontSize: typography.size.md,
+        flex: 1,
+       }}
+      >
+       {t('backlog.dateChange.resetAbandoned')}
+      </Text>
+      <Switch
+       value={pendingResetAbandoned}
+       onValueChange={togglePendingResetAbandoned}
+       thumbColor={pendingResetAbandoned ? colors.primary.DEFAULT : colors.text.disabled}
+       trackColor={{ false: 'rgba(255,255,255,0.12)', true: `${colors.primary.DEFAULT}80` }}
+       ios_backgroundColor="rgba(255,255,255,0.12)"
+      />
+     </View>
+    ) : null}
    </ConfirmModal>
 
    <ConfirmModal

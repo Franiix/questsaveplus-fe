@@ -1,7 +1,7 @@
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useRef, useState } from 'react';
-import { Modal, StyleSheet, Text, View } from 'react-native';
+import { Modal, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, {
  runOnJS,
  useAnimatedStyle,
@@ -25,6 +25,7 @@ export function LoadingOverlay({
  message = 'Caricamento...',
  visible = true,
 }: LoadingOverlayProps) {
+ const { width: screenWidth } = useWindowDimensions();
  const [shouldRender, setShouldRender] = useState(visible);
  const plusScale = useSharedValue(1);
  const plusOpacity = useSharedValue(1);
@@ -87,6 +88,7 @@ export function LoadingOverlay({
  const overlayStyle = useAnimatedStyle(() => ({
   opacity: overlayOpacity.value,
  }));
+ const cardWidth = Math.min(320, Math.max(240, screenWidth - 32));
 
  return (
   <Modal visible={shouldRender} transparent statusBarTranslucent animationType="none">
@@ -104,7 +106,7 @@ export function LoadingOverlay({
     />
 
     <View style={styles.centered}>
-     <View style={styles.card}>
+     <View style={[styles.card, { width: cardWidth, maxWidth: cardWidth }]}>
       <LinearGradient
        colors={['rgba(255,255,255,0.07)', 'rgba(255,255,255,0.02)']}
        start={{ x: 0, y: 0 }}
@@ -112,8 +114,15 @@ export function LoadingOverlay({
        style={StyleSheet.absoluteFill}
       />
 
-      <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-       <Text style={styles.title}>QuestSave</Text>
+      <View style={styles.titleRow}>
+       <Text
+        style={styles.title}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.82}
+       >
+        QuestSave
+       </Text>
        <Animated.Text style={[plusStyle, styles.plus]}>+</Animated.Text>
       </View>
 
@@ -133,7 +142,6 @@ const styles = StyleSheet.create({
  },
  card: {
   minWidth: 214,
-  maxWidth: 270,
   borderRadius: 30,
   borderWidth: 1,
   borderColor: 'rgba(255,255,255,0.10)',
@@ -150,12 +158,20 @@ const styles = StyleSheet.create({
   shadowOffset: { width: 0, height: 16 },
   elevation: 16,
  },
+ titleRow: {
+  width: '100%',
+  flexDirection: 'row',
+  alignItems: 'baseline',
+  justifyContent: 'center',
+  flexWrap: 'nowrap',
+ },
  title: {
   color: colors.text.primary,
   fontFamily: typography.font.bold,
   fontSize: typography.size.lg,
   letterSpacing: typography.letterSpacing.tight,
- },
+  flexShrink: 1,
+  },
  plus: {
   color: colors.primary.DEFAULT,
   fontFamily: typography.font.black,

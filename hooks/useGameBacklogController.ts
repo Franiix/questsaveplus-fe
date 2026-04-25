@@ -5,6 +5,10 @@ import type { SearchableSelectOption } from '@/components/base/inputs/Searchable
 import { useBacklogStatusPresentation } from '@/hooks/useBacklogStatusPresentation';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { CatalogPlatform } from '@/shared/models/Catalog.model';
+import {
+ isBacklogStatusRateable,
+ normalizeBacklogRatingForStatus,
+} from '@/shared/utils/backlogRating';
 import { formatDate } from '@/shared/utils/date';
 import { useAuthStore } from '@/stores/auth.store';
 import { useBacklogStore } from '@/stores/backlog.store';
@@ -33,11 +37,11 @@ type PendingDateWarning = {
  showResetAbandonedSwitch?: boolean;
  onConfirm: (options?: {
   startedAt?: string;
-  completedAt?: string;
-  abandonedAt?: string;
-  resumedAt?: string;
-  resetAbandoned?: boolean;
- }) => Promise<void>;
+ completedAt?: string;
+ abandonedAt?: string;
+ resumedAt?: string;
+ resetAbandoned?: boolean;
+ }) => Promise<BacklogStatusEnum | null>;
 };
 
 const RESUMABLE_STATUSES = new Set<BacklogStatusEnum>([
@@ -126,6 +130,9 @@ export function useGameBacklogController({
 
  const userId = session?.user?.id ?? null;
  const backlogItem = backlog?.game_id === game?.id ? backlog : null;
+ const persistedRating = backlogItem
+  ? normalizeBacklogRatingForStatus(backlogItem.status, backlogItem.personal_rating)
+  : null;
  const isInBacklog = !!backlogItem;
  const isArchived = backlogItem?.is_archived === true;
  const isBacklogLoading = isReadingCurrent;
@@ -135,7 +142,7 @@ export function useGameBacklogController({
  const hasPendingChanges =
   !!backlogItem &&
   (selectedStatus !== backlogItem.status ||
-   selectedRating !== (backlogItem.personal_rating ?? 0) ||
+   selectedRating !== (persistedRating ?? 0) ||
    localNotes !== (backlogItem.notes ?? '') ||
    localStartedAt !== (backlogItem.started_at ?? null) ||
    localCompletedAt !== (backlogItem.completed_at ?? null) ||
@@ -165,8 +172,8 @@ export function useGameBacklogController({
 
  useEffect(() => {
   if (!backlogItem) {
-   setSelectedStatus(BacklogStatusEnum.WANT_TO_PLAY);
-   setSelectedRating(0);
+  setSelectedStatus(BacklogStatusEnum.WANT_TO_PLAY);
+  setSelectedRating(0);
    setLocalNotes('');
    setLocalStartedAt(null);
    setLocalCompletedAt(null);
@@ -177,14 +184,14 @@ export function useGameBacklogController({
   }
 
   setSelectedStatus(backlogItem.status);
-  setSelectedRating(backlogItem.personal_rating ?? 0);
+  setSelectedRating(persistedRating ?? 0);
   setLocalNotes(backlogItem.notes ?? '');
   setLocalStartedAt(backlogItem.started_at ?? null);
   setLocalCompletedAt(backlogItem.completed_at ?? null);
   setLocalAbandonedAt(backlogItem.abandoned_at ?? null);
   setLocalResumedAt(backlogItem.resumed_at ?? null);
   setLocalPlatformPlayed(backlogItem.platform_played ?? null);
- }, [backlogItem]);
+ }, [backlogItem, persistedRating]);
 
  useEffect(() => {
   if (!error) return;
@@ -195,6 +202,9 @@ export function useGameBacklogController({
  function handleStatusChange(value: string) {
   const newStatus = value as BacklogStatusEnum;
   setSelectedStatus(newStatus);
+  if (!isBacklogStatusRateable(newStatus)) {
+   setSelectedRating(0);
+  }
   if (selectedStatus === BacklogStatusEnum.COMPLETED && newStatus !== BacklogStatusEnum.COMPLETED) {
    setLocalCompletedAt(null);
   }
@@ -234,7 +244,9 @@ export function useGameBacklogController({
    game_name: game.name,
    game_cover_url: game.background_image ?? undefined,
    status: selectedStatus,
-   personal_rating: selectedRating > 0 ? selectedRating : undefined,
+   personal_rating:
+    normalizeBacklogRatingForStatus(selectedStatus, selectedRating > 0 ? selectedRating : null) ??
+    undefined,
    platform_played: pendingPlatformPlayed,
    started_at: isResumableStatus ? now : undefined,
    completed_at: isCompleted ? now : undefined,
@@ -252,8 +264,8 @@ export function useGameBacklogController({
   setPendingPlatformPlayed([]);
  }
 
- async function handleUpdateBacklog() {
-  if (!backlogItem) return;
+ async function handleUpdateBacklog(): Promise<BacklogStatusEnum | null> {
+  if (!backlogItem) return null;
 
   const now = new Date().toISOString();
   const today = formatDate(now, i18n.language, { day: 'numeric', month: 'long', year: 'numeric' });
@@ -301,7 +313,7 @@ export function useGameBacklogController({
    abandonedAt?: string;
    resumedAt?: string;
    resetAbandoned?: boolean;
-  }) => {
+  }): Promise<BacklogStatusEnum | null> => {
    const dateFields: {
     started_at?: string | null;
     completed_at?: string | null;
@@ -349,7 +361,10 @@ export function useGameBacklogController({
 
    const updated = await update(backlogItem.id, {
     status: selectedStatus,
-    personal_rating: selectedRating > 0 ? selectedRating : null,
+    personal_rating: normalizeBacklogRatingForStatus(
+     selectedStatus,
+     selectedRating > 0 ? selectedRating : null,
+    ),
     notes: localNotes.trim().length > 0 ? localNotes : null,
     platform_played: localPlatformPlayed?.length ? localPlatformPlayed : null,
     ...(shouldUnpin ? { is_play_next: false, play_next_priority: null } : {}),
@@ -361,7 +376,10 @@ export function useGameBacklogController({
     void (isCompleted && !currentCompletedAt
      ? Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
      : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium));
+    return selectedStatus;
    }
+
+   return null;
   };
 
   if (isGoingToWishlist) {
@@ -371,7 +389,7 @@ export function useGameBacklogController({
     body: t('backlog.dateChange.bodyToWishlist'),
     onConfirm: doUpdate,
    });
-   return;
+   return null;
   }
 
   if (isLeavingAbandoned) {
@@ -390,7 +408,7 @@ export function useGameBacklogController({
     showResetAbandonedSwitch: true,
     onConfirm: doUpdate,
    });
-   return;
+   return null;
   }
 
   if (wouldAutoSetAbandoned) {
@@ -401,7 +419,7 @@ export function useGameBacklogController({
     abandonedAtInput: new Date(),
     onConfirm: doUpdate,
    });
-   return;
+   return null;
   }
 
   if (isLeavingCompleted || wouldAutoSetStarted || wouldAutoSetCompleted || wouldPromptResumed) {
@@ -432,15 +450,15 @@ export function useGameBacklogController({
     resumedAtInput: wouldPromptResumed ? new Date() : undefined,
     onConfirm: doUpdate,
    });
-   return;
+   return null;
   }
 
-  await doUpdate();
+  return await doUpdate();
  }
 
- async function confirmPendingDateWarning() {
-  if (!pendingDateWarning) return;
-  await pendingDateWarning.onConfirm({
+ async function confirmPendingDateWarning(): Promise<BacklogStatusEnum | null> {
+  if (!pendingDateWarning) return null;
+  const confirmedStatus = await pendingDateWarning.onConfirm({
    startedAt: pendingDateWarning.startedAtInput?.toISOString(),
    completedAt: pendingDateWarning.completedAtInput?.toISOString(),
    abandonedAt: pendingDateWarning.abandonedAtInput?.toISOString(),
@@ -449,6 +467,7 @@ export function useGameBacklogController({
   });
   setPendingDateWarning(null);
   setPendingResetAbandoned(false);
+  return confirmedStatus;
  }
 
  function dismissPendingDateWarning() {

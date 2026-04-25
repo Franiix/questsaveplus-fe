@@ -331,6 +331,8 @@
   rateGame: 'Dai un voto',
   editRating: 'Modifica voto',
   ratingSheetTitle: 'Il tuo voto',
+  ratingSheetDescription:
+   'Aggiorna il voto al volo: appena tocchi le stelle o usi - e +, il valore viene salvato subito.',
   sort: {
    label: 'Ordina',
    title: 'Ordina per',

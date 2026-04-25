@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
  Animated,
+ InteractionManager,
  KeyboardAvoidingView,
  Platform,
  Switch,
@@ -11,6 +12,7 @@ import {
  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BacklogStatusCelebrationOverlay } from '@/components/backlog/BacklogStatusCelebrationOverlay';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
 import { LoadingSpinner } from '@/components/base/feedback/LoadingSpinner';
 import { RetryState } from '@/components/base/feedback/RetryState';
@@ -25,6 +27,7 @@ import { GameStickyHeader } from '@/components/game/GameStickyHeader';
 import { useDeferredGameDetailSectionsGate } from '@/hooks/useDeferredGameDetailSectionsGate';
 import { useGameAdditions } from '@/hooks/useGameAdditions';
 import { useGameBacklogController } from '@/hooks/useGameBacklogController';
+import { useBacklogStatusPresentation } from '@/hooks/useBacklogStatusPresentation';
 import { useGameCommunityRating } from '@/hooks/useGameCommunityRating';
 import { useGameDetail } from '@/hooks/useGameDetail';
 import { useGameDetailNavigation } from '@/hooks/useGameDetailNavigation';
@@ -33,6 +36,7 @@ import { useGameDetailViewModel } from '@/hooks/useGameDetailViewModel';
 import { useGameSeries } from '@/hooks/useGameSeries';
 import { useGameSimilar } from '@/hooks/useGameSimilar';
 import { useRelatedCompanyGames } from '@/hooks/useRelatedCompanyGames';
+import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
 import { getIgdbNamedItemExternalId } from '@/shared/utils/gameCatalog';
 
@@ -42,6 +46,7 @@ export default function GameDetailScreen() {
  const { id } = useLocalSearchParams<{ id: string }>();
  const gameId = Number(id);
  const { t, i18n } = useTranslation();
+ const { colorMap, iconMap } = useBacklogStatusPresentation();
  const insets = useSafeAreaInsets();
  const { width: screenWidth } = useWindowDimensions();
  const stickyThreshold = HERO_HEIGHT - 88;
@@ -175,6 +180,19 @@ export default function GameDetailScreen() {
    : null,
  });
  const [confirmRestoreVisible, setConfirmRestoreVisible] = useState(false);
+ const [statusCelebration, setStatusCelebration] = useState<{
+  status: BacklogStatusEnum;
+  trigger: number;
+ } | null>(null);
+
+ function triggerStatusCelebration(status: BacklogStatusEnum) {
+  InteractionManager.runAfterInteractions(() => {
+   setStatusCelebration((current) => ({
+    status,
+    trigger: current ? current.trigger + 1 : 1,
+   }));
+  });
+ }
 
  const viewModel = useGameDetailViewModel({
   additions,
@@ -315,7 +333,13 @@ export default function GameDetailScreen() {
        onChangeNotes: setLocalNotes,
        onNotesFocus: handleNotesFocus,
        onAdd: () => void handleAddToBacklog(),
-       onUpdate: () => void handleUpdateBacklog(),
+       onUpdate: () => {
+        void handleUpdateBacklog().then((updatedStatus) => {
+         if (updatedStatus) {
+          triggerStatusCelebration(updatedStatus);
+         }
+        });
+       },
        onRemove: () => setConfirmRemoveVisible(true),
        onRestoreFromArchive: () => setConfirmRestoreVisible(true),
        onStartedAtChange: setLocalStartedAt,
@@ -376,8 +400,15 @@ export default function GameDetailScreen() {
        registerSectionOffset={registerSectionOffset}
       />
      ) : null}
-    </View>
-   </Animated.ScrollView>
+   </View>
+  </Animated.ScrollView>
+
+   <BacklogStatusCelebrationOverlay
+    colorMap={colorMap}
+    iconMap={iconMap}
+    status={statusCelebration?.status ?? null}
+    trigger={statusCelebration?.trigger ?? 0}
+   />
 
    <Animated.View
     pointerEvents={isStickyVisible ? 'auto' : 'none'}
@@ -454,7 +485,13 @@ export default function GameDetailScreen() {
     message={pendingDateWarning?.body ?? ''}
     confirmLabel={t('backlog.dateChange.confirm')}
     cancelLabel={t('common.cancel')}
-    onConfirm={() => void confirmPendingDateWarning()}
+    onConfirm={() => {
+     void confirmPendingDateWarning().then((updatedStatus) => {
+      if (updatedStatus) {
+       triggerStatusCelebration(updatedStatus);
+      }
+     });
+    }}
     onCancel={dismissPendingDateWarning}
    >
     {pendingDateWarning?.startedAtInput !== undefined ? (
