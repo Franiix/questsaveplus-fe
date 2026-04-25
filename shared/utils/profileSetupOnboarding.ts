@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 
-const PROFILE_SETUP_ONBOARDING_KEY_PREFIX = 'profile_setup_onboarding_seen:v1:';
+const PROFILE_SETUP_ONBOARDING_KEY_PREFIX = 'profileSetupOnboardingSeen_v1_';
 
 // Module-level set survives component remounts within the same JS bundle lifetime.
 const sessionDismissedSet = new Set<string>();
@@ -38,6 +38,6 @@ export async function consumeProfileSetupOnboarding(userId: string) {
  try {
   await SecureStore.setItemAsync(buildProfileSetupOnboardingKey(userId), '1');
  } catch {
-  // If SecureStore fails, we simply don't persist the dismiss — no crash.
+  // SecureStore write failed; onboarding may reappear on next cold start.
  }
 }

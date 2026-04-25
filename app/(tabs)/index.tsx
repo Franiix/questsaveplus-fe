@@ -129,8 +129,12 @@ export default function HomeScreen() {
   let isCancelled = false;
 
   void getProfileSetupOnboardingPending(userId).then((isPending) => {
-   if (!isCancelled) {
-    setIsFirstRunOnboardingVisible(isPending);
+   if (isCancelled) return;
+   setIsFirstRunOnboardingVisible(isPending);
+   if (isPending) {
+    // Mark as seen immediately when shown — avoids losing the flag if the
+    // user reloads before tapping close (fire-and-forget write would race).
+    void consumeProfileSetupOnboarding(userId);
    }
   });
 
@@ -182,11 +186,7 @@ export default function HomeScreen() {
  const handleCloseFirstRunOnboarding = useCallback(() => {
   const userId = session?.user?.id;
   setIsFirstRunOnboardingVisible(false);
-
-  if (!userId) return;
-
-  markOnboardingDismissedForSession(userId);
-  void consumeProfileSetupOnboarding(userId);
+  if (userId) markOnboardingDismissedForSession(userId);
  }, [session?.user?.id]);
 
  return (
