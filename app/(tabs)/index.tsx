@@ -1,5 +1,5 @@
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -25,8 +25,11 @@ import { toAppliedFilterChips, toQuickPresetActions } from '@/shared/utils/homeD
 import {
  consumeProfileSetupOnboarding,
  getProfileSetupOnboardingPending,
+ isOnboardingDismissedForSession,
+ markOnboardingDismissedForSession,
 } from '@/shared/utils/profileSetupOnboarding';
 import { useAuthStore } from '@/stores/auth.store';
+import { useProfileStore } from '@/stores/profile.store';
 
 const NUM_COLUMNS = 2;
 const COLUMN_GAP = spacing.sm;
@@ -106,9 +109,10 @@ export default function HomeScreen() {
   [screenWidth],
  );
  const { prefetchGame, prefetchGames } = usePrefetchGameResources();
+ const profile = useProfileStore((state) => state.profile);
+ const hasResolvedProfile = useProfileStore((state) => state.hasResolvedProfile);
  const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
  const [isFirstRunOnboardingVisible, setIsFirstRunOnboardingVisible] = useState(false);
- const onboardingDismissedRef = useRef(false);
  const pickerSortOptions = useMemo<PickerOption[]>(
   () => sortOptions.map((option) => ({ label: option.label, value: option.key })),
   [sortOptions],
@@ -117,7 +121,7 @@ export default function HomeScreen() {
  const checkFirstRunOnboarding = useCallback(() => {
   const userId = session?.user?.id;
 
-  if (!userId || onboardingDismissedRef.current) {
+  if (!userId || !hasResolvedProfile || !profile || isOnboardingDismissedForSession(userId)) {
    setIsFirstRunOnboardingVisible(false);
    return () => undefined;
   }
@@ -133,7 +137,7 @@ export default function HomeScreen() {
   return () => {
    isCancelled = true;
   };
- }, [session?.user?.id]);
+ }, [session?.user?.id, hasResolvedProfile, profile]);
 
  useEffect(() => checkFirstRunOnboarding(), [checkFirstRunOnboarding]);
  useFocusEffect(checkFirstRunOnboarding);
@@ -177,13 +181,11 @@ export default function HomeScreen() {
  );
  const handleCloseFirstRunOnboarding = useCallback(() => {
   const userId = session?.user?.id;
-  onboardingDismissedRef.current = true;
   setIsFirstRunOnboardingVisible(false);
 
-  if (!userId) {
-   return;
-  }
+  if (!userId) return;
 
+  markOnboardingDismissedForSession(userId);
   void consumeProfileSetupOnboarding(userId);
  }, [session?.user?.id]);
 

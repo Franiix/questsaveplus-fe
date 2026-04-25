@@ -2,6 +2,17 @@ import * as SecureStore from 'expo-secure-store';
 
 const PROFILE_SETUP_ONBOARDING_KEY_PREFIX = 'profile_setup_onboarding_seen:v1:';
 
+// Module-level set survives component remounts within the same JS bundle lifetime.
+const sessionDismissedSet = new Set<string>();
+
+export function markOnboardingDismissedForSession(userId: string): void {
+ sessionDismissedSet.add(userId);
+}
+
+export function isOnboardingDismissedForSession(userId: string): boolean {
+ return sessionDismissedSet.has(userId);
+}
+
 function buildProfileSetupOnboardingKey(userId: string) {
  return `${PROFILE_SETUP_ONBOARDING_KEY_PREFIX}${userId}`;
 }
