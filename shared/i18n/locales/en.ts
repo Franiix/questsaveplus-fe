@@ -327,6 +327,12 @@
    resetAbandoned: 'Reset abandoned date',
    confirm: 'Save',
   },
+  releaseValidation: {
+   unreleasedStatus:
+    'An unreleased game cannot be set to Playing, Ongoing, Completed, or Abandoned.',
+   startedBeforeRelease:
+    'The start date cannot be earlier than the game release date.',
+  },
   rateGame: 'Rate this game',
   editRating: 'Edit rating',
   ratingSheetTitle: 'Your rating',

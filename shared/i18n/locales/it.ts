@@ -328,6 +328,12 @@
    resetAbandoned: 'Resetta data abbandono',
    confirm: 'Salva',
   },
+  releaseValidation: {
+   unreleasedStatus:
+    'Un gioco non ancora uscito non puo essere impostato come In corso, Ricorrente, Completato o Abbandonato.',
+   startedBeforeRelease:
+    'La data di inizio non puo essere precedente alla data di uscita del gioco.',
+  },
   rateGame: 'Dai un voto',
   editRating: 'Modifica voto',
   ratingSheetTitle: 'Il tuo voto',

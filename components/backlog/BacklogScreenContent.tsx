@@ -32,6 +32,9 @@ type BacklogScreenContentProps = {
  onRefetch: () => void;
  onRequestRemove: (item: BacklogItemEntity) => void;
  onRatingChange: (item: BacklogItemEntity, rating: number) => void;
+ getDisabledStatuses?: (item: BacklogItemEntity) => readonly BacklogStatusEnum[];
+ onDisabledStatusPress?: (item: BacklogItemEntity, status: BacklogStatusEnum) => void;
+ getIsMetadataLoadingForItem?: (item: BacklogItemEntity) => boolean;
  isUpdatingStatus?: boolean;
  isUpdatingPlayNext?: boolean;
  isUpdatingArchive?: boolean;
@@ -67,6 +70,9 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
  onRefetch,
  onRequestRemove,
  onRatingChange,
+ getDisabledStatuses,
+ onDisabledStatusPress,
+ getIsMetadataLoadingForItem,
  isUpdatingStatus = false,
  isUpdatingPlayNext = false,
  isUpdatingArchive = false,
@@ -100,6 +106,9 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
     iconMap={iconMap}
     showAddedDate
     onRatingChange={onRatingChange}
+    disabledStatuses={getDisabledStatuses?.(item) ?? []}
+    onDisabledStatusPress={onDisabledStatusPress}
+    isMetadataLoading={getIsMetadataLoadingForItem?.(item) ?? false}
    />
   ),
   [
@@ -110,6 +119,9 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
    onToggleArchive,
    onRequestRemove,
    onRatingChange,
+   getDisabledStatuses,
+   onDisabledStatusPress,
+   getIsMetadataLoadingForItem,
    isUpdatingStatus,
    isUpdatingPlayNext,
    isUpdatingArchive,

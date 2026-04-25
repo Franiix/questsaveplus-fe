@@ -19,6 +19,8 @@ type StatusOption = {
  value: BacklogStatusEnum;
  icon?: React.ComponentProps<typeof import('@expo/vector-icons').FontAwesome5>['name'];
  color?: string;
+ isDisabled?: boolean;
+ allowPressWhenDisabled?: boolean;
 };
 
 type GameBacklogPanelProps = {
@@ -33,6 +35,7 @@ type GameBacklogPanelProps = {
  selectedRating: number;
  localNotes?: string;
  localStartedAt?: string | null;
+ minimumStartedAtDate?: Date;
  localCompletedAt?: string | null;
  localAbandonedAt?: string | null;
  localResumedAt?: string | null;
@@ -101,6 +104,7 @@ export function GameBacklogPanel({
  selectedRating,
  localNotes = '',
  localStartedAt,
+ minimumStartedAtDate,
  localCompletedAt,
  localAbandonedAt,
  localResumedAt,
@@ -244,6 +248,7 @@ export function GameBacklogPanel({
        value={localStartedAt ? new Date(localStartedAt) : undefined}
        onChange={(date) => onStartedAtChange(date.toISOString())}
        placeholder={t('gameDetail.datePlaceholder')}
+       minimumDate={minimumStartedAtDate}
        maximumDate={new Date()}
        isDisabled={isDisabled}
        accessibilityLabel={t('backlog.startedAtLabel')}

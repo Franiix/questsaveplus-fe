@@ -60,6 +60,10 @@ export type BacklogListItemProps = {
  showAddedDate?: boolean;
  onRatingChange?: (item: BacklogItemEntity, rating: number) => void;
  reasonToPlay?: string;
+ disabledStatuses?: readonly BacklogStatusEnum[];
+ onDisabledStatusPress?: (item: BacklogItemEntity, status: BacklogStatusEnum) => void;
+ isPrimaryActionDisabled?: boolean;
+ isMetadataLoading?: boolean;
 };
 
 export const BacklogListItem = memo(function BacklogListItem({
@@ -91,6 +95,10 @@ export const BacklogListItem = memo(function BacklogListItem({
  showAddedDate = false,
  onRatingChange,
  reasonToPlay,
+ disabledStatuses = [],
+ onDisabledStatusPress,
+ isPrimaryActionDisabled = false,
+ isMetadataLoading = false,
 }: BacklogListItemProps) {
  const { t, i18n } = useTranslation();
  const [isRatingSheetOpen, setIsRatingSheetOpen] = useState(false);
@@ -104,7 +112,10 @@ export const BacklogListItem = memo(function BacklogListItem({
   Boolean(onTogglePlayNext) && (item.status === BacklogStatusEnum.WANT_TO_PLAY || isPlayNext);
  const showPinInQuickActions = quickActionsMode === 'default' && canTogglePlayNext;
  const quickPrimaryCount = showPinInQuickActions ? 2 : 3;
- const { secondaryActions } = getBacklogQuickStatusGroups(item.status, quickPrimaryCount);
+ const { primaryActions, secondaryActions } = getBacklogQuickStatusGroups(
+  item.status,
+  quickPrimaryCount,
+ );
  const isSwipeEnabled = quickActionsMode !== 'play-only';
 
 const showLeadingControl =
@@ -114,6 +125,7 @@ const showLeadingControl =
  const showTrailingPinButton = quickActionsMode === 'hidden' && canTogglePlayNext;
  const canToggleArchive = Boolean(onToggleArchive);
  const playNextToggleIconName = 'thumbtack' as React.ComponentProps<typeof FontAwesome5>['name'];
+ const disabledStatusSet = new Set(disabledStatuses);
 
  const pinAuxiliaryAction = showPinInQuickActions
   ? {
@@ -144,11 +156,27 @@ const showLeadingControl =
        color: colorMap[BacklogStatusEnum.PLAYING],
        iconName: iconMap[BacklogStatusEnum.PLAYING],
        isActive: item.status === BacklogStatusEnum.PLAYING,
-       isDisabled: isUpdatingStatus,
-       onPress: () => onQuickStatusChange(item, BacklogStatusEnum.PLAYING),
+       isDisabled: isUpdatingStatus || disabledStatusSet.has(BacklogStatusEnum.PLAYING),
+       allowPressWhenDisabled: disabledStatusSet.has(BacklogStatusEnum.PLAYING),
+       onPress: () =>
+        disabledStatusSet.has(BacklogStatusEnum.PLAYING)
+         ? onDisabledStatusPress?.(item, BacklogStatusEnum.PLAYING)
+         : onQuickStatusChange(item, BacklogStatusEnum.PLAYING),
       },
      ] as const)
    : undefined;
+ const defaultQuickActions = primaryActions.map((action) => ({
+  accessibilityLabel: labelMap[action.status],
+  color: colorMap[action.status],
+  iconName: iconMap[action.status],
+  isActive: action.isPrimary,
+  isDisabled: isUpdatingStatus || disabledStatusSet.has(action.status),
+  allowPressWhenDisabled: disabledStatusSet.has(action.status),
+  onPress: () =>
+   disabledStatusSet.has(action.status)
+    ? onDisabledStatusPress?.(item, action.status)
+    : onQuickStatusChange(item, action.status),
+ }));
 
  function renderRightActions() {
   return (
@@ -261,23 +289,36 @@ const showLeadingControl =
        key={`${item.id}-${action.status}`}
        onPress={() => {
         swipeableRef.current?.close();
+        if (disabledStatusSet.has(action.status)) {
+         onDisabledStatusPress?.(item, action.status);
+         return;
+        }
         onQuickStatusChange(item, action.status);
        }}
        style={{
         width: SWIPE_STATUS_WIDTH,
         borderRadius: borderRadius.lg,
         borderWidth: 1,
-        borderColor: `${actionColor}66`,
-        backgroundColor: `${actionColor}22`,
+        borderColor: disabledStatusSet.has(action.status)
+         ? colors.border.subtle
+         : `${actionColor}66`,
+        backgroundColor: disabledStatusSet.has(action.status)
+         ? colors.background.surface
+         : `${actionColor}22`,
         alignItems: 'center',
         justifyContent: 'center',
         gap: spacing.xs,
        }}
       >
-       <FontAwesome5 name={iconMap[action.status]} size={16} color={actionColor} solid />
+       <FontAwesome5
+        name={iconMap[action.status]}
+        size={16}
+        color={disabledStatusSet.has(action.status) ? colors.text.disabled : actionColor}
+        solid={!disabledStatusSet.has(action.status)}
+       />
        <Text
         style={{
-         color: colors.text.primary,
+         color: disabledStatusSet.has(action.status) ? colors.text.disabled : colors.text.primary,
          fontSize: typography.size.xs,
          fontFamily: typography.font.semibold,
          textAlign: 'center',
@@ -539,11 +580,16 @@ const showLeadingControl =
         colorMap={colorMap}
         iconMap={iconMap}
         labelMap={labelMap}
-        primaryCount={quickPrimaryCount}
+       primaryCount={quickPrimaryCount}
         auxiliaryAction={pinnedCustomActions ? undefined : pinAuxiliaryAction}
-        customActions={pinnedCustomActions}
+        customActions={pinnedCustomActions ?? defaultQuickActions}
         isDisabled={isUpdatingStatus}
-        onStatusChange={(status) => onQuickStatusChange(item, status)}
+        isLoading={isMetadataLoading}
+        onStatusChange={(status) =>
+         disabledStatusSet.has(status)
+          ? onDisabledStatusPress?.(item, status)
+          : onQuickStatusChange(item, status)
+        }
        />
       </View>
      ) : null}
@@ -562,16 +608,26 @@ const showLeadingControl =
         iconMap={iconMap}
         labelMap={labelMap}
         isDisabled={isUpdatingStatus}
+        isLoading={isMetadataLoading}
         customActions={[
          {
           accessibilityLabel: primaryActionLabel,
           color: colorMap[BacklogStatusEnum.PLAYING],
           iconName: 'play',
-          isActive: true,
-          onPress: () => onPrimaryAction(item),
+          isActive: !isPrimaryActionDisabled,
+          isDisabled: isPrimaryActionDisabled,
+          allowPressWhenDisabled: isPrimaryActionDisabled,
+          onPress: () =>
+           isPrimaryActionDisabled
+            ? onDisabledStatusPress?.(item, BacklogStatusEnum.PLAYING)
+            : onPrimaryAction(item),
          },
         ]}
-        onStatusChange={(status) => onQuickStatusChange(item, status)}
+        onStatusChange={(status) =>
+         disabledStatusSet.has(status)
+          ? onDisabledStatusPress?.(item, status)
+          : onQuickStatusChange(item, status)
+        }
        />
       </View>
      ) : null}

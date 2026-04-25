@@ -38,7 +38,7 @@ import { useGameSimilar } from '@/hooks/useGameSimilar';
 import { useRelatedCompanyGames } from '@/hooks/useRelatedCompanyGames';
 import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
-import { getIgdbNamedItemExternalId } from '@/shared/utils/gameCatalog';
+import { getGameCatalogReleaseStatusKey, getIgdbNamedItemExternalId } from '@/shared/utils/gameCatalog';
 
 const HERO_HEIGHT = 320;
 
@@ -135,6 +135,7 @@ export default function GameDetailScreen() {
   selectedRating,
   localNotes,
   localStartedAt,
+  minimumStartedAtDate,
   localCompletedAt,
   localAbandonedAt,
   localResumedAt,
@@ -176,6 +177,9 @@ export default function GameDetailScreen() {
       name: game.name,
       background_image: game.backgroundImage?.url ?? game.coverImage?.url ?? null,
       platforms: game.parentPlatforms.length > 0 ? game.parentPlatforms : game.platforms,
+      releasedAt: game.releasedAt ?? null,
+      releaseStatusKey: getGameCatalogReleaseStatusKey(game.metadata?.raw ?? null),
+      firstReleaseDate: game.metadata?.raw?.first_release_date ?? null,
      }
    : null,
  });
@@ -350,6 +354,7 @@ export default function GameDetailScreen() {
        addedAt: backlogItem?.added_at ?? null,
        updatedAt: backlogItem?.updated_at ?? null,
        localStartedAt,
+       minimumStartedAtDate,
        localCompletedAt,
        localAbandonedAt,
        localResumedAt,
@@ -498,6 +503,7 @@ export default function GameDetailScreen() {
      <DatePickerInput
       value={pendingDateWarning.startedAtInput}
       onChange={handlePendingStartedAtChange}
+      minimumDate={minimumStartedAtDate}
       maximumDate={new Date()}
       accessibilityLabel={t('backlog.startedAtLabel')}
       placeholder={t('gameDetail.datePlaceholder')}

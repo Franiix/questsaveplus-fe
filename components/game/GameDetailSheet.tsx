@@ -15,6 +15,7 @@ import { useBacklogStatusPresentation } from '@/hooks/useBacklogStatusPresentati
 import type { CatalogGame } from '@/shared/models/Catalog.model';
 import type { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { colors, spacing, typography } from '@/shared/theme/tokens';
+import { getGameCatalogReleaseStatusKey } from '@/shared/utils/gameCatalog';
 
 type GameDetailSheetProps = {
  game: CatalogGame | null;
@@ -43,6 +44,7 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
   isDeleteMutating,
   selectedStatus,
   selectedRating,
+  minimumStartedAtDate,
   localPlatformPlayed,
   availablePlatformValues,
   platformOptions,
@@ -76,6 +78,9 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
       name: game.name,
       background_image: game.backgroundImage?.url ?? game.coverImage?.url ?? null,
       platforms: game.platforms,
+      releasedAt: game.releasedAt ?? null,
+      releaseStatusKey: getGameCatalogReleaseStatusKey(game.metadata?.raw ?? null),
+      firstReleaseDate: game.metadata?.raw?.first_release_date ?? null,
      }
    : null,
   isEnabled: isOpen,
@@ -142,6 +147,7 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
      isDeleteMutating={isDeleteMutating}
      selectedStatus={selectedStatus}
      selectedRating={selectedRating}
+     minimumStartedAtDate={minimumStartedAtDate}
      localPlatformPlayed={localPlatformPlayed}
      hasPendingChanges={hasPendingChanges}
      availablePlatformValues={availablePlatformValues}
@@ -225,6 +231,7 @@ export function GameDetailSheet({ game, isOpen, onClose }: GameDetailSheetProps)
      <DatePickerInput
       value={pendingDateWarning.startedAtInput}
       onChange={handlePendingStartedAtChange}
+      minimumDate={minimumStartedAtDate}
       maximumDate={new Date()}
       accessibilityLabel={t('backlog.startedAtLabel')}
       placeholder={t('gameDetail.datePlaceholder')}

@@ -47,6 +47,7 @@ type FilterChipProps = {
  isSelected: boolean;
  onPress: () => void;
  isDisabled?: boolean;
+ allowPressWhenDisabled?: boolean;
  color?: string;
  icon?: React.ComponentProps<typeof FontAwesome5>['name'];
  count?: number;
@@ -63,34 +64,47 @@ export function FilterChip({
  isSelected,
  onPress,
  isDisabled = false,
+ allowPressWhenDisabled = false,
  color,
  icon,
  count,
 }: FilterChipProps) {
  const selectedColor = colors.primary.DEFAULT;
  const selectedGlow = colors.primary.glow;
- const iconColor = color ?? '#FFFFFF';
+ const iconColor = isDisabled ? colors.text.disabled : color ?? '#FFFFFF';
  const containerStyle = ({ pressed }: { pressed: boolean }) => ({
   minHeight: 42,
   borderRadius: borderRadius.full,
   borderWidth: 1.5,
-  borderColor: isSelected ? colors.primary['300'] : color ? `${color}45` : `${selectedColor}40`,
+  borderColor: isDisabled
+   ? colors.border.subtle
+   : isSelected
+    ? colors.primary['300']
+    : color
+     ? `${color}45`
+     : `${selectedColor}40`,
   padding: 1,
   alignItems: 'center' as const,
   justifyContent: 'center' as const,
-  opacity: isDisabled ? opacityTokens.disabled : 1,
-  shadowColor: isSelected ? selectedGlow : color ? `${color}30` : `${selectedColor}25`,
+  opacity: isDisabled ? 1 : 1,
+  shadowColor: isDisabled
+   ? 'transparent'
+   : isSelected
+    ? selectedGlow
+    : color
+     ? `${color}30`
+     : `${selectedColor}25`,
   shadowOffset: { width: 0, height: isSelected ? 0 : 1 },
-  shadowOpacity: isSelected ? 0.45 : 0.2,
-  shadowRadius: isSelected ? 16 : 5,
-  elevation: isSelected ? 8 : 2,
-  transform: [{ scale: pressed ? 0.98 : 1 }],
+  shadowOpacity: isDisabled ? 0 : isSelected ? 0.45 : 0.2,
+  shadowRadius: isDisabled ? 0 : isSelected ? 16 : 5,
+  elevation: isDisabled ? 0 : isSelected ? 8 : 2,
+  transform: [{ scale: pressed && !isDisabled ? 0.98 : 1 }],
  });
 
  return (
   <Pressable
    onPress={() => {
-    if (!isDisabled) onPress();
+    if (!isDisabled || allowPressWhenDisabled) onPress();
    }}
    accessibilityRole="button"
    accessibilityLabel={label}
@@ -102,10 +116,15 @@ export function FilterChip({
      colors={['#7B73FF', '#6C63FF', '#5A52E0']}
      start={{ x: 0, y: 0 }}
      end={{ x: 1, y: 0 }}
-     style={CHIP_CONTENT_STYLE_SELECTED}
+     style={[
+      CHIP_CONTENT_STYLE_SELECTED,
+      isDisabled ? { backgroundColor: colors.background.elevated } : null,
+     ]}
     >
      {icon ? <FontAwesome5 name={icon} size={11} color={iconColor} solid /> : null}
-     <Text style={CHIP_LABEL_STYLE}>{label}</Text>
+     <Text style={[CHIP_LABEL_STYLE, isDisabled ? { color: colors.text.disabled } : null]}>
+      {label}
+     </Text>
      {typeof count === 'number' ? (
       <View style={[COUNT_BADGE_STYLE_BASE, { backgroundColor: 'rgba(255,255,255,0.22)' }]}>
        <Text
@@ -122,9 +141,16 @@ export function FilterChip({
      ) : null}
     </LinearGradient>
    ) : (
-    <View style={CHIP_CONTENT_STYLE_UNSELECTED}>
+    <View
+     style={[
+      CHIP_CONTENT_STYLE_UNSELECTED,
+      isDisabled ? { backgroundColor: colors.background.surface } : null,
+     ]}
+    >
      {icon ? <FontAwesome5 name={icon} size={11} color={iconColor} solid /> : null}
-     <Text style={CHIP_LABEL_STYLE}>{label}</Text>
+     <Text style={[CHIP_LABEL_STYLE, isDisabled ? { color: colors.text.disabled } : null]}>
+      {label}
+     </Text>
      {typeof count === 'number' ? (
       <View style={[COUNT_BADGE_STYLE_BASE, { backgroundColor: `${iconColor}22` }]}>
        <Text

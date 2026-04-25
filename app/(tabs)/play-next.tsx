@@ -41,6 +41,7 @@ import {
  shouldLoadBacklogMetadata,
 } from '@/shared/utils/backlogScreen';
 import { calculateBacklogDateFields } from '@/shared/utils/backlogDateFields';
+import { isBacklogStatusReleaseLocked } from '@/shared/utils/backlogRelease';
 import { createEmptyGameDiscoveryFilters } from '@/shared/utils/gameDiscoveryFilters';
 import { getPlayNextReasonKey } from '@/shared/utils/playNextReason';
 import { useAuthStore } from '@/stores/auth.store';
@@ -141,7 +142,7 @@ export default function PlayNextScreen() {
   isLoading: isPublishersLoading,
   isError: isPublishersError,
  } = useCatalogPublishers(catalogFiltersEnabled);
- const { data: backlogMetadata } = useBacklogGameMetadata(
+ const { data: backlogMetadata, loadingGameIds } = useBacklogGameMetadata(
   playNextItems.map((item) => item.game_id),
   true,
  );
@@ -227,6 +228,17 @@ export default function PlayNextScreen() {
  const handleQuickStatusChange = useCallback(
   async (item: BacklogItemEntity, status: BacklogStatusEnum) => {
    if (item.status === status) return;
+   const itemMetadata = backlogMetadata?.get(item.game_id);
+   if (
+    isBacklogStatusReleaseLocked(status, {
+     releasedAt: itemMetadata?.releasedAt ?? null,
+     releaseStatusKey: itemMetadata?.releaseStatusKey ?? null,
+     firstReleaseDate: itemMetadata?.firstReleaseDate ?? null,
+    })
+   ) {
+    showToast(t('backlog.releaseValidation.unreleasedStatus'), 'error');
+    return;
+   }
 
    const dateFields = calculateBacklogDateFields(item, status);
 
@@ -240,7 +252,7 @@ export default function PlayNextScreen() {
     showToast(updateError, 'error');
    }
   },
-  [clearError, showToast, t, update],
+  [backlogMetadata, clearError, showToast, t, update],
  );
 
  const handleRequestPlay = useCallback((item: BacklogItemEntity) => {
@@ -250,6 +262,17 @@ export default function PlayNextScreen() {
  const handleConfirmPlay = useCallback(async () => {
   if (!pendingPlayItem) return;
   const playItem = pendingPlayItem;
+  const itemMetadata = backlogMetadata?.get(playItem.game_id);
+  if (
+   isBacklogStatusReleaseLocked(BacklogStatusEnum.PLAYING, {
+    releasedAt: itemMetadata?.releasedAt ?? null,
+    releaseStatusKey: itemMetadata?.releaseStatusKey ?? null,
+    firstReleaseDate: itemMetadata?.firstReleaseDate ?? null,
+   })
+  ) {
+   showToast(t('backlog.releaseValidation.unreleasedStatus'), 'error');
+   return;
+  }
   const dateFields = calculateBacklogDateFields(playItem, BacklogStatusEnum.PLAYING);
   setPendingPlayItem(null);
 
@@ -274,7 +297,7 @@ export default function PlayNextScreen() {
   } else {
    showToast(updateError, 'error');
   }
- }, [clearError, pendingPlayItem, showToast, t, update]);
+ }, [backlogMetadata, clearError, pendingPlayItem, showToast, t, update]);
 
  const handleTogglePlayNext = useCallback(
   async (item: BacklogItemEntity) => {
@@ -319,16 +342,48 @@ export default function PlayNextScreen() {
   [clearError, showToast, t, update],
  );
 
- const handleRefetch = useCallback(() => {
-  if (!userId) return;
-  void readAll(userId);
- }, [readAll, userId]);
+const handleRefetch = useCallback(() => {
+ if (!userId) return;
+ void readAll(userId);
+}, [readAll, userId]);
+
+ const getLockedStatusesForItem = useCallback(
+  (item: BacklogItemEntity) =>
+   ([
+    BacklogStatusEnum.PLAYING,
+    BacklogStatusEnum.ONGOING,
+    BacklogStatusEnum.COMPLETED,
+    BacklogStatusEnum.ABANDONED,
+   ] as const).filter((status) =>
+    isBacklogStatusReleaseLocked(status, {
+     releasedAt: backlogMetadata?.get(item.game_id)?.releasedAt ?? null,
+     releaseStatusKey: backlogMetadata?.get(item.game_id)?.releaseStatusKey ?? null,
+     firstReleaseDate: backlogMetadata?.get(item.game_id)?.firstReleaseDate ?? null,
+    }),
+   ),
+  [backlogMetadata],
+ );
+
+ const handleDisabledStatusPress = useCallback(
+  (_item: BacklogItemEntity, _status: BacklogStatusEnum) => {
+   showToast(t('backlog.releaseValidation.unreleasedStatus'), 'error');
+  },
+  [showToast, t],
+ );
 
  const renderItem = useCallback(
   ({ item, drag, isActive }: RenderItemParams<BacklogItemEntity>) => {
    const itemMeta = backlogMetadata?.get(item.game_id) ?? null;
    const reasonKey = getPlayNextReasonKey(item, itemMeta);
    const reasonToPlay = reasonKey ? t(`playNext.reason.${reasonKey}`) : undefined;
+   const isMetadataLoading = loadingGameIds.has(item.game_id);
+   const isPrimaryActionDisabled =
+    !isMetadataLoading &&
+    isBacklogStatusReleaseLocked(BacklogStatusEnum.PLAYING, {
+     releasedAt: itemMeta?.releasedAt ?? null,
+     releaseStatusKey: itemMeta?.releaseStatusKey ?? null,
+     firstReleaseDate: itemMeta?.firstReleaseDate ?? null,
+    });
    return (
     <ScaleDecorator activeScale={1.03}>
      <BacklogListItem
@@ -352,6 +407,10 @@ export default function PlayNextScreen() {
       playNextPinLabel={t('backlog.playNext.pinAction')}
       playNextUnpinLabel={t('backlog.playNext.unpinAction')}
       removeLabel={t('gameDetail.confirmRemove.confirm')}
+      disabledStatuses={getLockedStatusesForItem(item)}
+      onDisabledStatusPress={handleDisabledStatusPress}
+      isPrimaryActionDisabled={isPrimaryActionDisabled}
+      isMetadataLoading={isMetadataLoading}
       labelMap={labelMap}
       colorMap={colorMap}
       iconMap={iconMap}
@@ -369,9 +428,12 @@ export default function PlayNextScreen() {
    handleQuickStatusChange,
    handleRequestPlay,
    handleTogglePlayNext,
+   handleDisabledStatusPress,
    iconMap,
    isMutating,
    backlogMetadata,
+   loadingGameIds,
+   getLockedStatusesForItem,
    labelMap,
    t,
   ],

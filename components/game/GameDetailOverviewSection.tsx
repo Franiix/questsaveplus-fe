@@ -66,6 +66,7 @@ type GameDetailOverviewSectionProps = {
   addedAt?: string | null;
   updatedAt?: string | null;
   localStartedAt?: string | null;
+  minimumStartedAtDate?: Date;
   localCompletedAt?: string | null;
   localAbandonedAt?: string | null;
   localResumedAt?: string | null;
@@ -150,6 +151,7 @@ export function GameDetailOverviewSection({
      addedAt={backlogController.addedAt}
      updatedAt={backlogController.updatedAt}
      localStartedAt={backlogController.localStartedAt}
+     minimumStartedAtDate={backlogController.minimumStartedAtDate}
      localCompletedAt={backlogController.localCompletedAt}
      localAbandonedAt={backlogController.localAbandonedAt}
      localResumedAt={backlogController.localResumedAt}

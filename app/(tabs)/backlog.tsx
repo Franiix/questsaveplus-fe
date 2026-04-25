@@ -34,6 +34,12 @@ import {
  isBacklogStatusRateable,
  normalizeBacklogRatingForStatus,
 } from '@/shared/utils/backlogRating';
+import {
+ getReleaseDate,
+ isBacklogStatusReleaseLocked,
+ isStartedAtBeforeRelease,
+ type BacklogReleaseContext,
+} from '@/shared/utils/backlogRelease';
 import { shouldLoadBacklogMetadata } from '@/shared/utils/backlogScreen';
 import { calculateBacklogDateFields } from '@/shared/utils/backlogDateFields';
 import { formatDate } from '@/shared/utils/date';
@@ -73,9 +79,11 @@ export default function BacklogScreen() {
  const [pendingQuickChange, setPendingQuickChange] = useState<{
   item: BacklogItemEntity;
   status: BacklogStatusEnum;
-  body: string;
-  startedAtInput?: Date;
-  completedAtInput?: Date;
+ body: string;
+ releaseContext?: BacklogReleaseContext;
+ minimumStartedAtDate?: Date;
+ startedAtInput?: Date;
+ completedAtInput?: Date;
   abandonedAtInput?: Date;
   resumedAtInput?: Date;
   showResetAbandonedSwitch?: boolean;
@@ -121,9 +129,9 @@ export default function BacklogScreen() {
   isLoading: isPublishersLoading,
   isError: isPublishersError,
  } = useCatalogPublishers(catalogFiltersEnabled);
- const { data: backlogMetadata } = useBacklogGameMetadata(
+ const { data: backlogMetadata, loadingGameIds } = useBacklogGameMetadata(
   backlogItems.map((item) => item.game_id),
-  shouldLoadBacklogMetadata(appliedFilters),
+  true,
  );
 
  const userId = session?.user?.id;
@@ -200,6 +208,35 @@ export default function BacklogScreen() {
  const handleRefetch = useCallback(() => {
   void refetch();
  }, [refetch]);
+
+ const getLockedStatusesForItem = useCallback(
+  (item: BacklogItemEntity) =>
+   ([
+    BacklogStatusEnum.PLAYING,
+    BacklogStatusEnum.ONGOING,
+    BacklogStatusEnum.COMPLETED,
+    BacklogStatusEnum.ABANDONED,
+   ] as const).filter((status) =>
+    isBacklogStatusReleaseLocked(status, {
+     releasedAt: backlogMetadata?.get(item.game_id)?.releasedAt ?? null,
+     releaseStatusKey: backlogMetadata?.get(item.game_id)?.releaseStatusKey ?? null,
+     firstReleaseDate: backlogMetadata?.get(item.game_id)?.firstReleaseDate ?? null,
+    }),
+   ),
+  [backlogMetadata],
+ );
+
+ const getIsMetadataLoadingForItem = useCallback(
+  (item: BacklogItemEntity) => loadingGameIds.has(item.game_id),
+  [loadingGameIds],
+ );
+
+ const handleDisabledStatusPress = useCallback(
+  (_item: BacklogItemEntity, _status: BacklogStatusEnum) => {
+   showToast(t('backlog.releaseValidation.unreleasedStatus'), 'error');
+  },
+  [showToast, t],
+ );
 
  const handleItemPress = useCallback(
   (item: BacklogItemEntity) => {
@@ -333,6 +370,7 @@ export default function BacklogScreen() {
   async (
    item: BacklogItemEntity,
    status: BacklogStatusEnum,
+   releaseContext?: BacklogReleaseContext,
    overrideStartedAt?: string,
    overrideCompletedAt?: string,
    overrideAbandonedAt?: string,
@@ -340,6 +378,11 @@ export default function BacklogScreen() {
    resetAbandonedAt?: boolean,
    shouldCelebrate = true,
   ) => {
+   if (isBacklogStatusReleaseLocked(status, releaseContext ?? {})) {
+    showToast(t('backlog.releaseValidation.unreleasedStatus'), 'error');
+    return false;
+   }
+
    clearError();
 
    const dateFields = calculateBacklogDateFields(item, status, {
@@ -360,6 +403,15 @@ export default function BacklogScreen() {
     item.is_play_next === true && ACTIVE_STATUSES.has(status)
      ? { is_play_next: false as const, play_next_priority: null }
      : {};
+   const startedAtToValidate =
+    overrideStartedAt ??
+    item.started_at ??
+    ('started_at' in dateFields ? (dateFields.started_at ?? null) : null);
+
+   if (isStartedAtBeforeRelease(startedAtToValidate, releaseContext ?? {})) {
+    showToast(t('backlog.releaseValidation.startedBeforeRelease'), 'error');
+    return false;
+   }
 
    await update(item.id, {
     status,
@@ -389,6 +441,18 @@ export default function BacklogScreen() {
  const handleQuickStatusChange = useCallback(
   async (item: BacklogItemEntity, status: BacklogStatusEnum) => {
    if (item.status === status) return;
+   const itemMetadata = backlogMetadata?.get(item.game_id);
+   const releaseContext = {
+    releasedAt: itemMetadata?.releasedAt ?? null,
+    releaseStatusKey: itemMetadata?.releaseStatusKey ?? null,
+    firstReleaseDate: itemMetadata?.firstReleaseDate ?? null,
+   } satisfies BacklogReleaseContext;
+   const minimumStartedAtDate = getReleaseDate(releaseContext) ?? undefined;
+
+   if (isBacklogStatusReleaseLocked(status, releaseContext)) {
+    showToast(t('backlog.releaseValidation.unreleasedStatus'), 'error');
+    return;
+   }
 
    const isCompleted = status === BacklogStatusEnum.COMPLETED;
    const isAbandoned = status === BacklogStatusEnum.ABANDONED;
@@ -439,6 +503,8 @@ export default function BacklogScreen() {
      item,
      status,
      body,
+     releaseContext,
+     minimumStartedAtDate,
      startedAtInput: wouldSetStarted ? new Date() : undefined,
      completedAtInput: wouldSetCompleted ? new Date() : undefined,
      resumedAtInput: wouldSetResumed ? new Date() : undefined,
@@ -450,7 +516,14 @@ export default function BacklogScreen() {
 
    if (isAbandoned && !hasAbandonedHistory) {
     const body = t('backlog.dateChange.bodyAbandoned');
-    setPendingQuickChange({ item, status, body, abandonedAtInput: new Date() });
+    setPendingQuickChange({
+     item,
+     status,
+     body,
+     releaseContext,
+     minimumStartedAtDate,
+     abandonedAtInput: new Date(),
+    });
     return;
    }
 
@@ -474,6 +547,8 @@ export default function BacklogScreen() {
      item,
      status,
      body,
+     releaseContext,
+     minimumStartedAtDate,
      startedAtInput: wouldSetStarted ? new Date() : undefined,
      completedAtInput: wouldSetCompleted ? new Date() : undefined,
      resumedAtInput: wouldSetResumed ? new Date() : undefined,
@@ -481,9 +556,9 @@ export default function BacklogScreen() {
     return;
    }
 
-   await doQuickStatusUpdate(item, status);
+   await doQuickStatusUpdate(item, status, releaseContext);
   },
-  [doQuickStatusUpdate, i18n.language, t],
+  [backlogMetadata, doQuickStatusUpdate, i18n.language, showToast, t],
  );
 
  const handleConfirmQuickChange = useCallback(async () => {
@@ -495,6 +570,7 @@ export default function BacklogScreen() {
   await doQuickStatusUpdate(
    currentQuickChange.item,
    currentQuickChange.status,
+   currentQuickChange.releaseContext,
    currentQuickChange.startedAtInput?.toISOString(),
    currentQuickChange.completedAtInput?.toISOString(),
    currentQuickChange.abandonedAtInput?.toISOString(),
@@ -663,6 +739,9 @@ export default function BacklogScreen() {
     onRefetch={handleRefetch}
     onRequestRemove={handleRequestRemove}
     onRatingChange={handleRatingChange}
+    getDisabledStatuses={getLockedStatusesForItem}
+    onDisabledStatusPress={handleDisabledStatusPress}
+    getIsMetadataLoadingForItem={getIsMetadataLoadingForItem}
     isUpdatingStatus={isMutating && activeMutation === 'update'}
     isUpdatingPlayNext={isMutating && activeMutation === 'update'}
     isUpdatingArchive={isMutating && activeMutation === 'update'}
@@ -746,6 +825,7 @@ export default function BacklogScreen() {
      <DatePickerInput
       value={pendingQuickChange.startedAtInput}
       onChange={handleQuickStartedAtChange}
+      minimumDate={pendingQuickChange.minimumStartedAtDate}
       maximumDate={new Date()}
       accessibilityLabel={t('backlog.startedAtLabel')}
       placeholder={t('gameDetail.datePlaceholder')}

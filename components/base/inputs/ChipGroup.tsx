@@ -2,7 +2,14 @@ import { View } from 'react-native';
 import { spacing } from '@/shared/theme/tokens';
 import { FilterChip } from './FilterChip';
 
-type ChipOption = { label: string; value: string; icon?: string; color?: string };
+type ChipOption = {
+ label: string;
+ value: string;
+ icon?: string;
+ color?: string;
+ isDisabled?: boolean;
+ allowPressWhenDisabled?: boolean;
+};
 
 type ChipGroupSingle = {
  options: ChipOption[];
@@ -64,7 +71,8 @@ export function ChipGroup(props: ChipGroupProps) {
      label={option.label}
      isSelected={isSelected(option.value)}
      onPress={() => handlePress(option.value)}
-     isDisabled={props.isDisabled}
+     isDisabled={option.isDisabled ?? props.isDisabled}
+     allowPressWhenDisabled={option.allowPressWhenDisabled}
      color={option.color ?? props.color}
      icon={option.icon}
     />

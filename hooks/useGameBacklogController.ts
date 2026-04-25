@@ -9,6 +9,11 @@ import {
  isBacklogStatusRateable,
  normalizeBacklogRatingForStatus,
 } from '@/shared/utils/backlogRating';
+import {
+ getReleaseDate,
+ isBacklogStatusReleaseLocked,
+ isStartedAtBeforeRelease,
+} from '@/shared/utils/backlogRelease';
 import { formatDate } from '@/shared/utils/date';
 import { useAuthStore } from '@/stores/auth.store';
 import { useBacklogStore } from '@/stores/backlog.store';
@@ -19,6 +24,9 @@ type BacklogGame = {
  name: string;
  background_image: string | null;
  platforms: CatalogPlatform[];
+ releasedAt?: string | null;
+ releaseStatusKey?: string | null;
+ firstReleaseDate?: number | null;
 };
 
 type UseGameBacklogControllerOptions = {
@@ -48,6 +56,13 @@ const RESUMABLE_STATUSES = new Set<BacklogStatusEnum>([
  BacklogStatusEnum.PLAYING,
  BacklogStatusEnum.ONGOING,
  BacklogStatusEnum.COMPLETED,
+]);
+
+const RELEASE_LOCKED_STATUSES = new Set<BacklogStatusEnum>([
+ BacklogStatusEnum.PLAYING,
+ BacklogStatusEnum.ONGOING,
+ BacklogStatusEnum.COMPLETED,
+ BacklogStatusEnum.ABANDONED,
 ]);
 
 function createPlatformOptions(platforms: CatalogPlatform[]): SearchableSelectOption[] {
@@ -150,6 +165,23 @@ export function useGameBacklogController({
    localResumedAt !== (backlogItem.resumed_at ?? null) ||
    JSON.stringify(localPlatformPlayed ?? []) !== JSON.stringify(backlogItem.platform_played ?? []));
  const availablePlatformOptions = createPlatformOptions(game?.platforms ?? []);
+ const releaseContext = {
+  releasedAt: game?.releasedAt ?? null,
+  releaseStatusKey: game?.releaseStatusKey ?? null,
+  firstReleaseDate: game?.firstReleaseDate ?? null,
+ } as const;
+const minimumStartedAtDate = getReleaseDate(releaseContext) ?? undefined;
+ const resolvedStatusOptions = statusOptions.map((option) => {
+  const isReleaseLocked =
+   RELEASE_LOCKED_STATUSES.has(option.value) &&
+   isBacklogStatusReleaseLocked(option.value, releaseContext);
+
+  return {
+   ...option,
+   isDisabled: isReleaseLocked,
+   allowPressWhenDisabled: isReleaseLocked,
+  };
+ });
  const platformOptions = ensureSelectedPlatformOptions(
   availablePlatformOptions,
   localPlatformPlayed ?? backlogItem?.platform_played ?? null,
@@ -201,6 +233,10 @@ export function useGameBacklogController({
 
  function handleStatusChange(value: string) {
   const newStatus = value as BacklogStatusEnum;
+  if (isBacklogStatusReleaseLocked(newStatus, releaseContext)) {
+   showToast(t('backlog.releaseValidation.unreleasedStatus'), 'error');
+   return;
+  }
   setSelectedStatus(newStatus);
   if (!isBacklogStatusRateable(newStatus)) {
    setSelectedRating(0);
@@ -231,6 +267,11 @@ export function useGameBacklogController({
 
   if (pendingPlatformPlayed.length === 0) {
    showToast(t('backlog.platformSelection.required'), 'error');
+   return;
+  }
+
+  if (isBacklogStatusReleaseLocked(selectedStatus, releaseContext)) {
+   showToast(t('backlog.releaseValidation.unreleasedStatus'), 'error');
    return;
   }
 
@@ -314,6 +355,23 @@ export function useGameBacklogController({
    resumedAt?: string;
    resetAbandoned?: boolean;
   }): Promise<BacklogStatusEnum | null> => {
+   if (isBacklogStatusReleaseLocked(selectedStatus, releaseContext)) {
+    showToast(t('backlog.releaseValidation.unreleasedStatus'), 'error');
+    return null;
+   }
+
+   const effectiveStartedAt =
+    isGoingToWishlist
+     ? null
+     : localStartedAt ??
+       backlogItem.started_at ??
+       (wouldAutoSetStarted ? (options?.startedAt ?? now) : null);
+
+   if (isStartedAtBeforeRelease(effectiveStartedAt, releaseContext)) {
+    showToast(t('backlog.releaseValidation.startedBeforeRelease'), 'error');
+    return null;
+   }
+
    const dateFields: {
     started_at?: string | null;
     completed_at?: string | null;
@@ -534,16 +592,23 @@ export function useGameBacklogController({
   localAbandonedAt,
   localResumedAt,
   localPlatformPlayed,
+  minimumStartedAtDate,
   availablePlatformValues,
   platformOptions,
   pendingPlatformPlayed,
   isPlatformModalOpen,
-  statusOptions,
+  statusOptions: resolvedStatusOptions,
   hasPendingChanges,
   pendingDateWarning,
   pendingResetAbandoned,
   setLocalNotes,
-  setLocalStartedAt,
+  setLocalStartedAt: (value: string | null) => {
+   if (isStartedAtBeforeRelease(value, releaseContext)) {
+    showToast(t('backlog.releaseValidation.startedBeforeRelease'), 'error');
+    return;
+   }
+   setLocalStartedAt(value);
+  },
   setLocalCompletedAt,
   setLocalAbandonedAt,
   setLocalResumedAt,

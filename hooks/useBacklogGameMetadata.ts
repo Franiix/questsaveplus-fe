@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { getCatalogGameDetail } from '@/lib/catalog';
 import { supabase } from '@/lib/supabase';
 import type { BacklogGameMetadata } from '@/shared/models/BacklogGameMetadata.model';
+import { getGameCatalogReleaseStatusKey } from '@/shared/utils/gameCatalog';
 
 export function useBacklogGameMetadata(gameIds: number[], enabled = true) {
  // biome-ignore lint/correctness/useExhaustiveDependencies: stable string key avoids per-render re-sort when caller creates a new array reference with the same IDs
@@ -54,6 +55,9 @@ export function useBacklogGameMetadata(gameIds: number[], enabled = true) {
     platforms: detail.platforms.map((p) => p.externalId).filter(Boolean),
     developers: detail.developers.map((d) => d.externalId).filter(Boolean) as string[],
     publishers: detail.publishers.map((p) => p.externalId).filter(Boolean) as string[],
+    releasedAt: detail.releasedAt ?? null,
+    releaseStatusKey: getGameCatalogReleaseStatusKey(detail.metadata?.raw ?? null),
+    firstReleaseDate: detail.metadata?.raw?.first_release_date ?? null,
     igdbRating: detail.rating ?? null,
     criticScore: detail.criticScore ?? null,
     questSaveRating: qs ? Math.round((qs.sum / qs.count) * 10) / 10 : null,
@@ -64,5 +68,15 @@ export function useBacklogGameMetadata(gameIds: number[], enabled = true) {
   return new Map(results.map((item) => [item.gameId, item]));
  }, [detailQueries, questSaveRows, sortedGameIds]);
 
- return { data };
+ const loadingGameIds = useMemo(() => {
+  const set = new Set<number>();
+  for (let i = 0; i < sortedGameIds.length; i++) {
+   if (detailQueries[i]?.isLoading) {
+    set.add(sortedGameIds[i] as number);
+   }
+  }
+  return set;
+ }, [detailQueries, sortedGameIds]);
+
+ return { data, loadingGameIds };
 }
