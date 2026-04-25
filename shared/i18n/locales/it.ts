@@ -71,6 +71,9 @@
   errorRetry: 'Riprova',
   gamesFound_one: '{{count}} gioco trovato',
   gamesFound_other: '{{count}} giochi trovati',
+  currentlyPlaying: {
+   title: 'Stai giocando',
+  },
   recentlyAdded: 'Aggiunti di recente',
   trendingNow: 'Giochi del momento',
   newGames: 'Giochi nuovi',
@@ -203,6 +206,8 @@
    ongoing: 'Ricorrenti',
    completed: 'Completati',
    abandoned: 'Abbandonati',
+   completionRate: 'Tasso di completamento',
+   avgRating: 'Rating medio',
   },
   deleteAccount: {
    trigger: 'Elimina account',

@@ -41,9 +41,9 @@ export function ScreenHeader({ title, onBack, rightAction }: ScreenHeaderProps) 
     height: HEADER_PILL_HEIGHT,
     paddingHorizontal: spacing.md,
     borderRadius: 24,
-    backgroundColor: 'rgba(11, 12, 22, 0.88)',
+    backgroundColor: colors.overlay.navBar,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.surface.subtle,
     shadowColor: colors.background.overlay,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
@@ -57,7 +57,7 @@ export function ScreenHeader({ title, onBack, rightAction }: ScreenHeaderProps) 
      position: 'absolute',
      inset: 0,
      borderRadius: 24,
-     backgroundColor: 'rgba(255,255,255,0.035)',
+     backgroundColor: colors.surface.glassInset,
     }}
    />
    <View
@@ -70,7 +70,7 @@ export function ScreenHeader({ title, onBack, rightAction }: ScreenHeaderProps) 
      height: 18,
      borderBottomLeftRadius: 24,
      borderBottomRightRadius: 24,
-     backgroundColor: 'rgba(8,8,16,0.18)',
+     backgroundColor: colors.surface.glassBottom,
     }}
    />
    {/* Slot sinistra */}
@@ -86,9 +86,9 @@ export function ScreenHeader({ title, onBack, rightAction }: ScreenHeaderProps) 
       borderRadius: 16,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: 'rgba(255,255,255,0.04)',
+      backgroundColor: colors.surface.iconButton,
       borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.05)',
+      borderColor: colors.surface.iconButtonBorder,
      }}
     >
      <FontAwesome5 name="arrow-left" size={16} color={colors.text.primary} solid />
@@ -126,9 +126,9 @@ export function ScreenHeader({ title, onBack, rightAction }: ScreenHeaderProps) 
       alignItems: 'center',
       justifyContent: 'center',
       marginLeft: 'auto',
-      backgroundColor: 'rgba(255,255,255,0.04)',
+      backgroundColor: colors.surface.iconButton,
       borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.05)',
+      borderColor: colors.surface.iconButtonBorder,
      }}
     >
      <FontAwesome5 name={rightAction.icon} size={16} color={colors.text.primary} solid />

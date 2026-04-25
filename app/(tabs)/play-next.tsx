@@ -39,6 +39,7 @@ import {
  getPlayNextItems,
  shouldLoadBacklogMetadata,
 } from '@/shared/utils/backlogScreen';
+import { calculateBacklogDateFields } from '@/shared/utils/backlogDateFields';
 import { createEmptyGameDiscoveryFilters } from '@/shared/utils/gameDiscoveryFilters';
 import { getPlayNextReasonKey } from '@/shared/utils/playNextReason';
 import { useAuthStore } from '@/stores/auth.store';
@@ -222,41 +223,7 @@ export default function PlayNextScreen() {
   async (item: BacklogItemEntity, status: BacklogStatusEnum) => {
    if (item.status === status) return;
 
-   const now = new Date().toISOString();
-   const isCompleted = status === BacklogStatusEnum.COMPLETED;
-   const isAbandoned = status === BacklogStatusEnum.ABANDONED;
-   const isWishlist = status === BacklogStatusEnum.WISHLIST;
-   const isResumable =
-    status === BacklogStatusEnum.PLAYING ||
-    status === BacklogStatusEnum.ONGOING ||
-    status === BacklogStatusEnum.COMPLETED;
-   const dateFields: {
-    started_at?: string | null;
-    completed_at?: string | null;
-    abandoned_at?: string | null;
-    resumed_at?: string | null;
-   } = {};
-
-   if (isWishlist) {
-    dateFields.started_at = null;
-    dateFields.completed_at = null;
-    dateFields.abandoned_at = null;
-    dateFields.resumed_at = null;
-   } else {
-    if (isResumable && !item.started_at) dateFields.started_at = now;
-    if (isCompleted && !item.completed_at) dateFields.completed_at = now;
-    if (isAbandoned && !item.abandoned_at) dateFields.abandoned_at = now;
-    if (
-     isResumable &&
-     item.abandoned_at &&
-     (item.status === BacklogStatusEnum.ABANDONED || !item.resumed_at)
-    ) {
-     dateFields.resumed_at = now;
-    }
-    if (item.status === BacklogStatusEnum.COMPLETED && !isCompleted) {
-     dateFields.completed_at = null;
-    }
-   }
+   const dateFields = calculateBacklogDateFields(item, status);
 
    clearError();
    await update(item.id, { status, ...dateFields });
@@ -277,21 +244,7 @@ export default function PlayNextScreen() {
 
  const handleConfirmPlay = useCallback(async () => {
   if (!pendingPlayItem) return;
-
-  const now = new Date().toISOString();
-  const dateFields: {
-   started_at?: string | null;
-   resumed_at?: string | null;
-  } = {};
-  if (!pendingPlayItem.started_at) {
-   dateFields.started_at = now;
-  }
-  if (
-   pendingPlayItem.abandoned_at &&
-   (pendingPlayItem.status === BacklogStatusEnum.ABANDONED || !pendingPlayItem.resumed_at)
-  ) {
-   dateFields.resumed_at = now;
-  }
+  const dateFields = calculateBacklogDateFields(pendingPlayItem, BacklogStatusEnum.PLAYING);
 
   clearError();
   await update(pendingPlayItem.id, {

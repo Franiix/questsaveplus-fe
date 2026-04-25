@@ -77,6 +77,19 @@ export const colors = {
   red: 'rgba(248, 113, 113, 0.35)',
   blue: 'rgba(56, 189, 248, 0.35)',
  },
+ surface: {
+  card: 'rgba(16,18,30,0.9)',
+  statCard: 'rgba(18,20,36,0.72)',
+  subtle: 'rgba(255,255,255,0.08)',
+  pillButton: 'rgba(255,255,255,0.02)',
+  iconButton: 'rgba(255,255,255,0.04)',
+  iconButtonBorder: 'rgba(255,255,255,0.05)',
+  glassInset: 'rgba(255,255,255,0.035)',
+  glassBottom: 'rgba(8,8,16,0.18)',
+ },
+ overlay: {
+  navBar: 'rgba(11,12,22,0.88)',
+ },
 } as const;
 
 export const spacing = {

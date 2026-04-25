@@ -16,6 +16,7 @@ import { RetryState } from '@/components/base/feedback/RetryState';
 import { DiscoveryContextCard } from '@/components/game/DiscoveryContextCard';
 import { GameCard } from '@/components/game/GameCard';
 import { GameCardSkeleton } from '@/components/game/GameCardSkeleton';
+import { CurrentlyPlayingSection } from '@/components/game/CurrentlyPlayingSection';
 import { GameCarouselSection } from '@/components/game/GameCarouselSection';
 import { RecentlyAddedRow } from '@/components/game/RecentlyAddedRow';
 import type { CatalogGame } from '@/shared/models/Catalog.model';
@@ -310,6 +311,7 @@ export function HomeScreenContent({
    contentContainerStyle={{ paddingTop: spacing.sm, paddingBottom: 96 }}
    style={{ flex: 1 }}
   >
+   <CurrentlyPlayingSection />
    <RecentlyAddedRow />
    {homeSections.map((section) => (
     <GameCarouselSection

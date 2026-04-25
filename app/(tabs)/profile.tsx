@@ -28,7 +28,7 @@ const PILL_BUTTON_STYLE = {
  paddingVertical: spacing.xs,
  paddingHorizontal: spacing.sm,
  borderRadius: borderRadius.full,
- backgroundColor: 'rgba(255,255,255,0.02)',
+ backgroundColor: colors.surface.pillButton,
 };
 
 function ProfilePillButton({
@@ -106,18 +106,29 @@ export default function ProfileScreen() {
   void readAll(userId);
  }, [clearBacklog, deferredStatsLoadEnabled, readAll, userId]);
 
- const stats = useMemo(
-  () => ({
-   total: backlogItems.length,
+ const stats = useMemo(() => {
+  const total = backlogItems.length;
+  const completed = backlogItems.filter(
+   (item) => item.status === BacklogStatusEnum.COMPLETED,
+  ).length;
+  const ratedItems = backlogItems.filter((item) => item.personal_rating !== null);
+  return {
+   total,
    wishlist: backlogItems.filter((item) => item.status === BacklogStatusEnum.WISHLIST).length,
    wantToPlay: backlogItems.filter((item) => item.status === BacklogStatusEnum.WANT_TO_PLAY).length,
    playing: backlogItems.filter((item) => item.status === BacklogStatusEnum.PLAYING).length,
    ongoing: backlogItems.filter((item) => item.status === BacklogStatusEnum.ONGOING).length,
-   completed: backlogItems.filter((item) => item.status === BacklogStatusEnum.COMPLETED).length,
+   completed,
    abandoned: backlogItems.filter((item) => item.status === BacklogStatusEnum.ABANDONED).length,
-  }),
-  [backlogItems],
- );
+   completionRate: total > 0 ? Math.round((completed / total) * 100) : null,
+   avgRating:
+    ratedItems.length > 0
+     ? Math.round(
+        (ratedItems.reduce((s, i) => s + i.personal_rating!, 0) / ratedItems.length) * 10,
+       ) / 10
+     : null,
+  };
+ }, [backlogItems]);
 
  if (isLoading || !profile) {
   return (
@@ -183,6 +194,8 @@ export default function ProfileScreen() {
         ongoing: t('profile.stats.ongoing'),
         completed: t('profile.stats.completed'),
         abandoned: t('profile.stats.abandoned'),
+        completionRate: t('profile.stats.completionRate'),
+        avgRating: t('profile.stats.avgRating'),
         title: t('profile.stats.title'),
         subtitle: t('profile.stats.subtitle'),
        }}

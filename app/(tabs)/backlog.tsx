@@ -30,6 +30,7 @@ import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import type { GameDiscoveryFilters } from '@/shared/models/GameDiscoveryFilters.model';
 import { colors, layout, spacing, typography } from '@/shared/theme/tokens';
 import { shouldLoadBacklogMetadata } from '@/shared/utils/backlogScreen';
+import { calculateBacklogDateFields } from '@/shared/utils/backlogDateFields';
 import { formatDate } from '@/shared/utils/date';
 import { createEmptyGameDiscoveryFilters } from '@/shared/utils/gameDiscoveryFilters';
 import { useAuthStore } from '@/stores/auth.store';
@@ -296,41 +297,13 @@ export default function BacklogScreen() {
   ) => {
    clearError();
 
-   const now = new Date().toISOString();
-   const isWishlist = status === BacklogStatusEnum.WISHLIST;
-   const dateFields: {
-    started_at?: string | null;
-    completed_at?: string | null;
-    abandoned_at?: string | null;
-    resumed_at?: string | null;
-   } = {};
-   const isCompleted = status === BacklogStatusEnum.COMPLETED;
-   const isAbandoned = status === BacklogStatusEnum.ABANDONED;
-   const isResumable =
-    status === BacklogStatusEnum.PLAYING ||
-    status === BacklogStatusEnum.ONGOING ||
-    status === BacklogStatusEnum.COMPLETED;
-   const hasAbandonedHistory = Boolean(item.abandoned_at);
-
-   if (isWishlist) {
-    dateFields.started_at = null;
-    dateFields.completed_at = null;
-    dateFields.abandoned_at = null;
-    dateFields.resumed_at = null;
-   } else {
-    if (isResumable && !item.started_at) dateFields.started_at = overrideStartedAt ?? now;
-    if (isCompleted && !item.completed_at) dateFields.completed_at = overrideCompletedAt ?? now;
-    if (isAbandoned && !hasAbandonedHistory) dateFields.abandoned_at = overrideAbandonedAt ?? now;
-    if (
-     isResumable &&
-     hasAbandonedHistory &&
-     (item.status === BacklogStatusEnum.ABANDONED || !item.resumed_at)
-    ) {
-     dateFields.resumed_at = overrideResumedAt ?? now;
-    }
-    if (item.status === BacklogStatusEnum.COMPLETED && !isCompleted) dateFields.completed_at = null;
-    if (resetAbandonedAt) dateFields.abandoned_at = null;
-   }
+   const dateFields = calculateBacklogDateFields(item, status, {
+    startedAt: overrideStartedAt,
+    completedAt: overrideCompletedAt,
+    abandonedAt: overrideAbandonedAt,
+    resumedAt: overrideResumedAt,
+    resetAbandonedAt,
+   });
 
    const ACTIVE_STATUSES = new Set([
     BacklogStatusEnum.PLAYING,
@@ -348,7 +321,7 @@ export default function BacklogScreen() {
 
    if (!updateError) {
     showToast(t('gameDetail.updateSuccess'), 'success');
-    void (isCompleted && !item.completed_at
+    void (status === BacklogStatusEnum.COMPLETED && !item.completed_at
      ? Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
      : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light));
    } else {
