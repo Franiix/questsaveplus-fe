@@ -85,6 +85,14 @@ export default function BacklogScreen() {
   status: BacklogStatusEnum;
   trigger: number;
  } | null>(null);
+ const [playNextCelebration, setPlayNextCelebration] = useState<{
+  mode: 'pin' | 'unpin';
+  trigger: number;
+ } | null>(null);
+ const [archiveCelebration, setArchiveCelebration] = useState<{
+  mode: 'archive' | 'restore';
+  trigger: number;
+ } | null>(null);
  const [appliedFilters, setAppliedFilters] = useState<GameDiscoveryFilters>(
   createEmptyGameDiscoveryFilters,
  );
@@ -249,6 +257,12 @@ export default function BacklogScreen() {
    const updateError = useBacklogStore.getState().error;
 
    if (!updateError) {
+    InteractionManager.runAfterInteractions(() => {
+     setPlayNextCelebration((current) => ({
+      mode: shouldPin ? 'pin' : 'unpin',
+      trigger: current ? current.trigger + 1 : 1,
+     }));
+    });
     showToast(
      shouldPin ? t('backlog.playNext.pinSuccess') : t('backlog.playNext.unpinSuccess'),
      'success',
@@ -273,8 +287,14 @@ export default function BacklogScreen() {
    const updateError = useBacklogStore.getState().error;
 
    if (!updateError) {
-    showToast(t('backlog.archive.restoreSuccess'), 'success');
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    InteractionManager.runAfterInteractions(() => {
+     setArchiveCelebration((current) => ({
+      mode: 'restore',
+      trigger: current ? current.trigger + 1 : 1,
+     }));
+   });
+   showToast(t('backlog.archive.restoreSuccess'), 'success');
+   void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
    } else {
     showToast(updateError, 'error');
    }
@@ -284,9 +304,11 @@ export default function BacklogScreen() {
 
  const handleConfirmArchive = useCallback(async () => {
   if (!pendingArchiveItem) return;
+  const archivedItem = pendingArchiveItem;
+  setPendingArchiveItem(null);
 
   clearError();
-  await update(pendingArchiveItem.id, {
+  await update(archivedItem.id, {
    is_archived: true,
    is_play_next: false,
    play_next_priority: null,
@@ -294,13 +316,17 @@ export default function BacklogScreen() {
   const updateError = useBacklogStore.getState().error;
 
   if (!updateError) {
+   InteractionManager.runAfterInteractions(() => {
+    setArchiveCelebration((current) => ({
+     mode: 'archive',
+     trigger: current ? current.trigger + 1 : 1,
+    }));
+   });
    showToast(t('backlog.archive.archiveSuccess'), 'success');
    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   } else {
    showToast(updateError, 'error');
   }
-
-  setPendingArchiveItem(null);
  }, [clearError, pendingArchiveItem, showToast, t, update]);
 
  const doQuickStatusUpdate = useCallback(
@@ -642,7 +668,7 @@ export default function BacklogScreen() {
     isUpdatingArchive={isMutating && activeMutation === 'update'}
     removeLabel={t('gameDetail.confirmRemove.confirm')}
     retryLabel={t('home.errorRetry')}
-    emptyActionLabel={t('backlog.emptyAll.action')}
+   emptyActionLabel={t('backlog.emptyAll.action')}
    />
 
    <BacklogStatusCelebrationOverlay
@@ -650,6 +676,10 @@ export default function BacklogScreen() {
     iconMap={iconMap}
     status={statusCelebration?.status ?? null}
     trigger={statusCelebration?.trigger ?? 0}
+    playNextTrigger={playNextCelebration?.trigger ?? 0}
+    playNextMode={playNextCelebration?.mode ?? null}
+    archiveTrigger={archiveCelebration?.trigger ?? 0}
+    archiveMode={archiveCelebration?.mode ?? null}
    />
 
    <GameFilterSheet

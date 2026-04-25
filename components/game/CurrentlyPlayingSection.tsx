@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, Text, View } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { ImageWithFallback } from '@/components/base/display/ImageWithFallback';
 import { SectionTitle } from '@/components/base/layout/SectionTitle';
 import { useSafeRouter } from '@/hooks/useSafeRouter';
@@ -17,15 +18,16 @@ const CARD_HEIGHT = 160;
 export function CurrentlyPlayingSection() {
  const { t } = useTranslation();
  const { session } = useAuthStore();
+ const isFocused = useIsFocused();
  const backlogItems = useBacklogStore((state) => state.backlogItems);
  const isReadingList = useBacklogStore((state) => state.isReadingList);
  const readAll = useBacklogStore((state) => state.readAll);
  const userId = session?.user?.id;
 
  useEffect(() => {
-  if (!userId || backlogItems.length > 0 || isReadingList) return;
+  if (!isFocused || !userId || backlogItems.length > 0 || isReadingList) return;
   void readAll(userId);
- }, [userId, backlogItems.length, isReadingList, readAll]);
+ }, [isFocused, userId, backlogItems.length, isReadingList, readAll]);
 
  const currentlyPlaying = backlogItems.filter(
   (item) =>

@@ -121,7 +121,7 @@ export const BacklogScreenContent = memo(function BacklogScreenContent({
   ],
  );
 
- if (state.isReadingList) {
+ if (state.isReadingList && state.totalItems === 0) {
   return <LoadingSpinner fullScreen />;
  }
 

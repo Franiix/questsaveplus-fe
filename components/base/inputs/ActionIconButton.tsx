@@ -11,6 +11,7 @@ type Props = {
  iconName: React.ComponentProps<typeof FontAwesome5>['name'];
  isActive?: boolean;
  isDisabled?: boolean;
+ showCloseBadge?: boolean;
  onPress: (
   event: Parameters<NonNullable<React.ComponentProps<typeof Pressable>['onPress']>>[0],
  ) => void;
@@ -22,6 +23,7 @@ export function ActionIconButton({
  iconName,
  isActive = false,
  isDisabled = false,
+ showCloseBadge = false,
  onPress,
 }: Props) {
  const iconWrapperStyle = iconName === 'play' ? { marginLeft: 2, marginTop: 1 } : undefined;
@@ -57,6 +59,25 @@ export function ActionIconButton({
       color={isActive ? color : colors.text.secondary}
       solid={isActive}
      />
+     {showCloseBadge ? (
+      <View
+       style={{
+        position: 'absolute',
+        right: -7,
+        top: -7,
+        width: 12,
+        height: 12,
+        borderRadius: borderRadius.full,
+        backgroundColor: colors.background.primary,
+        borderWidth: 1,
+        borderColor: `${color}88`,
+        alignItems: 'center',
+        justifyContent: 'center',
+       }}
+      >
+       <FontAwesome5 name="times" size={7} color={color} solid />
+      </View>
+     ) : null}
     </View>
    </Pressable>
   </View>

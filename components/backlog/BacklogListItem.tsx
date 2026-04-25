@@ -107,20 +107,22 @@ export const BacklogListItem = memo(function BacklogListItem({
  const { secondaryActions } = getBacklogQuickStatusGroups(item.status, quickPrimaryCount);
  const isSwipeEnabled = quickActionsMode !== 'play-only';
 
- const showLeadingControl =
+const showLeadingControl =
   (quickActionsMode === 'play-only' && typeof effectiveOrdinal === 'number') ||
   (quickActionsMode === 'default' && isPlayNext && typeof effectiveOrdinal === 'number');
 
  const showTrailingPinButton = quickActionsMode === 'hidden' && canTogglePlayNext;
  const canToggleArchive = Boolean(onToggleArchive);
+ const playNextToggleIconName = 'thumbtack' as React.ComponentProps<typeof FontAwesome5>['name'];
 
  const pinAuxiliaryAction = showPinInQuickActions
   ? {
      accessibilityLabel: isPlayNext ? playNextUnpinLabel : playNextPinLabel,
      color: colors.primary['200'],
-     iconName: 'thumbtack' as React.ComponentProps<typeof FontAwesome5>['name'],
+     iconName: playNextToggleIconName,
      isActive: isPlayNext,
      isDisabled: isUpdatingPlayNext,
+     showCloseBadge: isPlayNext,
      onPress: () => onTogglePlayNext?.(item),
     }
   : undefined;
@@ -131,9 +133,10 @@ export const BacklogListItem = memo(function BacklogListItem({
       {
        accessibilityLabel: playNextUnpinLabel,
        color: colors.primary['200'],
-       iconName: 'thumbtack' as React.ComponentProps<typeof FontAwesome5>['name'],
+       iconName: playNextToggleIconName,
        isActive: true,
        isDisabled: isUpdatingPlayNext,
+       showCloseBadge: true,
        onPress: () => onTogglePlayNext?.(item),
       },
       {
@@ -495,9 +498,10 @@ export const BacklogListItem = memo(function BacklogListItem({
          <ActionIconButton
           accessibilityLabel={isPlayNext ? playNextUnpinLabel : playNextPinLabel}
           color={colors.primary['200']}
-          iconName="thumbtack"
+          iconName={playNextToggleIconName}
           isActive={isPlayNext}
           isDisabled={isUpdatingPlayNext}
+          showCloseBadge={isPlayNext}
           onPress={(event) => {
            event.stopPropagation();
            onTogglePlayNext?.(item);

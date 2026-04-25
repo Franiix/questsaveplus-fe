@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Text, View } from 'react-native';
+import { FlatList, InteractionManager, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { BacklogStatusCelebrationOverlay } from '@/components/backlog/BacklogStatusCelebrationOverlay';
 import { BacklogListItem } from '@/components/backlog/BacklogListItem';
 import { GradientUnderline } from '@/components/base/display/GradientUnderline';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
@@ -49,7 +50,7 @@ export default function BacklogArchiveScreen() {
  const showToast = useToastStore((state) => state.showToast);
  const session = useAuthStore((state) => state.session);
  const archivedBacklogItems = useBacklogStore((state) => state.archivedBacklogItems);
- const isReadingList = useBacklogStore((state) => state.isReadingList);
+ const isReadingArchiveList = useBacklogStore((state) => state.isReadingArchiveList);
  const isMutating = useBacklogStore((state) => state.isMutating);
  const activeMutation = useBacklogStore((state) => state.activeMutation);
  const error = useBacklogStore((state) => state.error);
@@ -60,6 +61,10 @@ export default function BacklogArchiveScreen() {
  const clearBacklog = useBacklogStore((state) => state.clearBacklog);
  const [pendingDeleteItem, setPendingDeleteItem] = useState<BacklogItemEntity | null>(null);
  const [pendingRestoreItem, setPendingRestoreItem] = useState<BacklogItemEntity | null>(null);
+ const [archiveCelebration, setArchiveCelebration] = useState<{
+  mode: 'restore';
+  trigger: number;
+ } | null>(null);
  const [activeFilter, setActiveFilter] = useState<BacklogItemEntity['status'] | null>(null);
  const [search, setSearch] = useState('');
  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
@@ -150,6 +155,12 @@ export default function BacklogArchiveScreen() {
    const updateError = useBacklogStore.getState().error;
 
    if (!updateError) {
+    InteractionManager.runAfterInteractions(() => {
+     setArchiveCelebration((current) => ({
+      mode: 'restore',
+      trigger: current ? current.trigger + 1 : 1,
+     }));
+    });
     showToast(t('backlog.archive.restoreSuccess'), 'success');
    } else {
     showToast(updateError, 'error');
@@ -160,8 +171,9 @@ export default function BacklogArchiveScreen() {
 
  const handleConfirmRestore = useCallback(async () => {
   if (!pendingRestoreItem) return;
-  await handleRestore(pendingRestoreItem);
+  const restoreItem = pendingRestoreItem;
   setPendingRestoreItem(null);
+  await handleRestore(restoreItem);
  }, [handleRestore, pendingRestoreItem]);
 
  const handleConfirmRemove = useCallback(async () => {
@@ -215,7 +227,7 @@ export default function BacklogArchiveScreen() {
   setAppliedFilters(nextFilters);
  }
 
- if (isReadingList) {
+ if (isReadingArchiveList) {
   return (
    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
     <AppBackground />
@@ -410,6 +422,15 @@ export default function BacklogArchiveScreen() {
     cancelLabel={t('common.cancel')}
     onConfirm={() => void handleConfirmRestore()}
     onCancel={() => setPendingRestoreItem(null)}
+   />
+
+   <BacklogStatusCelebrationOverlay
+    colorMap={colorMap}
+    iconMap={iconMap}
+    status={null}
+    trigger={0}
+    archiveTrigger={archiveCelebration?.trigger ?? 0}
+    archiveMode={archiveCelebration?.mode ?? null}
    />
   </SafeAreaView>
  );

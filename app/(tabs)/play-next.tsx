@@ -3,12 +3,13 @@ import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { InteractionManager, Pressable, StyleSheet, Text, View } from 'react-native';
 import DraggableFlatList, {
  type RenderItemParams,
  ScaleDecorator,
 } from 'react-native-draggable-flatlist';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { BacklogStatusCelebrationOverlay } from '@/components/backlog/BacklogStatusCelebrationOverlay';
 import { BacklogListItem } from '@/components/backlog/BacklogListItem';
 import { GradientUnderline } from '@/components/base/display/GradientUnderline';
 import { ConfirmModal } from '@/components/base/feedback/ConfirmModal';
@@ -111,6 +112,10 @@ export default function PlayNextScreen() {
  const [isReordering, setIsReordering] = useState(false);
  const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
  const [pendingPlayItem, setPendingPlayItem] = useState<BacklogItemEntity | null>(null);
+ const [statusCelebration, setStatusCelebration] = useState<{
+  status: BacklogStatusEnum;
+  trigger: number;
+ } | null>(null);
  const { sortOrder: playNextSortOrder, setSortOrder: setPlayNextSortOrder } =
   useBacklogSortPreference('play_next_sort_order', BacklogSortEnum.PRIORITY);
  const userId = session?.user?.id;
@@ -244,10 +249,12 @@ export default function PlayNextScreen() {
 
  const handleConfirmPlay = useCallback(async () => {
   if (!pendingPlayItem) return;
-  const dateFields = calculateBacklogDateFields(pendingPlayItem, BacklogStatusEnum.PLAYING);
+  const playItem = pendingPlayItem;
+  const dateFields = calculateBacklogDateFields(playItem, BacklogStatusEnum.PLAYING);
+  setPendingPlayItem(null);
 
   clearError();
-  await update(pendingPlayItem.id, {
+  await update(playItem.id, {
    status: BacklogStatusEnum.PLAYING,
    is_play_next: false,
    play_next_priority: null,
@@ -256,13 +263,17 @@ export default function PlayNextScreen() {
   const updateError = useBacklogStore.getState().error;
 
   if (!updateError) {
+   InteractionManager.runAfterInteractions(() => {
+    setStatusCelebration((current) => ({
+     status: BacklogStatusEnum.PLAYING,
+     trigger: current ? current.trigger + 1 : 1,
+    }));
+   });
    showToast(t('playNext.playSuccess'), 'success');
    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   } else {
    showToast(updateError, 'error');
   }
-
-  setPendingPlayItem(null);
  }, [clearError, pendingPlayItem, showToast, t, update]);
 
  const handleTogglePlayNext = useCallback(
@@ -636,6 +647,13 @@ export default function PlayNextScreen() {
     onConfirm={() => void handleConfirmPlay()}
     onCancel={() => setPendingPlayItem(null)}
    />
-  </SafeAreaView>
- );
+
+   <BacklogStatusCelebrationOverlay
+    colorMap={colorMap}
+    iconMap={iconMap}
+    status={statusCelebration?.status ?? null}
+    trigger={statusCelebration?.trigger ?? 0}
+   />
+ </SafeAreaView>
+);
 }

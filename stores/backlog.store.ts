@@ -23,6 +23,7 @@ interface BacklogState {
  isFetching: boolean;
  isReadingCurrent: boolean;
  isReadingList: boolean;
+ isReadingArchiveList: boolean;
  isReadingRecent: boolean;
  isMutating: boolean;
  activeMutation: BacklogMutationKind;
@@ -50,6 +51,7 @@ export const useBacklogStore = create<BacklogState>(
   isFetching: false,
   isReadingCurrent: false,
   isReadingList: false,
+  isReadingArchiveList: false,
   isReadingRecent: false,
   isMutating: false,
   activeMutation: null,
@@ -67,7 +69,7 @@ export const useBacklogStore = create<BacklogState>(
 
    if (error) {
     set((state) => ({
-     isFetching: state.isReadingList || state.isReadingRecent,
+     isFetching: state.isReadingList || state.isReadingRecent || state.isReadingArchiveList,
      isReadingCurrent: false,
      error: error.message,
     }));
@@ -77,7 +79,7 @@ export const useBacklogStore = create<BacklogState>(
    const backlog = data ? toBacklogItemModel(data) : null;
    set((state) => ({
     backlog,
-    isFetching: state.isReadingList || state.isReadingRecent,
+    isFetching: state.isReadingList || state.isReadingRecent || state.isReadingArchiveList,
     isReadingCurrent: false,
    }));
    return backlog;
@@ -86,9 +88,12 @@ export const useBacklogStore = create<BacklogState>(
   readAll: async (userId, options) => {
    const target = options?.target ?? 'backlogItems';
    const isRecentTarget = target === 'recentBacklogItems';
+   const isArchiveTarget = target === 'archivedBacklogItems';
    const readFlag = isRecentTarget
     ? ({ isReadingRecent: true } as const)
-    : ({ isReadingList: true } as const);
+    : isArchiveTarget
+     ? ({ isReadingArchiveList: true } as const)
+     : ({ isReadingList: true } as const);
 
    set({ isFetching: true, error: null, ...readFlag });
 
@@ -126,9 +131,12 @@ export const useBacklogStore = create<BacklogState>(
    if (error) {
     set((state) => ({
      isFetching: isRecentTarget
-      ? state.isReadingCurrent || state.isReadingList
-      : state.isReadingCurrent || state.isReadingRecent,
-     isReadingList: isRecentTarget ? state.isReadingList : false,
+      ? state.isReadingCurrent || state.isReadingList || state.isReadingArchiveList
+      : isArchiveTarget
+       ? state.isReadingCurrent || state.isReadingList || state.isReadingRecent
+       : state.isReadingCurrent || state.isReadingRecent || state.isReadingArchiveList,
+     isReadingList: isRecentTarget || isArchiveTarget ? state.isReadingList : false,
+     isReadingArchiveList: isArchiveTarget ? false : state.isReadingArchiveList,
      isReadingRecent: isRecentTarget ? false : state.isReadingRecent,
      error: error.message,
     }));
@@ -139,9 +147,12 @@ export const useBacklogStore = create<BacklogState>(
    set((state) => ({
     [target]: items,
     isFetching: isRecentTarget
-     ? state.isReadingCurrent || state.isReadingList
-     : state.isReadingCurrent || state.isReadingRecent,
-    isReadingList: isRecentTarget ? state.isReadingList : false,
+     ? state.isReadingCurrent || state.isReadingList || state.isReadingArchiveList
+     : isArchiveTarget
+      ? state.isReadingCurrent || state.isReadingList || state.isReadingRecent
+      : state.isReadingCurrent || state.isReadingRecent || state.isReadingArchiveList,
+    isReadingList: isRecentTarget || isArchiveTarget ? state.isReadingList : false,
+    isReadingArchiveList: isArchiveTarget ? false : state.isReadingArchiveList,
     isReadingRecent: isRecentTarget ? false : state.isReadingRecent,
    }));
    return items;
@@ -240,8 +251,9 @@ export const useBacklogStore = create<BacklogState>(
     backlog: null,
     archivedBacklogItems: state.archivedBacklogItems,
     error: null,
-    isFetching: state.isReadingList || state.isReadingRecent,
+    isFetching: state.isReadingList || state.isReadingRecent || state.isReadingArchiveList,
     isReadingCurrent: false,
+    isReadingArchiveList: state.isReadingArchiveList,
     isMutating: false,
     activeMutation: null,
    })),
@@ -256,6 +268,7 @@ export const useBacklogStore = create<BacklogState>(
     isFetching: false,
     isReadingCurrent: false,
     isReadingList: false,
+    isReadingArchiveList: false,
     isReadingRecent: false,
     isMutating: false,
     activeMutation: null,

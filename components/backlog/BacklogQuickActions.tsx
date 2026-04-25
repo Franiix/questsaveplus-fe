@@ -14,6 +14,7 @@ type AuxiliaryAction = {
  iconName: React.ComponentProps<typeof FontAwesome5>['name'];
  isActive?: boolean;
  isDisabled?: boolean;
+ showCloseBadge?: boolean;
  rank?: number;
  onPress: () => void;
 };
@@ -37,6 +38,7 @@ type QuickActionButtonProps = {
  index: number;
  isActive?: boolean;
  isDisabled?: boolean;
+ showCloseBadge?: boolean;
  rank?: number;
  onPress: () => void;
 };
@@ -52,6 +54,7 @@ const QuickActionButton = memo(function QuickActionButton({
  index,
  isActive = false,
  isDisabled = false,
+ showCloseBadge = false,
  rank,
  onPress,
 }: QuickActionButtonProps) {
@@ -81,7 +84,28 @@ const QuickActionButton = memo(function QuickActionButton({
      accessibilityRole="button"
      accessibilityLabel={accessibilityLabel}
     >
-     <FontAwesome5 name={iconName} size={isActive ? 14 : 13} color={color} solid={isActive} />
+     <View>
+      <FontAwesome5 name={iconName} size={isActive ? 14 : 13} color={color} solid={isActive} />
+      {showCloseBadge ? (
+       <View
+        style={{
+         position: 'absolute',
+         right: -7,
+         top: -7,
+         width: 12,
+         height: 12,
+         borderRadius: borderRadius.full,
+         backgroundColor: colors.background.primary,
+         borderWidth: 1,
+         borderColor: `${color}88`,
+         alignItems: 'center',
+         justifyContent: 'center',
+        }}
+       >
+        <FontAwesome5 name="times" size={7} color={color} solid />
+       </View>
+      ) : null}
+     </View>
     </AnimatedPressable>
     {typeof rank === 'number' ? (
      <Text
@@ -160,12 +184,13 @@ export const BacklogQuickActions = memo(function BacklogQuickActions({
      <QuickActionButton
       accessibilityLabel={auxiliaryAction.accessibilityLabel}
       color={auxiliaryAction.color}
-      iconName={auxiliaryAction.iconName}
-      index={0}
-      isActive={auxiliaryAction.isActive}
-      isDisabled={auxiliaryAction.isDisabled}
-      rank={auxiliaryAction.rank}
-      onPress={auxiliaryAction.onPress}
+     iconName={auxiliaryAction.iconName}
+     index={0}
+     isActive={auxiliaryAction.isActive}
+     isDisabled={auxiliaryAction.isDisabled}
+      showCloseBadge={auxiliaryAction.showCloseBadge}
+     rank={auxiliaryAction.rank}
+     onPress={auxiliaryAction.onPress}
      />
     ) : null}
     {resolvedActions.map((quickActionProps, index) => {
@@ -178,6 +203,7 @@ export const BacklogQuickActions = memo(function BacklogQuickActions({
        index={index + (auxiliaryAction ? 1 : 0)}
        isActive={quickActionProps.isActive}
        isDisabled={quickActionProps.isDisabled ?? isDisabled}
+       showCloseBadge={quickActionProps.showCloseBadge}
        rank={quickActionProps.rank}
        onPress={quickActionProps.onPress}
       />

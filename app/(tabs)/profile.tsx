@@ -1,4 +1,5 @@
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useIsFocused } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -73,6 +74,7 @@ export default function ProfileScreen() {
  const authError = useAuthStore((state) => state.error);
  const isAuthMutating = useAuthStore((state) => state.isLoading);
  const session = useAuthStore((state) => state.session);
+ const isFocused = useIsFocused();
  const profile = useProfileStore((state) => state.profile);
  const isLoading = useProfileStore((state) => state.isLoading);
  const backlogItems = useBacklogStore((state) => state.backlogItems);
@@ -80,7 +82,7 @@ export default function ProfileScreen() {
  const clearBacklog = useBacklogStore((state) => state.clearBacklog);
 
  const userId = session?.user?.id;
- const shouldHydrateProfileStats = Boolean(userId) && backlogItems.length === 0;
+ const shouldHydrateProfileStats = Boolean(userId) && isFocused && backlogItems.length === 0;
  const deferredStatsLoadEnabled = useDeferredInteractionGate({
   enabled: shouldHydrateProfileStats,
   delayMs: 450,
