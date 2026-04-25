@@ -173,7 +173,7 @@
   },
  },
  profile: {
-  detailButton: 'Dettaglio utente',
+  detailButton: 'Il mio profilo',
   editButton: 'Modifica profilo',
   changeEmailButton: 'Cambia email',
   changePasswordButton: 'Cambia password',

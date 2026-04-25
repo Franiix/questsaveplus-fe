@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, Text, View } from 'react-native';
 import { ImageWithFallback } from '@/components/base/display/ImageWithFallback';
@@ -8,6 +8,7 @@ import { useSingleAction } from '@/hooks/useSingleAction';
 import type { BacklogItemEntity } from '@/shared/entities/BacklogItem.entity';
 import { BacklogStatusEnum } from '@/shared/enums/BacklogStatus.enum';
 import { borderRadius, colors, spacing, typography } from '@/shared/theme/tokens';
+import { useAuthStore } from '@/stores/auth.store';
 import { useBacklogStore } from '@/stores/backlog.store';
 
 const CARD_WIDTH = 110;
@@ -15,7 +16,16 @@ const CARD_HEIGHT = 160;
 
 export function CurrentlyPlayingSection() {
  const { t } = useTranslation();
+ const { session } = useAuthStore();
  const backlogItems = useBacklogStore((state) => state.backlogItems);
+ const isReadingList = useBacklogStore((state) => state.isReadingList);
+ const readAll = useBacklogStore((state) => state.readAll);
+ const userId = session?.user?.id;
+
+ useEffect(() => {
+  if (!userId || backlogItems.length > 0 || isReadingList) return;
+  void readAll(userId);
+ }, [userId, backlogItems.length, isReadingList, readAll]);
 
  const currentlyPlaying = backlogItems.filter(
   (item) =>

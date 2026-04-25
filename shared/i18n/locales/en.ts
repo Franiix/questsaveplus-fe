@@ -174,7 +174,7 @@
   },
  },
  profile: {
-  detailButton: 'User details',
+  detailButton: 'My profile',
   editButton: 'Edit profile',
   changeEmailButton: 'Change email',
   changePasswordButton: 'Change password',
